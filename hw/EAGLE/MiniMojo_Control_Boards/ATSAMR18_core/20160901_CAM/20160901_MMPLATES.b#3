@@ -203,8 +203,8 @@
 <text x="31.5722" y="17.5768" size="1.27" layer="210" font="fixed" ratio="3" align="center">MINI
 MOJO</text>
 <text x="34.2138" y="4.2164" size="0.762" layer="210" font="fixed" ratio="3" align="center">CSL 2016</text>
-<text x="14.859" y="6.9088" size="0.762" layer="210" font="fixed" ratio="3" align="center">CSL 2016</text>
-<text x="13.5128" y="8.5852" size="0.762" layer="210" font="fixed" ratio="3" align="center">MINI
+<text x="14.859" y="6.8072" size="0.762" layer="210" font="fixed" ratio="3" rot="SR180" align="center">CSL 2016</text>
+<text x="13.716" y="8.3566" size="0.762" layer="210" font="fixed" ratio="3" rot="SR180" align="center">MINI
 MOJO</text>
 </plain>
 <libraries>

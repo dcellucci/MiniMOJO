@@ -6,9 +6,9 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.003125" altunitdist="mic" altunit="mm"/>
+<grid distance="1" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="0.003125" altunitdist="mic" altunit="mm"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="1" name="Top" color="4" fill="1" visible="no" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
 <layer number="3" name="Route3" color="4" fill="3" visible="no" active="no"/>
 <layer number="14" name="Route14" color="1" fill="6" visible="no" active="no"/>
@@ -19,9 +19,9 @@
 <layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
 <layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="yes"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="yes"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="yes"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="25" name="tNames" color="7" fill="1" visible="no" active="yes"/>
 <layer number="26" name="bNames" color="7" fill="1" visible="no" active="yes"/>
 <layer number="27" name="tValues" color="7" fill="1" visible="no" active="yes"/>
@@ -1453,8 +1453,8 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <element name="D5" library="SparkFun-LED" package="LED-0603" value="BLUE" x="39.2684" y="28.1178" rot="R180">
 <attribute name="PROD_ID" value="DIO-08575" x="42.1894" y="27.3558" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="Q1" library="SparkFun-DiscreteSemi" package="SOT323" value="MOSFET-NCHANNEL2N7002PW" x="38.8366" y="27.4828" rot="MR90">
-<attribute name="PROD_ID" value="TRANS-11151" x="38.8366" y="27.4828" size="1.778" layer="28" rot="MR90" display="off"/>
+<element name="Q1" library="SparkFun-DiscreteSemi" package="SOT323" value="MOSFET-NCHANNEL2N7002PW" x="39.116" y="27.5082" rot="MR90">
+<attribute name="PROD_ID" value="TRANS-11151" x="39.116" y="27.5082" size="1.778" layer="28" rot="MR90" display="off"/>
 </element>
 <element name="U8" library="TPS61089RNRR_4.8V" package="RNR0011A" value="Value" x="14.444909375" y="17.8308" rot="R180">
 <attribute name="MANUFACTURER_PART_NUMBER" value="TPS61089RNRR" x="14.444909375" y="17.8308" size="1.778" layer="27" rot="R180" display="off"/>
@@ -2205,8 +2205,8 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="43.1546" y1="15.2908" x2="38.3032" y2="20.1422" width="0.1524" layer="16" curve="90"/>
 <wire x1="39.1922" y1="10.4394" x2="39.1922" y2="8.9916" width="0.1524" layer="16"/>
 <wire x1="38.3032" y1="20.1422" x2="37.1348" y2="20.1422" width="0.1524" layer="16"/>
-<wire x1="37.9116" y1="26.8328" x2="37.1348" y2="26.8328" width="0.1524" layer="16"/>
-<wire x1="37.1348" y1="26.8328" x2="37.1348" y2="20.1422" width="0.1524" layer="16"/>
+<wire x1="38.191" y1="26.8582" x2="37.1348" y2="26.8582" width="0.1524" layer="16"/>
+<wire x1="37.1348" y1="26.8582" x2="37.1348" y2="20.1422" width="0.1524" layer="16"/>
 <polygon width="0.1524" layer="16">
 <vertex x="38.7858" y="11.5316"/>
 <vertex x="38.7858" y="9.1948"/>
@@ -2230,8 +2230,8 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <contactref element="Q1" pad="3"/>
 <wire x1="39.2684" y1="27.2408" x2="39.2684" y2="28.0162" width="0.508" layer="1"/>
 <via x="39.2684" y="28.0162" extent="1-16" drill="0.254" shape="octagon"/>
-<wire x1="39.2684" y1="28.0162" x2="39.7616" y2="28.0162" width="0.508" layer="16"/>
-<wire x1="39.7616" y1="28.0162" x2="39.7616" y2="27.4828" width="0.508" layer="16"/>
+<wire x1="39.2684" y1="28.0162" x2="40.041" y2="28.0162" width="0.508" layer="16"/>
+<wire x1="40.041" y1="28.0162" x2="40.041" y2="27.5082" width="0.508" layer="16"/>
 </signal>
 <signal name="N$3">
 <contactref element="U8" pad="8"/>
