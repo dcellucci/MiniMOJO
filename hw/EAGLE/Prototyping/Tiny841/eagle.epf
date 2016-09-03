@@ -379,12 +379,5 @@ UsedLibrary="/Users/dcellucci/Box Sync/KCS_NSTRF/Libs/fab/01_FAB_Hello.lbr"
 UsedLibrary="/Users/dcellucci/github/MiniMOJO/hw/EAGLE/MiniMojo_Control_Boards/TPS61089RNRR_4.8V/TPS61089RNRR_4.8V.lbr"
 UsedLibrary="/Users/dcellucci/github/MiniMOJO/hw/EAGLE/MiniMojo_Control_Boards/TPS61089RNRR_4.8V/TPS61089RNRR_4.8V_NEWIND.lbr"
 
-[Win_1]
-Type="Control Panel"
-Loc="180 163 779 562"
-State=2
-Number=0
-
 [Desktop]
 Screen="1920 1200"
-Window="Win_1"
