@@ -20,7 +20,7 @@ ATSAMR21 flashing should work with any SAM flash programming utility- including 
 
 ### ATtiny841 Flashing
 The ATtiny does not need a bootloader since it won't be communicating over USART, but it does need its fuses rewritten to accomodate the 16 MHz clock. The SPI interface for a part is broken out on the back of the board, and can be accessed by soldering a 6-pin, 0.5 mm pitch connector onto it. The pinout is as follows:
-<img src="../media/Tiny841Pinout.png" alt="Tiny841 Pinout" style="width:50%;margin-left:25%;margin-right:25%;"/>
+<img src="../media/Tiny841Pinout.png" alt="Tiny841 Pinout" | width=100/>
 
 The [ATtinyCore](https://github.com/SpenceKonde/ATTinyCore) provides the necessary hooks to the Arduino IDE. The settings we want are shown below:
 <img src="./media/tiny841_burn.png" alt="ATtinyCore settings" style="width:50%;margin-left:25%;margin-right:25%;"/>
