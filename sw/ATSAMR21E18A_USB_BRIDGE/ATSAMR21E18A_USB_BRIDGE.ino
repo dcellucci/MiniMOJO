@@ -32,8 +32,9 @@ uint8_t *rec_message;
 static NWK_DataReq_t nwkDataReq;
 //Payload array (10 byte limit right now)
 static uint8_t payload[9];
+static uint8_t indata[5];
 
-static uint8_t servo_locs[5] = {0,0,0,0,0};
+static uint8_t servovals[5] = {74,182,185,174,182};
 
 //Command input (from Serial)
 String command = "";
@@ -88,9 +89,7 @@ void loop() {
 
   //Reads a command from Serial if available
   if(Serial.available() > 0){
-    command = Serial.readStringUntil('\n');
-    //parses the command, figures out what to do with it
-    parseCommand(command);
+    parseCommand();
   }
 
   //Toggle LED stuff. More debug.
@@ -114,6 +113,62 @@ static void appDataConf(NWK_DataReq_t *req){
     Serial.println("Packet failed to send");
 }
 
+void parseCommand(){
+  memset(indata,0,sizeof(indata));
+  memset(payload,0,sizeof(payload));
+  int curcount = 0;
+  char comm[2];
+  Serial.readBytesUntil(' ', comm, 2);
+  while(Serial.available()){ 
+    indata[curcount] = (uint8_t)Serial.parseInt();
+    curcount++;
+  }
+  switch(comm[0]){
+    case 's':
+      payload[0]='s';
+      sendMessage(1);
+      break;
+    case 'w':
+      switch(comm[1]){
+        case 't':
+          if(indata[0] > 0)
+            servovals[0] = indata[0];
+          if(indata[1] > 0)
+            servovals[1] = indata[1];
+          break;
+        case 'h':        
+          if(indata[0] > 0)      
+            servovals[2] = indata[0];
+          break;
+        case 'b': 
+          if(indata[0] > 0)     
+            servovals[3] = indata[0];
+          if(indata[1] > 0)
+            servovals[4] = indata[1];
+          break;
+      }
+      writeServoVals();
+      break;
+  }
+  Serial.print("Command Received: ");
+  Serial.println(comm);
+  for(int i = 0; i < 5; i++){
+    Serial.print(i);
+    Serial.print(": ");
+    Serial.println(indata[i]);
+  }
+}
+
+void writeServoVals(){
+  memset(payload,0,sizeof(payload));
+  for(int i = 0; i < 5; i++){
+    payload[i] = servovals[i];
+    Serial.println(servovals[i]);
+  }
+  Serial.println((char*)payload);
+  sendMessage(2);
+}
+/*
 void parseCommand(String com){
   //Debug
   Serial.print("Receiving Command: ");
@@ -126,7 +181,12 @@ void parseCommand(String com){
     payload[0]='s';
     sendMessage(1);
   }
-  if(com[0] == 'w' ){    
+  if(com[0] == 'w' ){
+    if(com[1] == 't')
+
+    if(com[1] == 'h')
+
+    if(com[1] == 'b')
     com = com.substring(com.indexOf(' ')+1);
     int index = 0;
     while(com.length()>0 && index < 8){
@@ -152,6 +212,7 @@ void parseCommand(String com){
 
   }
 }
+*/
 
 static void sendMessage(int dstEndpointVal){
   //Assigns values to the static data request struct

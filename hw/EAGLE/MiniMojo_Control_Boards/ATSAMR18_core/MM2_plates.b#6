@@ -1419,10 +1419,10 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <element name="D1" library="SparkFun-LED" package="LED-0603" value="BLUE" x="26.797" y="27.9654" rot="R180">
 <attribute name="PROD_ID" value="DIO-08575" x="26.797" y="27.9654" size="1.778" layer="27" font="vector" rot="R180" display="off"/>
 </element>
-<element name="U$1" library="atmel-samr21" package="QFN32" value="ATSAMR21E18A-MUT" x="33.02" y="9.525" rot="R45"/>
-<element name="U$2" library="balun" package="0805_BALUN" value="JOHANSON_2450BM15A0015E" x="38.8502" y="4.962990625" rot="R225"/>
-<element name="U$3" library="bar_antenna" package="ANT_BAR" value="PULSE_ANT_2.4GHZ" x="34.036" y="2.54" rot="R180"/>
-<element name="U$4" library="crystals" package="FA-238" value="FA-238" x="27.559" y="5.207"/>
+<element name="U2" library="atmel-samr21" package="QFN32" value="ATSAMR21E18A-MUT" x="33.02" y="9.525" rot="R45"/>
+<element name="U6" library="balun" package="0805_BALUN" value="JOHANSON_2450BM15A0015E" x="38.8502" y="4.962990625" rot="R225"/>
+<element name="U5" library="bar_antenna" package="ANT_BAR" value="PULSE_ANT_2.4GHZ" x="34.036" y="2.54" rot="R180"/>
+<element name="U7" library="crystals" package="FA-238" value="FA-238" x="27.559" y="5.207"/>
 <element name="C5" library="SparkFun-Passives" package="0402-CAP" value="22 pF C0G 5%" x="36.576" y="6.7056" rot="R315"/>
 <element name="C6" library="SparkFun-Passives" package="0402-CAP" value="22 pF C0G 5%" x="35.8394" y="5.969" rot="R135"/>
 <element name="C7" library="SparkFun-Passives" package="0402-CAP" value="DNP" x="37.01088125" y="3.070315625"/>
@@ -1441,14 +1441,14 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 </element>
 <element name="C8" library="SparkFun-Passives" package="0402-CAP" value="0.1 uF" x="27.686" y="18.415" rot="R180"/>
 <element name="R3" library="SparkFun-Passives" package="0402-RES" value="330" x="27.686" y="19.558" rot="R180"/>
-<element name="U$5" library="SparkFun-Connectors" package="EB-85A" value="EB-85ASMD" x="29.591" y="25.908" rot="MR180"/>
+<element name="U12" library="SparkFun-Connectors" package="EB-85A" value="EB-85ASMD" x="29.591" y="25.908" rot="MR180"/>
 <element name="J1" library="SparkFun-Connectors" package="SAMTECH_FTSH-105-01" value="CORTEX_DEBUGSMD" x="28.321" y="11.43" rot="MR90"/>
-<element name="U$9" library="SparkFun-AnalogIC" package="SO08" value="ACS712" x="16.5354" y="24.7142">
+<element name="U9" library="SparkFun-AnalogIC" package="SO08" value="ACS712" x="16.5354" y="24.7142">
 <attribute name="PROD_ID" value="IC-08964" x="16.5354" y="24.7142" size="1.778" layer="27" display="off"/>
 </element>
 <element name="C23" library="SparkFun-Passives" package="0402-CAP" value="0.1 uF" x="15.214596875" y="20.2630375"/>
 <element name="C24" library="SparkFun-Passives" package="0402-CAP" value="1 nF" x="21.7424" y="25.5524" rot="R90"/>
-<element name="U$10" library="SparkFun-Connectors" package="EB-85A" value="EB-85ASMD" x="18.3388" y="7.2136" rot="MR0"/>
+<element name="U11" library="SparkFun-Connectors" package="EB-85A" value="EB-85ASMD" x="18.3388" y="7.2136" rot="MR0"/>
 <element name="R12" library="SparkFun-Passives" package="0402-RES" value="330" x="38.1" y="29.2354" rot="R270"/>
 <element name="D5" library="SparkFun-LED" package="LED-0603" value="BLUE" x="39.2684" y="28.1178" rot="R180">
 <attribute name="PROD_ID" value="DIO-08575" x="42.1894" y="27.3558" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1456,7 +1456,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <element name="Q1" library="SparkFun-DiscreteSemi" package="SOT323" value="MOSFET-NCHANNEL2N7002PW" x="38.8366" y="27.4828" rot="MR90">
 <attribute name="PROD_ID" value="TRANS-11151" x="38.8366" y="27.4828" size="1.778" layer="28" rot="MR90" display="off"/>
 </element>
-<element name="U3" library="TPS61089RNRR_4.8V" package="RNR0011A" value="Value" x="14.444909375" y="17.8308" rot="R180">
+<element name="U8" library="TPS61089RNRR_4.8V" package="RNR0011A" value="Value" x="14.444909375" y="17.8308" rot="R180">
 <attribute name="MANUFACTURER_PART_NUMBER" value="TPS61089RNRR" x="14.444909375" y="17.8308" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="TYPE" value="TYPE" x="14.444909375" y="17.8308" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="PARTNUMBER" value="TPS61089RNRR" x="14.444909375" y="17.8308" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1464,7 +1464,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <attribute name="REFDES" value="RefDes" x="14.444909375" y="17.8308" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MANUFACTURER_NAME" value="Texas Instruments" x="14.444909375" y="17.8308" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="U$6" library="TPS61089RNRR_4.8V" package="XAL4020" value="XAL4020-122MEB" x="9.779" y="10.62355"/>
+<element name="L2" library="TPS61089RNRR_4.8V" package="XAL4020" value="XAL4020-122MEB" x="9.779" y="10.62355"/>
 <element name="R4" library="SparkFun-Resistors" package="1206" value="" x="9.8806" y="13.7668"/>
 <element name="R5" library="SparkFun-Passives" package="0402-RES" value="" x="17.4498" y="20.2692" rot="R180"/>
 <element name="C9" library="SparkFun-Passives" package="0805" value="" x="19.7104" y="20.2946" rot="R270"/>
@@ -1477,7 +1477,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <element name="C22" library="SparkFun-Passives" package="1206" value="" x="11.7602" y="20.193" rot="R180"/>
 <element name="C25" library="SparkFun-Passives" package="0402-CAP" value="" x="11.6586" y="15.882690625" rot="R270"/>
 <element name="R10" library="SparkFun-Resistors" package="1206" value="" x="14.622709375" y="14.7066"/>
-<element name="U$7" library="SparkFun-DigitalIC" package="QFN20" value="ATTINY84ATTINY84-20MU" x="19.77735625" y="11.748403125" rot="R270"/>
+<element name="U10" library="SparkFun-DigitalIC" package="QFN20" value="ATTINY84ATTINY84-20MU" x="19.77735625" y="11.748403125" rot="R270"/>
 <element name="Y1" library="SparkFun-FreqCtrl" package="RESONATOR-SMD" value="16MHZ" x="19.685" y="7.7724">
 <attribute name="PROD_ID" value="XTAL-08900" x="19.685" y="7.7724" size="1.778" layer="27" display="off"/>
 </element>
@@ -1501,20 +1501,20 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <contactref element="C3" pad="1"/>
 <contactref element="C4" pad="1"/>
 <contactref element="D1" pad="C"/>
-<contactref element="U$4" pad="4"/>
+<contactref element="U7" pad="4"/>
 <contactref element="C1" pad="2"/>
-<contactref element="U$4" pad="2"/>
+<contactref element="U7" pad="2"/>
 <contactref element="C2" pad="1"/>
-<contactref element="U$2" pad="5"/>
-<contactref element="U$2" pad="6"/>
-<contactref element="U$3" pad="3"/>
+<contactref element="U6" pad="5"/>
+<contactref element="U6" pad="6"/>
+<contactref element="U5" pad="3"/>
 <contactref element="C7" pad="2"/>
 <wire x1="38.673421875" y1="3.866975" x2="38.213803125" y2="4.32659375" width="0.1524" layer="1"/>
-<contactref element="U$1" pad="3"/>
-<contactref element="U$1" pad="6"/>
-<contactref element="U$1" pad="11"/>
-<contactref element="U$1" pad="14"/>
-<contactref element="U$1" pad="33"/>
+<contactref element="U2" pad="3"/>
+<contactref element="U2" pad="6"/>
+<contactref element="U2" pad="11"/>
+<contactref element="U2" pad="14"/>
+<contactref element="U2" pad="33"/>
 <contactref element="C11" pad="2"/>
 <contactref element="C12" pad="2"/>
 <contactref element="C13" pad="2"/>
@@ -1529,7 +1529,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <contactref element="J1" pad="5"/>
 <contactref element="J1" pad="3"/>
 <contactref element="C24" pad="2"/>
-<contactref element="U$9" pad="5"/>
+<contactref element="U9" pad="5"/>
 <wire x1="26.162" y1="5.095" x2="27.447" y2="5.095" width="0.508" layer="1"/>
 <wire x1="27.447" y1="5.095" x2="27.559" y2="5.207" width="0.508" layer="1"/>
 <contactref element="Q1" pad="2"/>
@@ -1599,7 +1599,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="37.069528125" y1="3.773671875" x2="34.4932" y2="6.35" width="0.1524" layer="1"/>
 <wire x1="34.4932" y1="6.35" x2="34.4424" y2="6.35" width="0.1524" layer="1"/>
 <contactref element="S2" pad="2"/>
-<contactref element="U3" pad="5"/>
+<contactref element="U8" pad="5"/>
 <contactref element="C21" pad="2"/>
 <contactref element="C19" pad="2"/>
 <contactref element="C20" pad="2"/>
@@ -1610,7 +1610,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <contactref element="C9" pad="2"/>
 <contactref element="C23" pad="2"/>
 <contactref element="Y1" pad="2"/>
-<contactref element="U$7" pad="8"/>
+<contactref element="U10" pad="8"/>
 <via x="19.3548" y="6.35" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="15.5956" y="19.3548" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="14.794909375" y1="18.5308" x2="14.794909375" y2="19.3548" width="0.4572" layer="1"/>
@@ -1629,8 +1629,8 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <contactref element="J3" pad="6"/>
 <contactref element="U4" pad="3"/>
 <contactref element="U4" pad="4"/>
-<contactref element="U$10" pad="5"/>
-<contactref element="U$10" pad="4"/>
+<contactref element="U11" pad="5"/>
+<contactref element="U11" pad="4"/>
 <wire x1="15.3388" y1="7.2136" x2="15.3388" y2="5.9182" width="0.6096" layer="16"/>
 <wire x1="15.3388" y1="5.9182" x2="19.3548" y2="5.9182" width="0.6096" layer="16"/>
 <wire x1="19.3548" y1="5.9182" x2="19.3548" y2="6.35" width="0.6096" layer="16"/>
@@ -1695,13 +1695,15 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <via x="17.1704" y="2.9718" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="9.7536" y="9.0678" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="9.7536" y="12.1158" extent="1-16" drill="0.254" shape="octagon"/>
-<contactref element="U$5" pad="7"/>
+<contactref element="U12" pad="7"/>
 <via x="29.7688" y="29.6672" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="36.2204" y="29.6926" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="34.2646" y="23.5712" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="25.8318" y="9.5504" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="34.8742" y="10.3124" extent="1-16" drill="0.254" shape="octagon"/>
-<wire x1="25.5778" y1="5.0442" x2="22.1488" y2="4.953" width="0" layer="19" extent="1-16"/>
+<contactref element="U6" pad="2"/>
+<wire x1="22.1488" y1="4.953" x2="25.5778" y2="5.0442" width="0" layer="19" extent="1-16"/>
+<wire x1="39.48659375" y1="5.599384375" x2="38.213803125" y2="4.32659375" width="0.1524" layer="1"/>
 </signal>
 <signal name="VIN">
 <contactref element="U1" pad="3"/>
@@ -1725,8 +1727,8 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <contactref element="C16" pad="1"/>
 <contactref element="C17" pad="1"/>
 <contactref element="L1" pad="1"/>
-<contactref element="U$1" pad="30"/>
-<contactref element="U$1" pad="24"/>
+<contactref element="U2" pad="30"/>
+<contactref element="U2" pad="24"/>
 <contactref element="R2" pad="2"/>
 <wire x1="27.779040625" y1="11.904040625" x2="27.575840625" y2="12.056440625" width="0.1524" layer="1"/>
 <contactref element="J1" pad="1"/>
@@ -1791,38 +1793,35 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="27.459" y1="29.8854" x2="26.797" y2="28.8424" width="0.508" layer="1"/>
 </signal>
 <signal name="N$6">
-<contactref element="U$3" pad="1"/>
-<contactref element="U$2" pad="1"/>
+<contactref element="U5" pad="1"/>
+<contactref element="U6" pad="1"/>
 <wire x1="35.336" y1="2.17" x2="38.4666" y2="2.17" width="0.381" layer="1"/>
 <wire x1="38.4666" y1="2.17" x2="39.9542" y2="3.6576" width="0.381" layer="1"/>
 <wire x1="39.9542" y1="3.6576" x2="39.9542" y2="5.131778125" width="0.381" layer="1"/>
 <wire x1="39.9542" y1="5.131778125" x2="39.9462125" y2="5.139765625" width="0.381" layer="1"/>
 </signal>
 <signal name="N$7">
-<contactref element="U$3" pad="2"/>
+<contactref element="U5" pad="2"/>
 <contactref element="C7" pad="1"/>
 <wire x1="35.336" y1="2.92" x2="36.36088125" y2="2.92" width="0.381" layer="1"/>
 <wire x1="36.36088125" y1="2.92" x2="36.36088125" y2="3.070315625" width="0.381" layer="1"/>
 </signal>
 <signal name="N$10">
-<contactref element="U$2" pad="3"/>
+<contactref element="U6" pad="3"/>
 <contactref element="C5" pad="2"/>
 <wire x1="37.03561875" y1="6.245978125" x2="38.84" y2="6.245978125" width="0.3556" layer="1"/>
 <wire x1="38.84" y1="6.245978125" x2="39.026975" y2="6.059003125" width="0.3556" layer="1"/>
 </signal>
 <signal name="N$11">
-<contactref element="U$2" pad="4"/>
+<contactref element="U6" pad="4"/>
 <contactref element="C6" pad="1"/>
 <wire x1="37.754184375" y1="4.7862125" x2="37.022184375" y2="4.7862125" width="0.3556" layer="1"/>
 <wire x1="37.022184375" y1="4.7862125" x2="36.29901875" y2="5.509378125" width="0.3556" layer="1"/>
 </signal>
-<signal name="N$12">
-<contactref element="U$2" pad="2"/>
-</signal>
 <signal name="XIN">
-<contactref element="U$4" pad="1"/>
+<contactref element="U7" pad="1"/>
 <contactref element="C1" pad="1"/>
-<contactref element="U$1" pad="1"/>
+<contactref element="U2" pad="1"/>
 <wire x1="28.575" y1="6.35" x2="28.575" y2="3.683" width="0.1524" layer="1"/>
 <wire x1="28.575" y1="3.683" x2="28.448" y2="3.556" width="0.1524" layer="1"/>
 <wire x1="28.448" y1="3.556" x2="27.61" y2="3.556" width="0.1524" layer="1"/>
@@ -1834,9 +1833,9 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="29.1846" y1="6.9596" x2="28.575" y2="6.35" width="0.1524" layer="1"/>
 </signal>
 <signal name="XOUT">
-<contactref element="U$4" pad="3"/>
+<contactref element="U7" pad="3"/>
 <contactref element="C2" pad="2"/>
-<contactref element="U$1" pad="2"/>
+<contactref element="U2" pad="2"/>
 <wire x1="29.464" y1="5.502" x2="29.759" y2="5.207" width="0.1524" layer="1"/>
 <wire x1="29.4132" y1="5.5528" x2="29.759" y2="5.207" width="0.1524" layer="1"/>
 <wire x1="29.759" y1="5.207" x2="30.6982" y2="5.207" width="0.635" layer="1"/>
@@ -1847,13 +1846,13 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 </signal>
 <signal name="RFN">
 <contactref element="C5" pad="1"/>
-<contactref element="U$1" pad="13"/>
+<contactref element="U2" pad="13"/>
 <wire x1="35.070609375" y1="7.827940625" x2="35.782328125" y2="7.116221875" width="0.1524" layer="1"/>
 <wire x1="35.782328125" y1="7.116221875" x2="36.116378125" y2="7.16521875" width="0.1524" layer="1"/>
 </signal>
 <signal name="RFP">
 <contactref element="C6" pad="2"/>
-<contactref element="U$1" pad="12"/>
+<contactref element="U2" pad="12"/>
 <wire x1="34.71705625" y1="7.4743875" x2="35.481378125" y2="6.710065625" width="0.1524" layer="1"/>
 <wire x1="35.481378125" y1="6.710065625" x2="35.379778125" y2="6.42861875" width="0.1524" layer="1"/>
 </signal>
@@ -1861,7 +1860,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <contactref element="C10" pad="2"/>
 <contactref element="C11" pad="1"/>
 <contactref element="L1" pad="2"/>
-<contactref element="U$1" pad="4"/>
+<contactref element="U2" pad="4"/>
 <wire x1="30.9693875" y1="7.827940625" x2="31.369" y2="8.227553125" width="0.1524" layer="1"/>
 <wire x1="31.369" y1="8.227553125" x2="31.369" y2="8.255" width="0.1524" layer="1"/>
 <wire x1="31.369" y1="8.255" x2="30.1244" y2="9.4996" width="0.1524" layer="1"/>
@@ -1880,7 +1879,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 </signal>
 <signal name="VDDCORE">
 <contactref element="C14" pad="1"/>
-<contactref element="U$1" pad="29"/>
+<contactref element="U2" pad="29"/>
 <wire x1="30.9693875" y1="11.22205625" x2="30.6324" y2="11.55904375" width="0.1524" layer="1"/>
 <wire x1="30.6324" y1="11.55904375" x2="30.6324" y2="11.7348" width="0.1524" layer="1"/>
 <wire x1="30.6324" y1="11.7348" x2="31.115" y2="12.2174" width="0.1524" layer="1"/>
@@ -1890,7 +1889,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 </signal>
 <signal name="DVDD">
 <contactref element="C13" pad="1"/>
-<contactref element="U$1" pad="21"/>
+<contactref element="U2" pad="21"/>
 <via x="34.163" y="10.4394" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="36.9824" y="10.4394" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="34.71705625" y1="11.575609375" x2="34.163" y2="11.021553125" width="0.1524" layer="1"/>
@@ -1906,7 +1905,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 </signal>
 <signal name="AVDD">
 <contactref element="C12" pad="1"/>
-<contactref element="U$1" pad="5"/>
+<contactref element="U2" pad="5"/>
 <wire x1="31.322940625" y1="7.4743875" x2="30.89038125" y2="7.041828125" width="0.1524" layer="1"/>
 <wire x1="30.89038125" y1="7.041828125" x2="30.580984375" y2="6.864028125" width="0.1524" layer="1"/>
 </signal>
@@ -1914,7 +1913,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <contactref element="C8" pad="1"/>
 <contactref element="R2" pad="1"/>
 <contactref element="R3" pad="1"/>
-<contactref element="U$1" pad="26"/>
+<contactref element="U2" pad="26"/>
 <contactref element="J1" pad="10"/>
 <wire x1="29.56801875" y1="13.28661875" x2="29.26321875" y2="13.28661875" width="0.1524" layer="1"/>
 <wire x1="29.26321875" y1="13.28661875" x2="29.0576" y2="13.081" width="0.1524" layer="1"/>
@@ -1931,7 +1930,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="32.03005" y1="12.282715625" x2="30.393565625" y2="13.9192" width="0.1524" layer="1"/>
 <wire x1="30.393565625" y1="13.9192" x2="30.2006" y2="13.9192" width="0.1524" layer="1"/>
 <contactref element="J3" pad="5"/>
-<contactref element="U$7" pad="13"/>
+<contactref element="U10" pad="13"/>
 <via x="19.304" y="10.7188" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="19.77735625" y1="9.848403125" x2="19.77735625" y2="10.22004375" width="0.2286" layer="1"/>
 <wire x1="19.77735625" y1="10.22004375" x2="19.304" y2="10.6934" width="0.2286" layer="1"/>
@@ -1962,7 +1961,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="26.886" y1="21.0132" x2="26.886" y2="25.1132" width="0.508" layer="1"/>
 </signal>
 <signal name="N$1">
-<contactref element="U$5" pad="8"/>
+<contactref element="U12" pad="8"/>
 <contactref element="F1" pad="1"/>
 <wire x1="37.8088" y1="25.8318" x2="37.8088" y2="27.5082" width="0.508" layer="1"/>
 <wire x1="37.8088" y1="27.5082" x2="37.084" y2="27.5082" width="0.508" layer="1"/>
@@ -1971,7 +1970,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="36.591" y1="27.5082" x2="36.591" y2="25.908" width="0.508" layer="16"/>
 </signal>
 <signal name="PA25/USBDP">
-<contactref element="U$1" pad="23"/>
+<contactref element="U2" pad="23"/>
 <wire x1="34.009946875" y1="12.282715625" x2="33.30963125" y2="11.5824" width="0.1524" layer="1"/>
 <wire x1="33.30963125" y1="11.5824" x2="33.02" y2="11.5824" width="0.1524" layer="1"/>
 <via x="33.02" y="11.5824" extent="1-16" drill="0.254" shape="octagon"/>
@@ -1985,12 +1984,12 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="33.5788" y1="24.5618" x2="33.0454" y2="24.5618" width="0.1524" layer="16"/>
 <wire x1="33.0454" y1="24.5618" x2="32.7152" y2="24.2316" width="0.1524" layer="16"/>
 <wire x1="32.7152" y1="24.2316" x2="32.1818" y2="24.2316" width="0.1524" layer="16"/>
-<contactref element="U$5" pad="5"/>
+<contactref element="U12" pad="5"/>
 <wire x1="33.5788" y1="24.5618" x2="33.591" y2="24.5618" width="0.1524" layer="16"/>
 <wire x1="33.591" y1="24.5618" x2="33.591" y2="25.908" width="0.1524" layer="16"/>
 </signal>
 <signal name="PA24/USBDM">
-<contactref element="U$1" pad="22"/>
+<contactref element="U2" pad="22"/>
 <wire x1="34.3635" y1="11.9291625" x2="33.6296" y2="11.2206625" width="0.1524" layer="1"/>
 <wire x1="33.6296" y1="11.2206625" x2="33.6296" y2="10.9728" width="0.1524" layer="1"/>
 <via x="33.6296" y="10.9728" extent="1-16" drill="0.254" shape="octagon"/>
@@ -2007,13 +2006,13 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="33.1724" y1="24.2316" x2="33.7312" y2="24.2316" width="0.1524" layer="16"/>
 <wire x1="33.7312" y1="24.2316" x2="34.0614" y2="24.5618" width="0.1524" layer="16"/>
 <wire x1="34.0614" y1="24.5618" x2="34.5694" y2="24.5618" width="0.1524" layer="16"/>
-<contactref element="U$5" pad="6"/>
+<contactref element="U12" pad="6"/>
 <wire x1="34.5694" y1="24.5618" x2="34.591" y2="24.5618" width="0.1524" layer="16"/>
 <wire x1="34.591" y1="24.5618" x2="34.591" y2="25.908" width="0.1524" layer="16"/>
 </signal>
 <signal name="SWDIO">
 <contactref element="J1" pad="2"/>
-<contactref element="U$1" pad="32"/>
+<contactref element="U2" pad="32"/>
 <via x="28.6512" y="9.4996" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="29.908728125" y1="10.16139375" x2="29.7942" y2="10.046865625" width="0.1524" layer="1"/>
 <wire x1="29.7942" y1="10.046865625" x2="29.7942" y2="9.8044" width="0.1524" layer="1"/>
@@ -2023,7 +2022,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="29.4894" y1="9.4996" x2="28.6512" y2="9.4996" width="0.1524" layer="1"/>
 </signal>
 <signal name="SWCLK">
-<contactref element="U$1" pad="31"/>
+<contactref element="U2" pad="31"/>
 <contactref element="J1" pad="4"/>
 <wire x1="30.26228125" y1="10.514946875" x2="29.906028125" y2="10.8712" width="0.1524" layer="1"/>
 <wire x1="29.906028125" y1="10.8712" x2="29.7688" y2="10.8712" width="0.1524" layer="1"/>
@@ -2034,10 +2033,10 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="29.2862" y1="10.1346" x2="30.734" y2="10.16" width="0.1524" layer="16"/>
 </signal>
 <signal name="V_BATT">
-<contactref element="U3" pad="9"/>
+<contactref element="U8" pad="9"/>
 <contactref element="C20" pad="1"/>
 <contactref element="C19" pad="1"/>
-<contactref element="U$6" pad="1"/>
+<contactref element="L2" pad="1"/>
 <wire x1="13.269909375" y1="17.5808" x2="11.8872" y2="17.5808" width="0.2286" layer="1"/>
 <wire x1="11.8872" y1="17.5808" x2="11.7602" y2="17.4094" width="0.2286" layer="1"/>
 <contactref element="U4" pad="1"/>
@@ -2083,13 +2082,13 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="9.525" y1="3.556" x2="10.1854" y2="3.556" width="0.1524" layer="1"/>
 </signal>
 <signal name="V_MOT_UNSENSE">
-<contactref element="U$9" pad="1"/>
-<contactref element="U$9" pad="2"/>
-<contactref element="U$9" pad="8"/>
+<contactref element="U9" pad="1"/>
+<contactref element="U9" pad="2"/>
+<contactref element="U9" pad="8"/>
 <contactref element="C23" pad="1"/>
 <contactref element="C22" pad="1"/>
 <contactref element="R6" pad="2"/>
-<contactref element="U3" pad="6"/>
+<contactref element="U8" pad="6"/>
 <polygon width="0.1778" layer="1">
 <vertex x="13.8684" y="17.9832"/>
 <vertex x="14.3256" y="17.9832"/>
@@ -2127,12 +2126,12 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="15.0368" y1="22.098" x2="13.589" y2="22.098" width="0.2286" layer="16"/>
 </signal>
 <signal name="VMOT">
-<contactref element="U$9" pad="3"/>
-<contactref element="U$9" pad="4"/>
-<contactref element="U$10" pad="1"/>
-<contactref element="U$10" pad="2"/>
-<contactref element="U$10" pad="3"/>
-<contactref element="U$7" pad="9"/>
+<contactref element="U9" pad="3"/>
+<contactref element="U9" pad="4"/>
+<contactref element="U11" pad="1"/>
+<contactref element="U11" pad="2"/>
+<contactref element="U11" pad="3"/>
+<contactref element="U10" pad="9"/>
 <contactref element="J3" pad="1"/>
 <contactref element="R9" pad="2"/>
 <contactref element="R8" pad="2"/>
@@ -2183,14 +2182,14 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="15.6314" y1="9.906" x2="16.764" y2="9.906" width="0.508" layer="1"/>
 </signal>
 <signal name="N$16">
-<contactref element="U$9" pad="6"/>
+<contactref element="U9" pad="6"/>
 <contactref element="C24" pad="1"/>
 <wire x1="17.1704" y1="24.257" x2="21.7424" y2="24.257" width="0.2286" layer="1"/>
 <wire x1="21.7424" y1="24.257" x2="21.7424" y2="24.9024" width="0.2286" layer="1"/>
 <wire x1="17.1704" y1="24.257" x2="17.1704" y2="27.3304" width="0.2286" layer="1"/>
 </signal>
 <signal name="BLINK">
-<contactref element="U$1" pad="18"/>
+<contactref element="U2" pad="18"/>
 <contactref element="Q1" pad="1"/>
 <via x="36.4236" y="9.525" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="35.777715625" y1="10.514946875" x2="35.5346" y2="10.27183125" width="0.1524" layer="1"/>
@@ -2233,7 +2232,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="39.7616" y1="28.0162" x2="39.7616" y2="27.4828" width="0.508" layer="16"/>
 </signal>
 <signal name="N$3">
-<contactref element="U3" pad="8"/>
+<contactref element="U8" pad="8"/>
 <contactref element="R4" pad="2"/>
 <wire x1="10.922" y1="13.7668" x2="11.2806" y2="13.7668" width="0.2286" layer="1"/>
 <wire x1="13.269909375" y1="18.0808" x2="10.9982" y2="18.0808" width="0.2286" layer="1"/>
@@ -2250,7 +2249,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="19.7104" y1="20.2692" x2="18.0998" y2="20.2692" width="0.508" layer="1"/>
 </signal>
 <signal name="N$15">
-<contactref element="U3" pad="4"/>
+<contactref element="U8" pad="4"/>
 <contactref element="R5" pad="2"/>
 <contactref element="C18" pad="1"/>
 <wire x1="16.6768" y1="18.9992" x2="16.6768" y2="18.5808" width="0.2286" layer="1"/>
@@ -2259,9 +2258,9 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="16.7998" y1="18.9992" x2="16.6768" y2="18.9992" width="0.508" layer="1"/>
 </signal>
 <signal name="N$19">
-<contactref element="U3" pad="2"/>
+<contactref element="U8" pad="2"/>
 <contactref element="C21" pad="1"/>
-<contactref element="U3" pad="7"/>
+<contactref element="U8" pad="7"/>
 <wire x1="15.619909375" y1="17.5808" x2="16.2052" y2="17.5808" width="0.2286" layer="1"/>
 <via x="16.129" y="16.0782" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="16.2052" y1="17.5808" x2="16.2052" y2="16.1544" width="0.2286" layer="1"/>
@@ -2283,7 +2282,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="12.7628" y1="18.5808" x2="12.6238" y2="18.7198" width="0.2286" layer="16"/>
 </signal>
 <signal name="N$27">
-<contactref element="U3" pad="10"/>
+<contactref element="U8" pad="10"/>
 <contactref element="C25" pad="1"/>
 <wire x1="13.269909375" y1="17.0808" x2="13.337709375" y2="17.0808" width="0.2286" layer="1"/>
 <wire x1="11.6586" y1="16.532690625" x2="12.290890625" y2="15.9004" width="0.2286" layer="1"/>
@@ -2292,8 +2291,8 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 </signal>
 <signal name="N$28">
 <contactref element="C25" pad="2"/>
-<contactref element="U$6" pad="2"/>
-<contactref element="U3" pad="11"/>
+<contactref element="L2" pad="2"/>
+<contactref element="U8" pad="11"/>
 <contactref element="R10" pad="1"/>
 <polygon width="0.1778" layer="1" thermals="no">
 <vertex x="13.9954" y="17.5768"/>
@@ -2319,7 +2318,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <via x="12.3444" y="9.1186" extent="1-16" drill="0.254" shape="octagon"/>
 </signal>
 <signal name="N$29">
-<contactref element="U3" pad="1"/>
+<contactref element="U8" pad="1"/>
 <contactref element="R10" pad="2"/>
 <polygon width="0.1524" layer="1">
 <vertex x="15.2908" y="17.272"/>
@@ -2335,7 +2334,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <signal name="N$31">
 <contactref element="R7" pad="2"/>
 <contactref element="R6" pad="1"/>
-<contactref element="U3" pad="3"/>
+<contactref element="U8" pad="3"/>
 <wire x1="15.619909375" y1="18.0808" x2="17.1196" y2="18.0808" width="0.2286" layer="1"/>
 <wire x1="17.1196" y1="18.0808" x2="17.1196" y2="17.4648" width="0.2286" layer="1"/>
 <wire x1="17.1196" y1="17.4648" x2="17.1196" y2="16.8148" width="0.2286" layer="1"/>
@@ -2344,7 +2343,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="17.9832" y1="15.9648" x2="18.3642" y2="15.9648" width="0.2286" layer="1"/>
 </signal>
 <signal name="N$4">
-<contactref element="U$7" pad="12"/>
+<contactref element="U10" pad="12"/>
 <contactref element="Y1" pad="3"/>
 <wire x1="19.27735625" y1="9.848403125" x2="19.27735625" y2="9.1948" width="0.2286" layer="1"/>
 <wire x1="19.27735625" y1="9.1948" x2="20.8788" y2="9.1948" width="0.2286" layer="1"/>
@@ -2352,14 +2351,14 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="20.8788" y1="8.4582" x2="20.885" y2="8.7884" width="0.2286" layer="1"/>
 </signal>
 <signal name="N$5">
-<contactref element="U$7" pad="11"/>
+<contactref element="U10" pad="11"/>
 <contactref element="Y1" pad="1"/>
 <wire x1="18.77735625" y1="9.848403125" x2="18.77735625" y2="9.1948" width="0.2286" layer="1"/>
 <wire x1="18.77735625" y1="9.1948" x2="18.485" y2="9.1948" width="0.2286" layer="1"/>
 <wire x1="18.485" y1="9.1948" x2="18.485" y2="7.7724" width="0.2286" layer="1"/>
 </signal>
 <signal name="MOTSIG0">
-<contactref element="U$7" pad="14"/>
+<contactref element="U10" pad="14"/>
 <wire x1="20.27735625" y1="9.848403125" x2="20.27735625" y2="10.60904375" width="0.2286" layer="1"/>
 <wire x1="20.27735625" y1="10.60904375" x2="20.1676" y2="10.7188" width="0.2286" layer="1"/>
 <via x="20.1676" y="10.7188" extent="1-16" drill="0.254" shape="octagon"/>
@@ -2370,7 +2369,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="18.6944" y1="10.4394" x2="19.4564" y2="9.6774" width="0.2286" layer="16"/>
 <wire x1="19.4564" y1="9.6774" x2="20.5486" y2="9.6774" width="0.2286" layer="16"/>
 <wire x1="20.5486" y1="9.6774" x2="20.5486" y2="9.1694" width="0.2286" layer="16"/>
-<contactref element="U$10" pad="8"/>
+<contactref element="U11" pad="8"/>
 <wire x1="20.5486" y1="9.1694" x2="20.5486" y2="8.9916" width="0.2286" layer="16"/>
 <wire x1="11.3388" y1="7.2136" x2="11.3388" y2="4.5212" width="0.2286" layer="16"/>
 <wire x1="11.3388" y1="4.5212" x2="21.1328" y2="4.5212" width="0.2286" layer="16"/>
@@ -2382,8 +2381,8 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="20.5486" y1="7.5692" x2="20.5486" y2="8.9916" width="0.2286" layer="16"/>
 </signal>
 <signal name="MOTSIG1">
-<contactref element="U$7" pad="15"/>
-<contactref element="U$10" pad="7"/>
+<contactref element="U10" pad="15"/>
+<contactref element="U11" pad="7"/>
 <wire x1="20.77735625" y1="9.848403125" x2="21.4122" y2="9.848403125" width="0.2286" layer="1"/>
 <wire x1="21.4122" y1="9.848403125" x2="21.4122" y2="6.4516" width="0.2286" layer="1"/>
 <via x="21.1328" y="5.4102" extent="1-16" drill="0.254" shape="octagon"/>
@@ -2394,7 +2393,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="21.1328" y1="6.1722" x2="21.1328" y2="5.4102" width="0.2286" layer="1"/>
 </signal>
 <signal name="SDA">
-<contactref element="U$7" pad="16"/>
+<contactref element="U10" pad="16"/>
 <contactref element="J3" pad="4"/>
 <via x="20.7772" y="11.3284" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="20.7772" y1="11.3284" x2="20.8308" y2="11.2748" width="0.3048" layer="16"/>
@@ -2418,7 +2417,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="16.319" y1="7.938" x2="16.319" y2="5.5626" width="0.3048" layer="1"/>
 </signal>
 <signal name="SCL">
-<contactref element="U$7" pad="1"/>
+<contactref element="U10" pad="1"/>
 <contactref element="J3" pad="2"/>
 <via x="20.0406" y="12.7508" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="20.77735625" y1="13.648403125" x2="20.77735625" y2="13.18275625" width="0.2286" layer="1"/>
@@ -2445,7 +2444,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="21.5392" y1="13.648403125" x2="20.77735625" y2="13.648403125" width="0.2286" layer="1"/>
 </signal>
 <signal name="MOTSIG2">
-<contactref element="U$7" pad="20"/>
+<contactref element="U10" pad="20"/>
 <contactref element="J3" pad="3"/>
 <via x="20.7772" y="12.1666" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="21.67735625" y1="12.748403125" x2="21.206603125" y2="12.748403125" width="0.2286" layer="1"/>
@@ -2459,7 +2458,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="18.288" y1="11.1252" x2="18.288" y2="10.2616" width="0.2286" layer="16"/>
 <wire x1="18.288" y1="10.2616" x2="19.3294" y2="9.271" width="0.2286" layer="16"/>
 <wire x1="19.3294" y1="9.271" x2="20.1422" y2="9.271" width="0.2286" layer="16"/>
-<contactref element="U$10" pad="6"/>
+<contactref element="U11" pad="6"/>
 <wire x1="13.3388" y1="7.2136" x2="13.3388" y2="5.334" width="0.2286" layer="16"/>
 <wire x1="13.3388" y1="5.334" x2="20.1676" y2="5.334" width="0.2286" layer="16"/>
 <wire x1="20.1676" y1="5.334" x2="20.9042" y2="6.0706" width="0.2286" layer="16"/>
@@ -2468,8 +2467,8 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="20.1422" y1="7.3914" x2="20.1422" y2="9.271" width="0.2286" layer="16"/>
 </signal>
 <signal name="CURSENSE">
-<contactref element="U$9" pad="7"/>
-<contactref element="U$7" pad="4"/>
+<contactref element="U9" pad="7"/>
+<contactref element="U10" pad="4"/>
 <wire x1="19.27735625" y1="13.648403125" x2="19.27735625" y2="14.351" width="0.3048" layer="1"/>
 <wire x1="22.2758" y1="23.8506" x2="15.9004" y2="23.8506" width="0.3048" layer="1"/>
 <wire x1="15.9004" y1="23.8506" x2="15.9004" y2="27.3304" width="0.3048" layer="1"/>
@@ -2480,7 +2479,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="20.7518" y1="16.4846" x2="21.3868" y2="17.1196" width="0.3048" layer="1"/>
 </signal>
 <signal name="SDA_LV">
-<contactref element="U$1" pad="9"/>
+<contactref element="U2" pad="9"/>
 <contactref element="R14" pad="1"/>
 <contactref element="Q3" pad="2"/>
 <via x="33.6042" y="8.0264" extent="1-16" drill="0.254" shape="octagon"/>
@@ -2503,7 +2502,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="33.3502" y1="6.719921875" x2="33.65639375" y2="6.413728125" width="0.1524" layer="1"/>
 </signal>
 <signal name="SCL_LV">
-<contactref element="U$1" pad="10"/>
+<contactref element="U2" pad="10"/>
 <contactref element="R13" pad="1"/>
 <contactref element="Q2" pad="2"/>
 <wire x1="33.6804" y1="7.096828125" x2="33.6804" y2="7.2644" width="0.1524" layer="1"/>
@@ -2531,8 +2530,8 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 </signal>
 <signal name="SDA_HV">
 <contactref element="Q3" pad="3"/>
-<contactref element="U$5" pad="2"/>
-<contactref element="U$5" pad="1"/>
+<contactref element="U12" pad="2"/>
+<contactref element="U12" pad="1"/>
 <wire x1="30.591" y1="25.908" x2="29.591" y2="25.908" width="0.6096" layer="16"/>
 <via x="30.6324" y="28.575" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="31.5976" y1="29.675" x2="30.6324" y2="29.675" width="0.1524" layer="1"/>
@@ -2542,8 +2541,8 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 </signal>
 <signal name="SCL_HV">
 <contactref element="Q2" pad="3"/>
-<contactref element="U$5" pad="4"/>
-<contactref element="U$5" pad="3"/>
+<contactref element="U12" pad="4"/>
+<contactref element="U12" pad="3"/>
 <wire x1="32.591" y1="25.908" x2="31.591" y2="25.908" width="0.6096" layer="16"/>
 <via x="32.5882" y="28.6004" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="32.5882" y1="28.6004" x2="32.591" y2="28.6004" width="0.1524" layer="16"/>

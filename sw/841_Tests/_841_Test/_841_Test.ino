@@ -26,24 +26,38 @@
 #define TOPSERVOPIN 2
 #define BOTSERVOPIN 3
 #define HIPSERVOPIN 5
-#define CURRENTREADPIN 9
+#define CURRENTREADPIN A1
 
 volatile uint8_t slaveAddr;
 Servo topservo,botservo,hipservo;
 
-uint8_t topservoval, botservoval, hipservoval;
-uint16_t current_read;
+uint8_t servovals[3];
+int current_read;
+
+long curtime = 0;
+long servoupdatetime = 0;
+long currentreadtime = 0;
+
+
+int servoupdateinterval = 10;
+int currentreadinterval = 10;
 
 void setup()
 {
-  Wire.begin(2, (3 << 1 | 1));      // join i2c bus with addresses #2 and #3
+  Wire.begin(4, (5 << 1 | 1));      // join i2c bus with addresses #2 and #3
   Wire.onAddrReceive(addressEvent); // register event
   Wire.onReceive(receiveEvent);
   Wire.onRequest(requestEvent);     // register event
 
-  topservoval = 74;
-  botservoval = 182;
-  hipservoval = 128;
+  ADMUXB = 0b00000000;
+  servovals[0] = 74;
+  servovals[1] = 182;
+  servovals[2] = 128;
+  current_read = 0;
+
+  pinMode(CURRENTREADPIN, INPUT);
+
+  //ADC_SetVoltageReference(ADC_REFERENCE_VCC);
 
   //Set in stone
   topservo.attach(TOPSERVOPIN);
@@ -53,13 +67,19 @@ void setup()
 
 void loop()
 {
-  delay(100);
-  //updating Servo Values
-  topservo.writeMicroseconds(map(topservoval,0,255,900,2100)); 
-  botservo.writeMicroseconds(map(botservoval,0,255,900,2100)); 
-  hipservo.writeMicroseconds(map(hipservoval,0,255,900,2100)); 
-  //updating analogpin value
-  current_read = analogRead(CURRENTREADPIN);
+  curtime = millis();
+  if(curtime - servoupdatetime > servoupdateinterval){
+    servoupdatetime = curtime;
+    topservo.writeMicroseconds(map(servovals[0],0,255,900,2100)); 
+    botservo.writeMicroseconds(map(servovals[1],0,255,900,2100)); 
+    hipservo.writeMicroseconds(map(servovals[2],0,255,900,2100)); 
+  }
+  
+  if(curtime - currentreadtime > currentreadinterval){  
+    currentreadtime = curtime;
+    //updating analogpin value
+    current_read = analogRead(CURRENTREADPIN);
+  }
 }
 
 // function that executes whenever address is received from master
@@ -71,9 +91,10 @@ boolean addressEvent(uint16_t address, uint8_t count)
 }
 
 void receiveEvent(size_t howMany){
-  topservoval = Wire.read();    // receive byte as an integer
-  botservoval = Wire.read();    // receive byte as an integer
-  hipservoval = Wire.read();    // receive byte as an integer
+  if(howMany > 3)
+    howMany = 3;
+  for(int i = 0; i < howMany; i++)
+    servovals[i] = Wire.read();    // receive byte as an integer
 }
 
 // function that executes whenever data is requested by master
@@ -81,13 +102,13 @@ void receiveEvent(size_t howMany){
 void requestEvent()
 {
   switch (slaveAddr) {
-  case 2:
-    Wire.write(topservoval); // respond with message of 6 bytes
-    Wire.write(botservoval);
-    Wire.write(hipservoval);// as expected by master
+  case 4:  
+    for(int i = 0; i < 3; i++)
+      Wire.write(servovals[i]);  
     break;
-  case 3:
-    Wire.write(current_read); // respond with another message
+  case 5:
+    Wire.write(highByte(current_read)); // respond with another message
+    Wire.write(lowByte(current_read));
     break;
   }
 }

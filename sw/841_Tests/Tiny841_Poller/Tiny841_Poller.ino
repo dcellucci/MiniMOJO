@@ -11,6 +11,7 @@
 #include <Wire.h>
 
 
+
 long curtime = 0;
 long oscupdatetime = 0;
 
@@ -24,6 +25,8 @@ boolean oscillate = false;
 uint8_t topservoval = 0;
 uint8_t botservoval = 0;
 
+float runavg = 0;
+
 void setup() {
   Wire.begin();        // join i2c bus (address optional for master)
   SerialUSB.begin(115200);  // start serial for output
@@ -34,15 +37,28 @@ void loop() {
   curtime = millis();
   if(SerialUSB.available()>0){
     char inval = SerialUSB.read();
+    char inval2;
     switch(inval){
       case 's':
-        printServoVals();
+        inval2 = SerialUSB.read();
+        if(inval2 == 't')
+          printServoVals(true);
+        else
+          printServoVals(false);
         break;
       case 'c':
-        printCurrentVals();
+        inval2 = SerialUSB.read();
+        if(inval2 == 't')
+          printCurrentVals(true);
+        else
+          printCurrentVals(false);
         break;
       case 'w':
-        setServoVals();
+        inval2 = SerialUSB.read();
+        if(inval2 == 't')
+          setServoVals(true);
+        else
+          setServoVals(false);
         break;
       case 'o':
         oscillate = !oscillate;
@@ -61,14 +77,20 @@ void loop() {
     setServoVals(topservoval,botservoval,0);
     
     SerialUSB.print(topservoval);
-    SerialUSB.print(" ");
-    SerialUSB.println(botservoval);
+    SerialUSB.print(", ");
+    SerialUSB.print(botservoval);
+    SerialUSB.print(", ");    
+
+    printCurrentVals(true);
   }
   
 }
 
-void printServoVals(){
-  Wire.requestFrom(2, 3);    // request 6 bytes from slave device #8
+void printServoVals(boolean top){
+  int address = 2;
+  if(top)
+    address = 4;
+  Wire.requestFrom(address, 3);    // request 6 bytes from slave device #8
 
   SerialUSB.print("Current Servo Values: ");
   while (Wire.available()) { // slave may send less than requested
@@ -79,36 +101,44 @@ void printServoVals(){
   SerialUSB.println(" ");
 }
 
-void setServoVals(){
+void setServoVals(boolean top){
   topservoval = SerialUSB.parseInt();
   botservoval = SerialUSB.parseInt();
   uint8_t hipservoval = SerialUSB.parseInt();
-
-  Wire.beginTransmission(2);
+  int address = 2;
+  if(top)
+    address = 4;
+  Wire.beginTransmission(address);
     Wire.write(topservoval);
     Wire.write(botservoval);
     Wire.write(hipservoval);
   Wire.endTransmission();
 
-  printServoVals();
+  printServoVals(top);
 }
 
 void setServoVals(int top, int bot, int hip){
-  Wire.beginTransmission(2);
+  Wire.beginTransmission(4);
     Wire.write(top);
     Wire.write(bot);
     Wire.write(hip);
   Wire.endTransmission();
 }
 
-void printCurrentVals(){
-  Wire.requestFrom(3, 2);    // request 6 bytes from slave device #8
+void printCurrentVals(boolean top){
+  int address = 3;
+  if(top)
+    address = 5;
+  Wire.requestFrom(address, 2);    // request 6 bytes from slave device #8
 
   while (Wire.available()) { // slave may send less than requested
     byte c1 = Wire.read(); // receive a byte as character
     byte c2 = Wire.read();
-    long curval = (c2<<8 | c1);
-    SerialUSB.println(curval);         
+    uint16_t curval = (c1<<8 | c2);
+    //SerialUSB.println(c1);
+    //SerialUSB.println(c2);
+    runavg = runavg + (map(curval,500,550,0,128)-runavg)/10.0;
+    SerialUSB.println(runavg);         
   }
 }
 

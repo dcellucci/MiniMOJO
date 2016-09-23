@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="1" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
+<grid distance="5" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -144,26 +144,28 @@
 </layers>
 <board>
 <plain>
-<wire x1="24.947809375" y1="15.2654" x2="24.947809375" y2="4.602409375" width="0.025" layer="20"/>
-<wire x1="24.947809375" y1="4.602409375" x2="27.947809375" y2="1.602409375" width="0.025" layer="20" curve="90"/>
-<wire x1="27.947809375" y1="1.602409375" x2="38.04665" y2="1.602409375" width="0.025" layer="20"/>
-<wire x1="38.04665" y1="1.602409375" x2="41.04665" y2="4.602409375" width="0.025" layer="20" curve="90"/>
-<wire x1="41.04665" y1="4.602409375" x2="41.04665" y2="6.59323125" width="0.025" layer="20"/>
-<wire x1="41.04665" y1="6.59323125" x2="43.46575" y2="13.404909375" width="0.025" layer="20"/>
-<wire x1="43.46575" y1="13.404909375" x2="41.244728125" y2="19.934365625" width="0.025" layer="20" curve="76.675889"/>
-<wire x1="41.24473125" y1="19.93436875" x2="40.614459375" y2="20.341740625" width="0.025" layer="20"/>
-<wire x1="40.614459375" y1="20.341740625" x2="40.614459375" y2="27.96235" width="0.025" layer="20"/>
-<wire x1="40.614459375" y1="27.96235" x2="37.614459375" y2="30.96235" width="0.025" layer="20" curve="90"/>
-<wire x1="37.614459375" y1="30.96235" x2="28.552540625" y2="30.96235" width="0.025" layer="20"/>
-<wire x1="28.552540625" y1="30.96235" x2="25.552540625" y2="27.96235" width="0.025" layer="20" curve="90"/>
-<wire x1="25.552540625" y1="27.96235" x2="25.552540625" y2="17.06906875" width="0.025" layer="20"/>
-<wire x1="25.552540625" y1="17.06906875" x2="24.9478125" y2="15.2654" width="0.025" layer="20" curve="37.070179"/>
+<wire x1="24.947809375" y1="15.2654" x2="24.947809375" y2="4.602409375" width="0" layer="20"/>
+<wire x1="24.947809375" y1="4.602409375" x2="27.947809375" y2="1.602409375" width="0" layer="20" curve="90"/>
+<wire x1="27.947809375" y1="1.602409375" x2="38.04665" y2="1.602409375" width="0" layer="20"/>
+<wire x1="38.04665" y1="1.602409375" x2="41.04665" y2="4.602409375" width="0" layer="20" curve="90"/>
+<wire x1="41.04665" y1="4.602409375" x2="41.04665" y2="6.59323125" width="0" layer="20"/>
+<wire x1="41.04665" y1="6.59323125" x2="43.46575" y2="13.404909375" width="0" layer="20"/>
+<wire x1="43.46575" y1="13.404909375" x2="41.244728125" y2="19.934365625" width="0" layer="20" curve="76.675889"/>
+<wire x1="41.24473125" y1="19.93436875" x2="40.614459375" y2="20.341740625" width="0" layer="20"/>
+<wire x1="40.614459375" y1="20.341740625" x2="40.614459375" y2="27.96235" width="0" layer="20"/>
+<wire x1="40.614459375" y1="27.96235" x2="37.614459375" y2="30.96235" width="0" layer="20" curve="90"/>
+<wire x1="37.614459375" y1="30.96235" x2="28.552540625" y2="30.96235" width="0" layer="20"/>
+<wire x1="28.552540625" y1="30.96235" x2="25.552540625" y2="27.96235" width="0" layer="20" curve="90"/>
+<wire x1="25.552540625" y1="27.96235" x2="25.552540625" y2="24.892" width="0" layer="20"/>
+<wire x1="25.552540625" y1="19.812" x2="25.552540625" y2="17.06906875" width="0" layer="20"/>
+<wire x1="25.552540625" y1="17.06906875" x2="24.9478125" y2="15.2654" width="0" layer="20" curve="37.070179"/>
 <wire x1="7.32035" y1="16.07793125" x2="7.32035" y2="5.18465" width="0" layer="20"/>
 <wire x1="7.32035" y1="5.18465" x2="10.32035" y2="2.18465" width="0" layer="20" curve="90"/>
 <wire x1="19.38226875" y1="2.18465" x2="22.38226875" y2="5.18465" width="0" layer="20" curve="90"/>
 <wire x1="22.38226875" y1="5.18465" x2="22.38226875" y2="16.07793125" width="0" layer="20"/>
 <wire x1="22.38226875" y1="16.07793125" x2="22.986996875" y2="17.8816" width="0" layer="20" curve="37.070179"/>
-<wire x1="22.987" y1="17.8816" x2="22.987" y2="25.5524" width="0" layer="20"/>
+<wire x1="22.987" y1="17.8816" x2="22.987" y2="19.812" width="0" layer="20"/>
+<wire x1="22.987" y1="24.892" x2="22.987" y2="25.5524" width="0" layer="20"/>
 <wire x1="22.987" y1="25.5524" x2="19.994809375" y2="28.544584375" width="0" layer="20" curve="90.00012"/>
 <wire x1="19.994809375" y1="28.544590625" x2="14.393190625" y2="28.544590625" width="0" layer="20"/>
 <wire x1="14.393190625" y1="28.544590625" x2="4.469053125" y2="23.69190625" width="0" layer="20" curve="166.988838"/>
@@ -183,6 +185,20 @@
 <hole x="19.994809375" y="25.5524" drill="1.5875"/>
 <hole x="14.851309375" y="11.66495" drill="2.2606"/>
 <hole x="33.0835" y="21.48205" drill="2.2606"/>
+<hole x="22.9362" y="23.622" drill="0.254"/>
+<hole x="22.9362" y="23.114" drill="0.254"/>
+<hole x="22.9362" y="22.606" drill="0.254"/>
+<hole x="22.9362" y="22.098" drill="0.254"/>
+<hole x="22.9362" y="21.59" drill="0.254"/>
+<hole x="22.9362" y="21.082" drill="0.254"/>
+<wire x1="22.987" y1="19.812" x2="25.552540625" y2="19.812" width="0" layer="20" curve="-180"/>
+<wire x1="25.552540625" y1="24.892" x2="22.987" y2="24.892" width="0" layer="20" curve="-180"/>
+<hole x="25.6032" y="23.622" drill="0.254"/>
+<hole x="25.6032" y="23.114" drill="0.254"/>
+<hole x="25.6032" y="22.606" drill="0.254"/>
+<hole x="25.6032" y="22.098" drill="0.254"/>
+<hole x="25.6032" y="21.59" drill="0.254"/>
+<hole x="25.6032" y="21.082" drill="0.254"/>
 </plain>
 <libraries>
 <library name="SparkFun-Connectors">
@@ -1394,11 +1410,11 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <element name="C1" library="SparkFun-Passives" package="0402-CAP" value="9 pF" x="26.162" y="4.445" rot="R90"/>
 <element name="C2" library="SparkFun-Passives" package="0402-CAP" value="9 pF" x="31.0896" y="4.1656" rot="R90"/>
 <element name="F1" library="SparkFun-PowerIC" package="0603" value="PTC0603" x="38.6588" y="25.8318"/>
-<element name="U1" library="SparkFun-PowerIC" package="SOT23-5" value="3.3V" x="37.7444" y="22.479" rot="R90">
-<attribute name="PROD_ID" value="VREG-12457" x="37.7444" y="22.479" size="1.778" layer="27" font="vector" rot="R90" display="off"/>
+<element name="U1" library="SparkFun-PowerIC" package="SOT23-5" value="3.3V" x="37.5412" y="22.479" rot="R90">
+<attribute name="PROD_ID" value="VREG-12457" x="37.5412" y="22.479" size="1.778" layer="27" font="vector" rot="R90" display="off"/>
 </element>
 <element name="C3" library="SparkFun-Passives" package="0402-CAP" value="1.0 uF" x="37.7444" y="24.511"/>
-<element name="C4" library="SparkFun-Passives" package="0402-CAP" value="2.2 uF" x="37.7444" y="20.3454" rot="R180"/>
+<element name="C4" library="SparkFun-Passives" package="0402-CAP" value="2.2 uF" x="37.5412" y="20.4724" rot="R180"/>
 <element name="R1" library="SparkFun-Passives" package="0402-RES" value="330" x="27.9654" y="29.2354" rot="R270"/>
 <element name="D1" library="SparkFun-LED" package="LED-0603" value="BLUE" x="26.797" y="27.9654" rot="R180">
 <attribute name="PROD_ID" value="DIO-08575" x="26.797" y="27.9654" size="1.778" layer="27" font="vector" rot="R180" display="off"/>
@@ -1509,7 +1525,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <contactref element="C10" pad="1"/>
 <contactref element="C8" pad="2"/>
 <contactref element="S2" pad="1"/>
-<via x="34.2392" y="10.287" extent="1-16" drill="0.254" shape="octagon"/>
+<via x="34.7218" y="9.144" extent="1-16" drill="0.254" shape="octagon"/>
 <contactref element="J1" pad="5"/>
 <contactref element="J1" pad="3"/>
 <contactref element="C24" pad="2"/>
@@ -1684,6 +1700,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <via x="36.2204" y="29.6926" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="34.2646" y="23.5712" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="25.8318" y="9.5504" extent="1-16" drill="0.254" shape="octagon"/>
+<via x="34.8742" y="10.3124" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="25.5778" y1="5.0442" x2="22.1488" y2="4.953" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="VIN">
@@ -1691,13 +1708,13 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <contactref element="F1" pad="2"/>
 <contactref element="U1" pad="1"/>
 <contactref element="C3" pad="2"/>
-<wire x1="39.0445" y1="23.429" x2="40.0812" y2="23.429" width="0.508" layer="1"/>
-<wire x1="40.0812" y1="23.429" x2="40.0812" y2="21.529" width="0.508" layer="1"/>
-<wire x1="40.0812" y1="21.529" x2="39.0445" y2="21.529" width="0.508" layer="1"/>
+<wire x1="38.8413" y1="23.429" x2="39.9542" y2="23.429" width="0.508" layer="1"/>
+<wire x1="39.9542" y1="23.429" x2="39.9542" y2="21.529" width="0.508" layer="1"/>
+<wire x1="39.9542" y1="21.529" x2="38.8413" y2="21.529" width="0.508" layer="1"/>
 <wire x1="38.3944" y1="24.511" x2="39.0906" y2="24.511" width="0.508" layer="1"/>
 <wire x1="39.0906" y1="24.511" x2="39.5088" y2="24.511" width="0.508" layer="1"/>
 <wire x1="39.5088" y1="24.511" x2="39.5088" y2="25.8318" width="0.508" layer="1"/>
-<wire x1="39.0445" y1="23.429" x2="39.0906" y2="23.429" width="0.508" layer="1"/>
+<wire x1="38.8413" y1="23.429" x2="39.0906" y2="23.429" width="0.508" layer="1"/>
 <wire x1="39.0906" y1="23.429" x2="39.0906" y2="24.511" width="0.508" layer="1"/>
 </signal>
 <signal name="3.3V">
@@ -1732,13 +1749,12 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="29.6164" y1="26.528" x2="29.6164" y2="18.4658" width="0.508" layer="1"/>
 <wire x1="29.6164" y1="18.4658" x2="29.6164" y2="17.272" width="0.508" layer="1"/>
 <wire x1="29.6164" y1="17.272" x2="28.336" y2="17.272" width="0.508" layer="1"/>
-<wire x1="36.4443" y1="21.529" x2="36.4443" y2="21.5091" width="0.508" layer="1"/>
+<wire x1="36.2411" y1="21.529" x2="36.4443" y2="21.5091" width="0.508" layer="1"/>
 <wire x1="36.4443" y1="21.5091" x2="33.401" y2="18.4658" width="0.508" layer="1"/>
 <wire x1="33.401" y1="18.4658" x2="29.6164" y2="18.4658" width="0.508" layer="1"/>
-<wire x1="37.0944" y1="20.3454" x2="36.4443" y2="20.9955" width="0.508" layer="1"/>
-<wire x1="36.4443" y1="20.9955" x2="36.4443" y2="21.529" width="0.508" layer="1"/>
-<wire x1="36.4443" y1="21.529" x2="35.7378" y2="22.2355" width="0.508" layer="1"/>
-<wire x1="35.7378" y1="22.2355" x2="35.7378" y2="25.258" width="0.508" layer="1"/>
+<wire x1="36.8912" y1="20.4724" x2="36.4443" y2="20.9955" width="0.508" layer="1"/>
+<wire x1="36.4443" y1="20.9955" x2="36.2411" y2="21.529" width="0.508" layer="1"/>
+<wire x1="35.7378" y1="22.0323" x2="35.7378" y2="25.258" width="0.508" layer="1"/>
 <wire x1="35.7378" y1="26.02" x2="35.9768" y2="26.02" width="0.508" layer="1"/>
 <wire x1="35.9768" y1="26.02" x2="36.322" y2="26.3652" width="0.508" layer="1"/>
 <wire x1="36.322" y1="26.3652" x2="36.322" y2="28.5854" width="0.508" layer="1"/>
@@ -1766,6 +1782,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="27.4828" y1="12.8524" x2="26.9494" y2="13.3858" width="0.508" layer="16"/>
 <wire x1="26.9494" y1="13.3858" x2="26.966240625" y2="13.3858" width="0.508" layer="1"/>
 <wire x1="26.966240625" y1="13.3858" x2="27.474240625" y2="12.8778" width="0.508" layer="1"/>
+<wire x1="36.2411" y1="21.529" x2="35.7378" y2="22.0323" width="0.508" layer="1"/>
 </signal>
 <signal name="N$8">
 <contactref element="R1" pad="1"/>
@@ -1874,10 +1891,18 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <signal name="DVDD">
 <contactref element="C13" pad="1"/>
 <contactref element="U$1" pad="21"/>
-<wire x1="34.71705625" y1="11.575609375" x2="35.028646875" y2="11.8872" width="0.1524" layer="1"/>
-<wire x1="35.028646875" y1="11.8872" x2="35.2552" y2="11.8872" width="0.1524" layer="1"/>
-<wire x1="35.2552" y1="11.8872" x2="36.9674" y2="10.175" width="0.1524" layer="1"/>
-<wire x1="36.9674" y1="10.175" x2="37.6786" y2="10.16" width="0.1524" layer="1"/>
+<via x="34.163" y="10.4394" extent="1-16" drill="0.254" shape="octagon"/>
+<via x="36.9824" y="10.4394" extent="1-16" drill="0.254" shape="octagon"/>
+<wire x1="34.71705625" y1="11.575609375" x2="34.163" y2="11.021553125" width="0.1524" layer="1"/>
+<wire x1="34.163" y1="11.021553125" x2="34.163" y2="10.4394" width="0.1524" layer="1"/>
+<wire x1="37.6786" y1="10.16" x2="37.3992" y2="10.4394" width="0.1524" layer="1"/>
+<wire x1="37.3992" y1="10.4394" x2="36.9824" y2="10.4394" width="0.1524" layer="1"/>
+<wire x1="36.9824" y1="10.4394" x2="36.5506" y2="10.0076" width="0.1524" layer="16"/>
+<wire x1="36.5506" y1="10.0076" x2="35.306" y2="10.0076" width="0.1524" layer="16"/>
+<wire x1="35.306" y1="10.0076" x2="35.1282" y2="9.8298" width="0.1524" layer="16"/>
+<wire x1="35.1282" y1="9.8298" x2="34.6456" y2="9.8298" width="0.1524" layer="16"/>
+<wire x1="34.6456" y1="9.8298" x2="34.163" y2="10.3124" width="0.1524" layer="16"/>
+<wire x1="34.163" y1="10.3124" x2="34.163" y2="10.4394" width="0.1524" layer="16"/>
 </signal>
 <signal name="AVDD">
 <contactref element="C12" pad="1"/>
