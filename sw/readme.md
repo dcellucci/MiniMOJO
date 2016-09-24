@@ -24,6 +24,7 @@ The ATtiny does not need a bootloader since it won't be communicating over USART
 <img src="../media/Tiny841Pinout.png" alt="Tiny841 Pinout" width=500px/>
 
 The [ATtinyCore](https://github.com/SpenceKonde/ATTinyCore) provides the necessary hooks to the Arduino IDE. The settings we want are shown below:
+
 <img src="./media/tiny841_burn.png" alt="ATtinyCore settings" width=500px/>
 
 Once these settings are selected, burn the bootloader. You should get a confirmation, and if you have verbose mode on (you should), you will see that it changed the fuses on the Tiny to the right values. 
