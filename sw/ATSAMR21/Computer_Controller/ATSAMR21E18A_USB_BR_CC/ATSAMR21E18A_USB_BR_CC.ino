@@ -190,6 +190,24 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
     Serial.println("message: ");
   }
   rec_message = (uint8_t*)(ind->data);
-  Serial.println((char*)rec_message);
+  if(rec_message[0] == 'c'){
+    Serial.print("c,");
+    byte tmparr[4];
+    int tmpint;
+    for(int i = 0; i < 4; i++){
+      tmparr[i] = rec_message[i+1];
+    }
+    //gotta cast that byte array
+    tmpint = (int)*(float *)&tmparr;
+    Serial.print(tmpint);
+    Serial.print(",");
+    for(int i = 0; i < 4; i++){
+      tmparr[i] = rec_message[5+i];
+    }
+    tmpint = (int)*(float *)&tmparr;
+    Serial.println(tmpint);
+  }
+  else
+    Serial.println((char*)rec_message);
   return true;
 }
