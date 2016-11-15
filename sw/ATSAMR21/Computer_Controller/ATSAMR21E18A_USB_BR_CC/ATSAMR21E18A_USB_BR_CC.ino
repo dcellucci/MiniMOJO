@@ -121,6 +121,7 @@ void parseCommand(){
     switch(Serial.read()){
       case 'l':
         ledstatus = !ledstatus;
+        digitalWrite(0,ledstatus);
         break;
       case 's':
         //Status request packet, send to endpoint 1
