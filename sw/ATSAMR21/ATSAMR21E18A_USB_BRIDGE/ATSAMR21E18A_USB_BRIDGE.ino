@@ -45,6 +45,7 @@ long curtime = 0;
 
 //for debug
 boolean ledstatus = true; 
+boolean debug = false;
 long ledtoggletime = 0;
 
 
@@ -124,6 +125,12 @@ void parseCommand(){
     curcount++;
   }
   switch(comm[0]){
+    case '!':
+      payload[0] = comm[0];
+      payload[1] = comm[1];
+      Serial.println((char*)payload);
+      sendMessage(3);
+      break;
     case 's':
       payload[0]='s';
       sendMessage(1);
@@ -135,19 +142,39 @@ void parseCommand(){
             servovals[0] = indata[0];
           if(indata[1] > 0)
             servovals[1] = indata[1];
+          writeServoVals();
           break;
         case 'h':        
           if(indata[0] > 0)      
             servovals[2] = indata[0];
+          writeServoVals();
           break;
         case 'b': 
           if(indata[0] > 0)     
             servovals[3] = indata[0];
           if(indata[1] > 0)
             servovals[4] = indata[1];
+          writeServoVals();
+          break;
+        case 'c':
+          payload[0] = comm[0];
+          payload[1] = comm[1];
+          Serial.println((char*)payload);
+          sendMessage(3);
+          break;
+        case 'o':
+          payload[0] = comm[0];
+          payload[1] = comm[1];
+          Serial.println((char*)payload);
+          sendMessage(3);
+          break;
+        case 'm':
+          payload[0] = comm[0];
+          payload[1] = comm[1];
+          Serial.println((char*)payload);
+          sendMessage(3);
           break;
       }
-      writeServoVals();
       break;
   }
   Serial.print("Command Received: ");
@@ -168,51 +195,6 @@ void writeServoVals(){
   Serial.println((char*)payload);
   sendMessage(2);
 }
-/*
-void parseCommand(String com){
-  //Debug
-  Serial.print("Receiving Command: ");
-  Serial.print(command);
-  Serial.print("| Size: ");
-  Serial.println(sizeof(payload));
-  //clears payload buffer
-  memset(payload,0,sizeof(payload));
-  if(com[0] == 's'){  
-    payload[0]='s';
-    sendMessage(1);
-  }
-  if(com[0] == 'w' ){
-    if(com[1] == 't')
-
-    if(com[1] == 'h')
-
-    if(com[1] == 'b')
-    com = com.substring(com.indexOf(' ')+1);
-    int index = 0;
-    while(com.length()>0 && index < 8){
-       //Serial.println(com);
-       uint8_t t_servo_val = (uint8_t)com.substring(0,com.indexOf(' ')).toInt();
-       if(t_servo_val > 0){
-        servo_locs[index] = t_servo_val;
-       }
-       if(com.indexOf(' ') == -1)
-        index = 10;
-       else
-        index++;
-       com = com.substring(com.indexOf(' ')+1);       
-    }
-
-    for(int i = 0; i<5; i++){
-      payload[i] = servo_locs[i];
-    }
-
-    sendMessage(2);
-    
-    //Serial.println((char*)payload);
-
-  }
-}
-*/
 
 static void sendMessage(int dstEndpointVal){
   //Assigns values to the static data request struct
@@ -227,19 +209,44 @@ static void sendMessage(int dstEndpointVal){
 }
 
 static bool receiveMessage(NWK_DataInd_t *ind) {
-  Serial.print("Received message - ");
-  Serial.print("lqi: ");
-  Serial.print(ind->lqi, DEC);
-
-  Serial.print("  ");
-
-  Serial.print("rssi: ");
-  Serial.print(ind->rssi, DEC);
-  Serial.print("  ");
-  Serial.print("Data: ");
-  Serial.println(ind->size);
-  Serial.print("message: ");
+  if(debug){
+    Serial.print("Received message - ");
+    Serial.print("lqi: ");
+    Serial.print(ind->lqi, DEC);
+  
+    Serial.print("  ");
+  
+    Serial.print("rssi: ");
+    Serial.print(ind->rssi, DEC);
+    Serial.print("  ");
+    Serial.print("Data: ");
+    Serial.println(ind->size);
+    Serial.print("message: ");
+  }
   rec_message = (uint8_t*)(ind->data);
+  switch((char)rec_message[0]){
+    case 's':
+      for(int i = 0; i < ind->size; i++){
+        Serial.println((int)rec_message[i+1]);
+      }
+      break;
+    case 'c':
+      byte tmparr[4];
+      float tmpflt;
+      for(int i = 0; i < 4; i++){
+        tmparr[i] = rec_message[i+1];
+      }
+      tmpflt = *(float *)&tmparr;
+      Serial.print(tmpflt);
+      Serial.print(",");
+      for(int i = 0; i < 4; i++){
+        tmparr[i] = rec_message[5+i];
+      }
+      tmpflt = *(float *)&tmparr;
+      Serial.println(tmpflt);
+      //Serial.print(",");
+      break;
+  }
   if((char)rec_message[0] == 's'){
     for(int i = 0; i < 5; i++){
       Serial.println((int)rec_message[i+1]);

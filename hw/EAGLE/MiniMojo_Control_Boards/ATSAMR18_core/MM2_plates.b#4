@@ -8,7 +8,7 @@
 </settings>
 <grid distance="1" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="0.003125" altunitdist="mic" altunit="mm"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="no" active="yes"/>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
 <layer number="3" name="Route3" color="4" fill="3" visible="no" active="no"/>
 <layer number="14" name="Route14" color="1" fill="6" visible="no" active="no"/>
@@ -20,7 +20,7 @@
 <layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="yes"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="25" name="tNames" color="7" fill="1" visible="no" active="yes"/>
 <layer number="26" name="bNames" color="7" fill="1" visible="no" active="yes"/>
@@ -36,9 +36,9 @@
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="yes"/>
 <layer number="37" name="tTest" color="7" fill="1" visible="no" active="yes"/>
 <layer number="38" name="bTest" color="7" fill="1" visible="no" active="yes"/>
-<layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="yes"/>
+<layer number="39" name="tKeepout" color="4" fill="11" visible="yes" active="yes"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="yes"/>
-<layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="yes"/>
+<layer number="41" name="tRestrict" color="4" fill="10" visible="yes" active="yes"/>
 <layer number="42" name="bRestrict" color="1" fill="10" visible="no" active="yes"/>
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="yes"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
@@ -199,6 +199,7 @@
 <hole x="25.6032" y="22.098" drill="0.254"/>
 <hole x="25.6032" y="21.59" drill="0.254"/>
 <hole x="25.6032" y="21.082" drill="0.254"/>
+<rectangle x1="9.0678" y1="8.6614" x2="10.4648" y2="12.5222" layer="41"/>
 </plain>
 <libraries>
 <library name="SparkFun-Connectors">
@@ -1464,7 +1465,6 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <attribute name="REFDES" value="RefDes" x="14.444909375" y="17.8308" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="MANUFACTURER_NAME" value="Texas Instruments" x="14.444909375" y="17.8308" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="L2" library="TPS61089RNRR_4.8V" package="XAL4020" value="1.2 uH" x="9.779" y="10.62355"/>
 <element name="R4" library="SparkFun-Resistors" package="1206" value="143k" x="9.8806" y="13.7668"/>
 <element name="R5" library="SparkFun-Passives" package="0402-RES" value="22.6k" x="17.4498" y="20.2692" rot="R180"/>
 <element name="C9" library="SparkFun-Passives" package="0805" value="1.2 nF" x="19.7104" y="20.2946" rot="R270"/>
@@ -1494,6 +1494,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <element name="Q3" library="SparkFun-DiscreteSemi" package="SOT23-3" value="MOSFET-NCHANNELAO3404A" x="31.5976" y="28.575">
 <attribute name="PROD_ID" value="TRAN-12988" x="31.5976" y="28.575" size="1.778" layer="27" display="off"/>
 </element>
+<element name="U$1" library="TPS61089RNRR_4.8V" package="XAL4020" value="XAL4020-122MEB" x="9.7348" y="10.619"/>
 </elements>
 <signals>
 <signal name="GND">
@@ -1685,7 +1686,6 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <via x="19.4056" y="27.3558" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="20.9296" y="27.3558" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="8.7376" y="15.9258" extent="1-16" drill="0.254" shape="octagon"/>
-<via x="9.7536" y="10.5918" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="19.812" y1="3.302" x2="17.272" y2="3.302" width="1.27" layer="1"/>
 <via x="7.6962" y="21.0058" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="17.9324" y="3.7338" extent="1-16" drill="0.254" shape="octagon"/>
@@ -1693,8 +1693,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <via x="14.8844" y="3.7338" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="15.6464" y="2.9718" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="17.1704" y="2.9718" extent="1-16" drill="0.254" shape="octagon"/>
-<via x="9.7536" y="9.0678" extent="1-16" drill="0.254" shape="octagon"/>
-<via x="9.7536" y="12.1158" extent="1-16" drill="0.254" shape="octagon"/>
+<via x="9.8806" y="7.4422" extent="1-16" drill="0.254" shape="octagon"/>
 <contactref element="U12" pad="7"/>
 <via x="29.7688" y="29.6672" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="36.2204" y="29.6926" extent="1-16" drill="0.254" shape="octagon"/>
@@ -1705,6 +1704,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="39.48659375" y1="5.599384375" x2="38.213803125" y2="4.32659375" width="0.1524" layer="1"/>
 <wire x1="39.624" y1="5.715" x2="40.386" y2="6.477" width="0.1524" layer="1"/>
 <wire x1="40.386" y1="6.477" x2="40.386" y2="8.382" width="0.1524" layer="1"/>
+<via x="10.0584" y="13.1572" extent="1-16" drill="0.254" shape="octagon"/>
 <wire x1="25.5778" y1="5.0442" x2="22.1488" y2="4.953" width="0" layer="19" extent="1-16"/>
 </signal>
 <signal name="VIN">
@@ -2038,7 +2038,6 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <contactref element="U8" pad="9"/>
 <contactref element="C20" pad="1"/>
 <contactref element="C19" pad="1"/>
-<contactref element="L2" pad="1"/>
 <wire x1="13.269909375" y1="17.5808" x2="11.8872" y2="17.5808" width="0.2286" layer="1"/>
 <wire x1="11.8872" y1="17.5808" x2="11.7602" y2="17.4094" width="0.2286" layer="1"/>
 <contactref element="U4" pad="1"/>
@@ -2082,6 +2081,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <wire x1="10.541" y1="3.5052" x2="9.5758" y2="3.5052" width="0.1524" layer="1"/>
 <wire x1="9.5758" y1="3.5052" x2="9.525" y2="3.556" width="0.1524" layer="1"/>
 <wire x1="9.525" y1="3.556" x2="10.1854" y2="3.556" width="0.1524" layer="1"/>
+<contactref element="U$1" pad="1"/>
 </signal>
 <signal name="V_MOT_UNSENSE">
 <contactref element="U9" pad="1"/>
@@ -2293,7 +2293,6 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 </signal>
 <signal name="N$28">
 <contactref element="C25" pad="2"/>
-<contactref element="L2" pad="2"/>
 <contactref element="U8" pad="11"/>
 <contactref element="R10" pad="1"/>
 <polygon width="0.1778" layer="1" thermals="no">
@@ -2318,6 +2317,7 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <via x="12.3444" y="10.1346" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="13.1064" y="9.6266" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="12.3444" y="9.1186" extent="1-16" drill="0.254" shape="octagon"/>
+<contactref element="U$1" pad="2"/>
 </signal>
 <signal name="N$29">
 <contactref element="U8" pad="1"/>

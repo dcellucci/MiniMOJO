@@ -21,24 +21,24 @@ static void appDataConf(NWK_DataReq_t *req);
 
 //Update 
 static bool sendStatus(NWK_DataInd_t *ind);
-static bool updateMotors(NWK_DataInd_t *ind);
 
-//1 is MOJO control
+//1 is Receiver
 //2 is USB bridge
 int meshAddress = 1;
 
+char payload[64] = "|abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+int curloc = 0;
 //Static data packet types (prevents memory leak)
 //LWM data request struct
 static NWK_DataReq_t nwkDataReq;
 //Payload array (10 byte limit right now)
-static uint8_t payload[9];
-static uint8_t servovals[5];
 
 uint8_t* rec_message;
 
 byte pingCounter = 0;
 
 boolean ledstatus = true; //for debug
+boolean debugmode = false;
 long curtime = 0;
 long ledupdatetime = 0;
 long servoupdatetime = 0;
@@ -46,8 +46,10 @@ long currentreadtime = 0;
 
 
 void setup() {
-  Serial.begin(115200);
-  Serial.println("MOJO Control Board - w Tiny841");
+  if(debugmode){
+    Serial.begin(115200);
+    Serial.println("MOJO Control Board - Receiver");
+  }
 
   //All this was from LWM example. Thanks Atmel.
   SPI.usingInterrupt(digitalPinToInterrupt(PIN_SPI_IRQ));
@@ -70,42 +72,14 @@ void setup() {
   PHY_SetChannel(0x1a);
   PHY_SetRxState(true);
   NWK_OpenEndpoint(1, sendStatus);
-  NWK_OpenEndpoint(2, updateMotors);
 
-  Wire.begin();        // join i2c bus (address optional for master)
-  servovals[0] = 72;
-  servovals[1] = 184;
-  servovals[2] = 185;
-  servovals[3] = 72;
-  servovals[4] = 184;
 }
 
 void loop() {
   SYS_TaskHandler();
-  curtime = millis();  
-
-  if(curtime - ledupdatetime > 10){
-    ledupdatetime = curtime;
-    digitalWrite(0, ledstatus);
-  }
-  if(curtime - servoupdatetime > 10){
-    servoupdatetime = curtime;
-    Wire.beginTransmission(4);
-      Wire.write(servovals[0]);
-      Wire.write(servovals[1]);
-      Wire.write(servovals[2]);
-    Wire.endTransmission();
-    Wire.beginTransmission(2);
-      Wire.write(servovals[3]);
-      Wire.write(servovals[4]);
-    Wire.endTransmission();
-  }
 }
 
 void parseMessage(char *data){
-  if(data[0] == 'l'){
-    ledstatus = !ledstatus;
-  }
 }
 
 static void sendMessage(void) {
@@ -126,52 +100,33 @@ static void sendMessage(void) {
  * then freeze... this method fixed it.
  */
 static void appDataConf(NWK_DataReq_t *req){
-  if (NWK_SUCCESS_STATUS == req->status)
-    Serial.println("Sent successfully");
-  else
-    Serial.println("Packet failed to send");
+  if(debugmode){
+    if (NWK_SUCCESS_STATUS == req->status)
+      Serial.println("Sent successfully");
+    else
+      Serial.println("Packet failed to send");
+  }
 }
 
 static bool sendStatus(NWK_DataInd_t *ind) {
-  Serial.print("Received message - ");
-  Serial.print("lqi: ");
-  Serial.print(ind->lqi, DEC);
-
-  Serial.print("  ");
-
-  Serial.print("rssi: ");
-  Serial.print(ind->rssi, DEC);
-  Serial.print("  ");
-  payload[0]= 's';
-
-  for(int i = 0; i < 5; i++){
-    payload[i+1] = servovals[i];
-  }
-
-  sendMessage();
-
-  ledstatus = true;  
-  return true;
-}
-
-static bool updateMotors(NWK_DataInd_t *ind) {
-  Serial.print("Received message - ");
-  Serial.print("lqi: ");
-  Serial.print(ind->lqi, DEC);
-
-  Serial.print("  ");
-
-  Serial.print("rssi: ");
-  Serial.print(ind->rssi, DEC);
-  Serial.print("  ");
-
-  rec_message = (uint8_t*)(ind->data);
-
-  Serial.println((char*)rec_message);
-
-  for(int i = 0; i < 5; i++){
-    servovals[i] = rec_message[i];
-  }
+  if(debugmode){
+    Serial.print("Status Request Received...");
+    Serial.print("lqi: ");
+    Serial.print(ind->lqi, DEC);
   
+    Serial.print("  ");
+  
+    Serial.print("rssi: ");
+    Serial.print(ind->rssi, DEC);
+    Serial.print("  ");
+  }
+
+  char tmp = payload[(curloc+1)%63];
+  payload[(curloc+1)%63]='|';
+  payload[curloc]=tmp;
+  sendMessage();
+  curloc = (curloc+1)%63;
+
   return true;
 }
+

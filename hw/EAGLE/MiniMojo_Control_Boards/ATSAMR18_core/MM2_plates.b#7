@@ -1701,7 +1701,9 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <via x="34.2646" y="23.5712" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="25.8318" y="9.5504" extent="1-16" drill="0.254" shape="octagon"/>
 <via x="34.8742" y="10.3124" extent="1-16" drill="0.254" shape="octagon"/>
-<wire x1="25.5778" y1="5.0442" x2="22.1488" y2="4.953" width="0" layer="19" extent="1-16"/>
+<contactref element="U6" pad="2"/>
+<wire x1="22.1488" y1="4.953" x2="25.5778" y2="5.0442" width="0" layer="19" extent="1-16"/>
+<wire x1="39.48659375" y1="5.599384375" x2="38.213803125" y2="4.32659375" width="0.1524" layer="1"/>
 </signal>
 <signal name="VIN">
 <contactref element="U1" pad="3"/>
@@ -1815,9 +1817,6 @@ This Tempo Automation 2 Layer .DRU has been set to cover our standard requiremen
 <contactref element="C6" pad="1"/>
 <wire x1="37.754184375" y1="4.7862125" x2="37.022184375" y2="4.7862125" width="0.3556" layer="1"/>
 <wire x1="37.022184375" y1="4.7862125" x2="36.29901875" y2="5.509378125" width="0.3556" layer="1"/>
-</signal>
-<signal name="N$12">
-<contactref element="U6" pad="2"/>
 </signal>
 <signal name="XIN">
 <contactref element="U7" pad="1"/>
