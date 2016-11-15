@@ -7,9 +7,10 @@ That's the one with the battery backpack.
 ### TeuxDeux
 
  1. Add solder jumper to disconnect power for I2C cable
- 2. Move backpack switch
+ 2. Move backpack switch to somewhere reachable
+ 	2a. backpack switch should turn IC on/off, IC should turn motors on/off
  3. Move servo connector up
-
+ 
 
 ### Notes
 
