@@ -132,10 +132,12 @@ void parseCommand(){
         //Status request packet, send to endpoint 1
         sendMessage(1);
         break;
-      case 'w':
-        for(int i = 0; i < 5; i++){
-          payload[i] = Serial.read();
-        }
+      case 'w': // mapping to be compatible with kenny's program CHANGE THIS
+        payload[0] = Serial.read(); 
+        payload[1] = Serial.read();
+        payload[3] = Serial.read();
+        payload[4] = Serial.read();
+        payload[2] = Serial.read();
         //Motor update packet, send to endpoint 2
         sendMessage(2);
         break;
