@@ -123,6 +123,11 @@ void parseCommand(){
         ledstatus = !ledstatus;
         digitalWrite(0,ledstatus);
         break;
+      case 'v':
+        debug = !debug;
+        if(debug)
+          Serial.println("Debug Serial Enabled");
+        break;
       case 's':
         //Status request packet, send to endpoint 1
         sendMessage(1);
@@ -152,6 +157,8 @@ void parseCommand(){
         sendMessage(4);
         break;
     }
+    if(debug)
+      Serial.print("Acknowledge: ");
     Serial.println(ack);
   }
 }
@@ -175,6 +182,8 @@ static void sendMessage(int dstEndpointVal){
 // Otherwise, outputs the info, and formats it if necessary
 
 static bool receiveMessage(NWK_DataInd_t *ind) {
+  rec_message = (uint8_t*)(ind->data);
+
   if(debug){
     Serial.print("Received message - ");
     Serial.print("lqi: ");
@@ -188,8 +197,9 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
     Serial.print("Data: ");
     Serial.println(ind->size);
     Serial.println("message: ");
+    Serial.println((char*)rec_message);
+
   }
-  rec_message = (uint8_t*)(ind->data);
   if(rec_message[0] == 'c'){
     Serial.print("c,");
     byte tmparr[4];

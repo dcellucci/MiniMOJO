@@ -1,21 +1,22 @@
 #include <Arduino.h>
 #include <Wire.h>
-
 #include <SPI.h>
 
 #define Serial SERIAL_PORT_USBVIRTUAL
 
+//Lightweight Mesh
 #include "lwm.h"
 #include "lwm/sys/sys.h"
 #include "lwm/nwk/nwk.h"
 
+//CSL extension for the INA219 sensor
 #include <MOJO_INA219.h>
 
 extern "C" {
   void println(char *x) { Serial.println(x); Serial.flush(); }
 }
 
-#define LED_PIN 0
+const int LED_PIN = 0;
  
 // LWM mesh methods 
 
@@ -30,7 +31,7 @@ static void appDataConf(NWK_DataReq_t *req);
 // a packet with that endpoint destination calls 
 // that method when parsed.
 
-//Sends Current Status, single packet
+//Sends Present Status, single packet
 //Endpoint: 1
 //Payload:  None
 static bool sendStatus(NWK_DataInd_t *ind);
@@ -45,8 +46,13 @@ static bool updateMotors(NWK_DataInd_t *ind);
 //Payload:  None
 static bool changeSetting(NWK_DataInd_t *ind);
 
+//Sends Current Values, single packet
+//Endpoint: 4
+//Payload:  None
+static bool sendCurrent(NWK_DataInd_t *ind);
+
 //Are we using serial comms?
-boolean usingSerial = false;
+boolean usingSerial = true;
 
 //1 is MOJO control
 //2 is USB bridge
@@ -122,6 +128,7 @@ void setup() {
   NWK_OpenEndpoint(1, sendStatus);
   NWK_OpenEndpoint(2, updateMotors);
   NWK_OpenEndpoint(3, changeSetting);
+  NWK_OpenEndpoint(4, sendCurrent);
 
   Wire.begin();
   
@@ -176,22 +183,18 @@ void parseSerialMessage(){
 
 void parseCommand(char* comm){
   switch(comm[0]){
-    case '!':
-      switch(comm[1]){
-        case 's':
-          usingSerial = !usingSerial;
-          break;
-        case 'i':
-          i2c_startup();
-          break;
-        case 'I':
-          usingSerial = !usingSerial;
-          i2c_startup();
-          break;
-        case 'l':
-          ledstatus = !ledstatus;
-          break;
-      }
+    case 's':
+      usingSerial = !usingSerial;
+      break;
+    case 'i':
+      i2c_startup();
+      break;
+    case 'I':
+      usingSerial = false;
+      i2c_startup();
+      break;
+    case 'l':
+      ledstatus = !ledstatus;
       break;
    }
 }
@@ -202,7 +205,7 @@ void readCurrentValues(){
   bot_cur_mA = bot_cur_sen.getCurrent_mA()*correction_factor;
 }
 
-void sendCurrentValues(){
+void sendCurrent(){
   if(usingSerial){
     Serial.print(top_cur_mA);
     Serial.print(",");
@@ -264,16 +267,9 @@ static void appDataConf(NWK_DataReq_t *req){
 
 static bool sendStatus(NWK_DataInd_t *ind) {
   if(usingSerial){
-    Serial.print("Received message - ");
-    Serial.print("lqi: ");
-    Serial.print(ind->lqi, DEC);
-  
-    Serial.print("  ");
-  
-    Serial.print("rssi: ");
-    Serial.print(ind->rssi, DEC);
-    Serial.print("  ");
+    printReceivedMessageStatus(ind);
   }
+  
   payload[0]= 's';
 
   for(int i = 0; i < 5; i++){
@@ -290,17 +286,7 @@ static bool updateMotors(NWK_DataInd_t *ind) {
   rec_message = (uint8_t*)(ind->data);
 
   if(usingSerial){
-    Serial.print("Received message - ");
-    Serial.print("lqi: ");
-    Serial.print(ind->lqi, DEC);
-  
-    Serial.print("  ");
-  
-    Serial.print("rssi: ");
-    Serial.print(ind->rssi, DEC);
-    Serial.print("  ");
-
-    Serial.println((char*)rec_message);
+    printReceivedMessageStatus(ind);
   }
 
   for(int i = 0; i < 5; i++)
@@ -312,7 +298,36 @@ static bool updateMotors(NWK_DataInd_t *ind) {
 
 static bool changeSetting(NWK_DataInd_t *ind){
   rec_message = (uint8_t*)(ind->data);
+  if(usingSerial){
+    printReceivedMessageStatus(ind);
+  }
   parseCommand((char*)rec_message);
+  return true;
+}
+
+static bool sendCurrent(NWK_DataInd_t *ind){
+  rec_message = (uint8_t*)(ind->data);
+  if(usingSerial){
+    printReceivedMessageStatus(ind);
+    Serial.print("Currents (mA): ");
+    Serial.print(top_cur_mA);
+    Serial.print(",");
+    Serial.println(bot_cur_mA);
+  } 
+  else{
+    payload[0]= 'c';
+    byte *top = (byte *)&top_cur_mA;
+    payload[1] = top[0];
+    payload[2] = top[1];
+    payload[3] = top[2];
+    payload[4] = top[3];
+    byte *bot = (byte *)&bot_cur_mA;
+    payload[5] = bot[0];
+    payload[6] = bot[1];
+    payload[7] = bot[2];
+    payload[8] = bot[3];
+    sendMessage();
+  }
   return true;
 }
 
@@ -321,7 +336,21 @@ void i2c_startup(){
   top_cur_sen.setCalibration_MOJO();
   bot_cur_sen.begin(bot_cur_address);
   bot_cur_sen.setCalibration_MOJO();
-
+  
   i2c_ready = true;
+}
+
+void printReceivedMessageStatus(NWK_DataInd_t *ind){
+    Serial.print("Received message - ");
+    Serial.print("lqi: ");
+    Serial.print(ind->lqi, DEC);
+  
+    Serial.print("  ");
+  
+    Serial.print("rssi: ");
+    Serial.print(ind->rssi, DEC);
+    Serial.print("  ");
+
+    Serial.println((char*)rec_message);
 }
 
