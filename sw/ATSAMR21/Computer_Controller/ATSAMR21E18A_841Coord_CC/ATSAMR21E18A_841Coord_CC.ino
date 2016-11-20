@@ -73,6 +73,7 @@ uint8_t* rec_message;
 //Booleans
 boolean ledstatus = true; //for debug
 boolean i2c_ready = false;
+boolean debug = false;
 
 /* TIMING VARIABLES
  *  
@@ -136,9 +137,9 @@ void setup() {
   //Initialize Servo Values
   servovals[0] = 72;
   servovals[1] = 184;
-  servovals[2] = 175;
-  servovals[3] = 72;
-  servovals[4] = 184;
+  servovals[2] = 72;
+  servovals[3] = 184;
+  servovals[4] = 175;
 
 }
 
@@ -196,6 +197,16 @@ void parseCommand(char* comm){
     case 'l':
       ledstatus = !ledstatus;
       break;
+    case 'v':
+      debug = !debug;
+      payload[0] = 'v';
+      payload[1] = ':';
+      if(debug)
+        payload[2] = 't';
+      else
+        payload[2] = 'f';
+      sendMessage();
+      break;
    }
 }
 
@@ -212,6 +223,7 @@ void sendCurrent(){
     Serial.println(bot_cur_mA);
   }
   else{
+    memset(payload,0,sizeof(payload));
     payload[0]= 'c';
     byte *top = (byte *)&top_cur_mA;
     payload[1] = top[0];
@@ -231,13 +243,13 @@ void updateServos(){
     Wire.beginTransmission(4);
       Wire.write(servovals[0]);
       Wire.write(servovals[1]);
-      Wire.write(servovals[2]);
+      Wire.write(servovals[4]);
     Wire.endTransmission();
     
     Wire.beginTransmission(2);
+      Wire.write(servovals[2]);
       Wire.write(servovals[3]);
       Wire.write(servovals[4]);
-      Wire.write(servovals[2]);
     Wire.endTransmission();
 }
 
@@ -292,7 +304,18 @@ static bool updateMotors(NWK_DataInd_t *ind) {
   for(int i = 0; i < 5; i++)
     if(rec_message[i] != 0)
       servovals[i] = rec_message[i];
+
+  if(debug){
+      //malloc(payload, 0, sizeof(payload));
+      payload[0] = 'm';
+      payload[1] = servovals[0]; 
+      payload[2] = servovals[1]; 
+      payload[3] = servovals[2]; 
+      payload[4] = servovals[3]; 
+      payload[5] = servovals[4]; 
   
+      sendMessage();
+  }
   return true;
 }
 

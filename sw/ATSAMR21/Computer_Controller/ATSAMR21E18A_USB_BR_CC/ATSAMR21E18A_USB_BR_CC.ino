@@ -106,10 +106,10 @@ void loop() {
  * then freeze... this method fixed it.
  */
 static void appDataConf(NWK_DataReq_t *req){
-  if (NWK_SUCCESS_STATUS == req->status)
-    Serial.println("Sent successfully");
-  else
-    Serial.println("Packet failed to send");
+  if (NWK_SUCCESS_STATUS == req->status && debug)
+    Serial.println("Sent successfully to Coord.");
+  else if (debug)
+    Serial.println("Packet to Coord. failed to send");
 }
 
 void parseCommand(){
@@ -126,19 +126,31 @@ void parseCommand(){
       case 'v':
         debug = !debug;
         if(debug)
-          Serial.println("Debug Serial Enabled");
+          Serial.println("Debug Mode Enabled");
         break;
       case 's':
         //Status request packet, send to endpoint 1
         sendMessage(1);
         break;
-      case 'w': // mapping to be compatible with kenny's program CHANGE THIS
+      case 'w': 
         payload[0] = Serial.read(); 
         payload[1] = Serial.read();
+        payload[2] = Serial.read();
         payload[3] = Serial.read();
         payload[4] = Serial.read();
-        payload[2] = Serial.read();
         //Motor update packet, send to endpoint 2
+        if(debug){
+          Serial.println("Received the following motor values:");
+          Serial.print(payload[0],DEC);
+          Serial.print(" ");
+          Serial.print(payload[1],DEC);
+          Serial.print(" ");
+          Serial.print(payload[2],DEC);
+          Serial.print(" ");
+          Serial.print(payload[3],DEC);
+          Serial.print(" ");
+          Serial.println(payload[4],DEC);
+        }
         sendMessage(2);
         break;
       case '!':
@@ -187,12 +199,10 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
   rec_message = (uint8_t*)(ind->data);
 
   if(debug){
-    Serial.print("Received message - ");
+    Serial.print("Received Coordinator Message - ");
     Serial.print("lqi: ");
     Serial.print(ind->lqi, DEC);
-  
     Serial.print("  ");
-  
     Serial.print("rssi: ");
     Serial.print(ind->rssi, DEC);
     Serial.print("  ");
@@ -200,9 +210,8 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
     Serial.println(ind->size);
     Serial.println("message: ");
     Serial.println((char*)rec_message);
-
   }
-  if(rec_message[0] == 'c'){
+  else if(rec_message[0] == 'c'){
     Serial.print("c,");
     byte tmparr[4];
     int tmpint;
@@ -219,7 +228,9 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
     tmpint = (int)*(float *)&tmparr;
     Serial.println(tmpint);
   }
-  else
+  else{
+    Serial.print("Received Coordinator Message:");
     Serial.println((char*)rec_message);
+  }
   return true;
 }
