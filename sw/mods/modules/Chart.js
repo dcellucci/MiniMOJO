@@ -12,23 +12,36 @@
 //
 
 (function(){
-var newScript = document.createElement('script')
-newScript.src = "https://d3js.org/d3.v4.js"
-document.body.appendChild(newScript)
 //
 // module globals
 //
 var mod = {}
-var data = [4, 8, 15, 16, 23, 42];
+
 var input
 //
 // name
 //
+var name = 'Chart'
 //
 // initialization
 //
 var init = function() {
-   //createChart()
+    mod.data = [{
+        x: ['2013-10-04 22:23:00', '2013-11-04 22:23:00', '2013-12-04 22:23:00'],
+        y: [1, 3, 6],
+        type: 'scatter'
+    }];
+    mod.layout = [{
+      autosize: true,
+      margin: {
+        l: 0,
+        r: 0,
+        b: 0,
+        t: 0,
+        pad: 0
+      }
+    }];
+    plot()
    }
 //
 // inputs
@@ -54,62 +67,27 @@ var outputs = {
 
 var interface = function(div){
    mod.div = div
-   chart = document.createElement('div')
-   chart.style.cssText = "font: 10px sans-serif;background-color: steelblue;text-align: right;padding: 3px;margin: 1px;color: white;"
-   chart.className = ".chart"
-   div.appendChild(chart)
-
-   div.appendChild(document.createTextNode('Bridge LED'))
-   div.appendChild(document.createElement('br'))
-   input = document.createElement('div')
-      input.style = 'background:red; border-radius: 25px; width: 50px; height: 50px;'
-   div.appendChild(input)
-   div.appendChild(document.createElement('br'))   
-
-   var btn = document.createElement('button')
-      btn.style.margin = 1
-      btn.appendChild(document.createTextNode('Toggle Bridge. LED'))
-      btn.addEventListener('click', sendBridgeToggle)
-   div.appendChild(btn)         
-
-   div.appendChild(document.createTextNode('Coord. LED'))   
-   div.appendChild(document.createElement('br'))
-
-   input = document.createElement('div')
-      input.style = 'background: black; border-radius: 25px; width: 50px; height: 50px;'
-    div.appendChild(input)
-   div.appendChild(document.createElement('br'))
-
-   var btn = document.createElement('button')
-      btn.style.margin = 1
-      btn.appendChild(document.createTextNode('Toggle Coord. LED'))
-      btn.addEventListener('click', createChart)
-   div.appendChild(btn)         
-   }
+   var canvas = document.createElement('canvas')
+      canvas.width = 300
+      canvas.height = 0
+      canvas.style.backgroundColor = 'rgb(255,255,255)'
+      div.appendChild(canvas)
+    var subdiv = document.createElement('div')
+      subdiv.setAttribute("id","myPlot")
+   div.appendChild(subdiv)
+   //
+}
 
 
 
 //
 // local functions
 //
-function sendBridgeToggle(){
-   mod.value = 'l'
-   outputs.output.event()
-}
-function sendCoordToggle(){
-   mod.value = '!l'
-   outputs.output.event()
+function plot(){
+  Plotly.plot(document.getElementById('myPlot'),mod.data)  
 }
 
-function createChart(){
-   d3.select(".chart")
-     .selectAll("div")
-       .data(data)
-     .enter().append("div")
-       .style("width", function(d) { return d + "px"; })
-       .text(function(d) { return d+"\n"; });
-       input.style = 'background: red; border-radius: 25px; width: 50px; height: 50px;'
-}
+
 
 //
 // return values

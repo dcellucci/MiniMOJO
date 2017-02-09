@@ -5724,6 +5724,7 @@ Some male, some female. Watch your step!</description>
 <wire x1="-25.4" y1="116.84" x2="-22.86" y2="116.84" width="0.1524" layer="91"/>
 <wire x1="-22.86" y1="116.84" x2="-22.86" y2="109.22" width="0.1524" layer="91"/>
 <pinref part="GND8" gate="1" pin="GND"/>
+<junction x="-22.86" y="116.84"/>
 </segment>
 <segment>
 <pinref part="U7" gate="G$1" pin="GND@1"/>
@@ -5732,6 +5733,7 @@ Some male, some female. Watch your step!</description>
 <wire x1="-45.72" y1="124.46" x2="-53.34" y2="124.46" width="0.1524" layer="91"/>
 <wire x1="-53.34" y1="124.46" x2="-53.34" y2="116.84" width="0.1524" layer="91"/>
 <pinref part="GND9" gate="1" pin="GND"/>
+<junction x="-45.72" y="124.46"/>
 </segment>
 <segment>
 <pinref part="U6" gate="G$1" pin="5"/>
@@ -5824,6 +5826,7 @@ Some male, some female. Watch your step!</description>
 <wire x1="33.02" y1="-15.24" x2="17.78" y2="-15.24" width="0.1524" layer="91"/>
 <wire x1="17.78" y1="-15.24" x2="17.78" y2="-12.7" width="0.1524" layer="91"/>
 <pinref part="S2" gate="G$1" pin="1"/>
+<junction x="33.02" y="-15.24"/>
 </segment>
 <segment>
 <pinref part="Q1" gate="G$1" pin="S"/>
@@ -5972,6 +5975,7 @@ Some male, some female. Watch your step!</description>
 <wire x1="365.76" y1="53.34" x2="365.76" y2="60.96" width="0.1524" layer="91"/>
 <wire x1="365.76" y1="60.96" x2="353.06" y2="60.96" width="0.1524" layer="91"/>
 <junction x="353.06" y="60.96"/>
+<junction x="342.9" y="40.64"/>
 </segment>
 <segment>
 <pinref part="U21" gate="G$1" pin="GND"/>
@@ -6040,6 +6044,9 @@ Some male, some female. Watch your step!</description>
 <wire x1="58.42" y1="157.48" x2="58.42" y2="154.94" width="0.1524" layer="91"/>
 <pinref part="C4" gate="G$1" pin="2"/>
 <junction x="55.88" y="157.48"/>
+<pinref part="U1" gate="G$1" pin="NC"/>
+<wire x1="53.34" y1="147.32" x2="55.88" y2="147.32" width="0.1524" layer="91"/>
+<wire x1="55.88" y1="147.32" x2="55.88" y2="157.48" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="R1" gate="G$1" pin="2"/>
@@ -6161,6 +6168,7 @@ Some male, some female. Watch your step!</description>
 <pinref part="C1" gate="G$1" pin="1"/>
 <wire x1="-25.4" y1="124.46" x2="-22.86" y2="124.46" width="0.1524" layer="91"/>
 <wire x1="-22.86" y1="124.46" x2="-17.78" y2="124.46" width="0.1524" layer="91"/>
+<junction x="-22.86" y="124.46"/>
 </segment>
 <segment>
 <pinref part="U2" gate="G$1" pin="XTAL2"/>
@@ -6174,6 +6182,7 @@ Some male, some female. Watch your step!</description>
 <pinref part="C2" gate="G$1" pin="2"/>
 <wire x1="-43.18" y1="116.84" x2="-45.72" y2="116.84" width="0.1524" layer="91"/>
 <wire x1="-45.72" y1="116.84" x2="-45.72" y2="109.22" width="0.1524" layer="91"/>
+<junction x="-45.72" y="116.84"/>
 </segment>
 <segment>
 <pinref part="U2" gate="G$1" pin="XTAL1"/>
@@ -6394,6 +6403,7 @@ Some male, some female. Watch your step!</description>
 <wire x1="322.58" y1="10.16" x2="297.18" y2="10.16" width="0.1524" layer="91"/>
 <label x="299.72" y="10.16" size="1.778" layer="95"/>
 <pinref part="L2" gate="G$1" pin="P$1"/>
+<junction x="322.58" y="10.16"/>
 </segment>
 <segment>
 <wire x1="297.18" y1="86.36" x2="309.88" y2="86.36" width="0.1524" layer="91"/>
@@ -6538,6 +6548,7 @@ Some male, some female. Watch your step!</description>
 <wire x1="518.16" y1="-7.62" x2="523.24" y2="-7.62" width="0.1524" layer="91"/>
 <wire x1="523.24" y1="-7.62" x2="523.24" y2="-12.7" width="0.1524" layer="91"/>
 <wire x1="518.16" y1="-7.62" x2="518.16" y2="2.54" width="0.1524" layer="91"/>
+<junction x="518.16" y="-7.62"/>
 </segment>
 </net>
 <net name="CURSENSE" class="0">
@@ -7057,6 +7068,7 @@ Some male, some female. Watch your step!</description>
 <wire x1="452.12" y1="-27.94" x2="452.12" y2="-30.48" width="0.1524" layer="91"/>
 <wire x1="452.12" y1="-27.94" x2="452.12" y2="-2.54" width="0.1524" layer="91"/>
 <label x="452.12" y="-25.4" size="1.778" layer="95" rot="R90"/>
+<junction x="452.12" y="-27.94"/>
 </segment>
 </net>
 <net name="V_BATT_BB" class="0">
@@ -7179,6 +7191,8 @@ Some male, some female. Watch your step!</description>
 <wire x1="167.64" y1="27.94" x2="160.02" y2="27.94" width="0.1524" layer="91"/>
 <wire x1="160.02" y1="27.94" x2="160.02" y2="7.62" width="0.1524" layer="91"/>
 <wire x1="160.02" y1="7.62" x2="167.64" y2="7.62" width="0.1524" layer="91"/>
+<junction x="167.64" y="7.62"/>
+<junction x="200.66" y="7.62"/>
 </segment>
 </net>
 <net name="N$33" class="0">

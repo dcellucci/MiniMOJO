@@ -16,7 +16,7 @@
 //
 // module globals
 //
-var mod = {}
+var mod = {bloop:["deep","dop"]}
 //
 // name
 //
@@ -25,12 +25,31 @@ var name = 'MOJOUI'
 // initialization
 //
 var init = function() {
+   mod.data = [{
+      x: ['2013-10-04 22:23:00', '2013-11-04 22:23:00', '2013-12-04 22:23:00'],
+      y: [1, 3, 6],
+      type: 'scatter'
+   }];
+   mod.layout = {
+      autosize:true,
+      height:500,
+      margin:{
+         l:20,
+         r:20,
+         b:50,
+         t:20,
+         pad:10
+      }
+   };
    openUI()
    }
 //
 // inputs
 //
-var inputs = {
+var inputs = {/*
+   input:{type:'array',
+   event:function(){
+      mods}}*/
    }
 //
 // outputs
@@ -60,9 +79,28 @@ var interface = function(div){
 //
 // local functions
 //
+
 function openUI() {
    mod.motorvals = new Array
    var win = window.open('')
+   var link = document.createElement('link')
+      link.rel = "stylesheet"
+      link.href = "https://unpkg.com/purecss@0.6.0/build/pure-min.css"
+   win.document.head.appendChild(link)
+   var link = document.createElement('link')
+      link.rel = "stylesheet"
+      link.href = "https://unpkg.com/purecss@0.6.0/build/grids-responsive-min.css"
+   win.document.head.appendChild(link)
+
+   var meta = document.createElement('meta')
+      meta.name = "viewport"
+      meta.setAttribute("content","width=device-width, initial-scale=1")
+   win.document.head.appendChild(meta)
+
+   var script = document.createElement('script')
+      script.src = "MOJOUI_handler.js"
+   win.document.head.appendChild(script)
+
    //
    // close
    //
@@ -79,100 +117,86 @@ function openUI() {
    //
    // button 1
    //
-   var btn = document.createElement('button')
-      btn.appendChild(document.createTextNode('Open'))
-      btn.style.padding = mods.ui.padding
-      btn.style.margin = 1
-      btn.addEventListener('click',openMOJO)
-      win.document.body.appendChild(btn)
-   win.document.body.appendChild(document.createTextNode(' '))
+   var div = document.createElement('div')
+   div.setAttribute("class","pure-g")
+   var divcol = document.createElement('div')
+   divcol.setAttribute("class", "pure-u-1 pure-u-md-1-2")
 
-   var btn = document.createElement('button')
-      btn.appendChild(document.createTextNode('Close'))
-      btn.style.padding = mods.ui.padding
-      btn.style.margin = 1
-      btn.addEventListener('click',closeMOJO)
-      win.document.body.appendChild(btn)
-   win.document.body.appendChild(document.createTextNode(' '))
+      var subdiv = document.createElement('div')
+      subdiv.setAttribute("class","pure-u-1-3")
+          var btn = document.createElement('button')
+             btn.appendChild(document.createTextNode('Open Motors'))
+             btn.setAttribute('class','pure-button pure-button-primary')
+             btn.style.padding = mods.ui.padding
+             btn.style.margin = 1
+             btn.addEventListener('click',openMOJO)
+      subdiv.appendChild(btn)
+   divcol.appendChild(subdiv)
+
+      var subdiv = document.createElement('div')
+      subdiv.setAttribute("class","pure-u-1-3")
+      var btn = document.createElement('button')
+         btn.appendChild(document.createTextNode('Close Motors'))
+         btn.setAttribute('class','pure-button pure-button-primary')
+         btn.style.padding = mods.ui.padding
+         btn.style.margin = 1
+         btn.addEventListener('click',closeMOJO)
+      subdiv.appendChild(btn)
+   divcol.appendChild(subdiv)
    //
    // button 2
    //
-   var btn = document.createElement('button')
-      btn.appendChild(document.createTextNode('send'))
-      btn.style.padding = mods.ui.padding
-      btn.style.margin = 1
-      btn.addEventListener('click',function(){
-         outputs.output.event()
-         })
-      win.document.body.appendChild(btn)
-   win.document.body.appendChild(document.createElement('br'))
+      var subdiv = document.createElement('div')
+      subdiv.setAttribute("class","pure-u-1-3")
+      var btn = document.createElement('button')
+         btn.appendChild(document.createTextNode('Send Positions'))
+         btn.setAttribute('class','pure-button pure-button-primary')
+         btn.style.padding = mods.ui.padding
+         btn.style.margin = 1
+         btn.addEventListener('click',function(){
+            outputs.output.event()
+            })
+      subdiv.appendChild(btn)
+   divcol.appendChild(subdiv)
+   
    //
    // text 1
    //
-   win.document.body.appendChild(document.createTextNode('Motor 1: '))
-   var input = document.createElement('input')
-      input.type = 'text'
-      input.size = 6
-      input.addEventListener('input',parseMotVals)
-      input.value = 128
-      win.document.body.appendChild(input)
+      var subdiv = document.createElement('div')
+         subdiv.setAttribute("class","pure-u-1-2")
+         subdiv.appendChild(document.createTextNode('Motor 1: '))
+   divcol.appendChild(subdiv)
+      var subdiv = document.createElement('div')
+         subdiv.setAttribute("class","pure-u-1-2")
+         var input = document.createElement('input')
+            input.type = 'text'
+            input.size = 6
+            input.addEventListener('input',parseMotVals)
+            input.value = 128
+      subdiv.appendChild(input)
       mod.motorvals.push(input)
+   divcol.appendChild(subdiv)
+   
+  
+   win.document.body.appendChild(divcol)   
 
-   var input = document.createElement('input')
-      input.type = 'text'
-      input.size = 6
-      win.document.body.appendChild(input)
-      mod.outputdisplay = input
-   win.document.body.appendChild(document.createElement('br'))
-   //
-   // text 2
-   //
-   win.document.body.appendChild(document.createTextNode('Motor 2: '))
-   var input = document.createElement('input')
-      input.type = 'text'
-      input.size = 6
-      input.addEventListener('input',parseMotVals)
-      input.value = 128
-      win.document.body.appendChild(input)
-      mod.motorvals.push(input)
-   win.document.body.appendChild(document.createElement('br'))
+   var divcol = document.createElement('div')
+   divcol.setAttribute("class", "pure-u-1 pure-u-md-1-2")
 
-   //
-   // text 3
-   //
-   win.document.body.appendChild(document.createTextNode('Motor 3: '))
-   var input = document.createElement('input')
-      input.type = 'text'
-      input.size = 6
-      input.addEventListener('input',parseMotVals)
-      input.value = 128
-      win.document.body.appendChild(input)
-      mod.motorvals.push(input)
+      var subdiv = document.createElement('div')
+      subdiv.setAttribute("id","myPlot")
+      subdiv.setAttribute("class","pure-u-1")
+      subdiv.setAttribute("style","padding:0px; margin:0px")
+   divcol.appendChild(subdiv)
+   win.document.body.appendChild(divcol)
+   win.document.body.setAttribute("onload","bodyLoad()")
+
    win.document.body.appendChild(document.createElement('br'))
-   //
-   // text 2
-   //
-   win.document.body.appendChild(document.createTextNode('Motor 4: '))
-   var input = document.createElement('input')
-      input.type = 'text'
-      input.size = 6
-      input.addEventListener('input',parseMotVals)
-      input.value = 128
-      win.document.body.appendChild(input)
-      mod.motorvals.push(input)
-   win.document.body.appendChild(document.createElement('br'))
-   //
-   // text 2
-   //
-   win.document.body.appendChild(document.createTextNode('Motor 5: '))
-   var input = document.createElement('input')
-      input.type = 'text'
-      input.size = 6
-      input.addEventListener('input',parseMotVals)
-      input.value = 128
-      win.document.body.appendChild(input)
-      mod.motorvals.push(input)
-   }  
+   Plotly.plot(win.document.getElementById('myPlot'),mod.data,mod.layout,{staticPlot:true})
+   win.onresize = function(){
+      Plotly.Plots.resize(win.document.getElementById('myPlot'))
+   }
+}  
 
 function parseMotVals(){
    mod.value = 'w'

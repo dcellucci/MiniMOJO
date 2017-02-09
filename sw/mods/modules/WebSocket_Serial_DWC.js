@@ -27,9 +27,9 @@ var name = 'WebSocket serial'
 var init = function() {
    mod.address.value = '127.0.0.1'
    mod.port.value = 1234
-   mod.device.value = 'tty.usbserial-A105BQJM'
+   mod.device = ''
    mod.baud.value = 9600
-   mod.flow_rtscts.checked = true
+   mod.flow_rtscts.checked = false
    mod.socket = null
    socket_open()
    }
@@ -54,14 +54,19 @@ var inputs = {
             mod.label.nodeValue = 'send file'
             mod.labelspan.style.fontWeight = 'bold'
             }
-         }}}
+         }
+      }
+   }
 //
 // outputs
 //
 var outputs = {
    receive:{type:'string',
       event:function(str){
-         mods.output(mod,'receive',str)}}}
+         mods.output(mod,'receive',str)
+         }
+      }
+   }
 //
 
 //
@@ -132,6 +137,13 @@ var interface = function(div){
    //
    var btn = document.createElement('button')
       btn.style.margin = 1
+      btn.appendChild(document.createTextNode('scan'))
+      btn.addEventListener('click',function() {
+         serial_scan()
+         })
+      div.appendChild(btn)
+   var btn = document.createElement('button')
+      btn.style.margin = 1
       btn.appendChild(document.createTextNode('open'))
       btn.addEventListener('click',function() {
          serial_open()
@@ -149,11 +161,15 @@ var interface = function(div){
    // device
    //
    div.appendChild(document.createTextNode('/dev/'))
-   var input = document.createElement('input')
-      input.type = 'text'
-      input.size = 10
-      div.appendChild(input)
-      mod.device = input
+   mod.device = ""
+   var sel = document.createElement('select')
+   sel.style.padding = mods.ui.padding
+   sel.addEventListener(('change'),function(evt){
+      mod.device = evt.target.value
+      })
+   sel.style.width = "100px"
+   mod.portlist = sel
+   div.appendChild(mod.portlist)
    div.appendChild(document.createElement('br'))   
    //
    // baud rate
@@ -195,7 +211,21 @@ var interface = function(div){
       input.disabled = true
       mod.flow_dsrdtr = input
    div.appendChild(document.createTextNode('DSRDTR'))
-   div.appendChild(document.createElement('br'))   
+   div.appendChild(document.createElement('br'))  
+   var btn = document.createElement('button')
+      btn.style.padding = mods.ui.padding
+      btn.style.margin = 1
+      var span = document.createElement('span')
+         var text = document.createTextNode('scan')
+            mod.label = text
+            span.appendChild(text)
+         mod.labelspan = span
+      btn.appendChild(span)
+      btn.addEventListener('click',function(){
+         serial_scan();
+      })
+   div.appendChild(btn)
+   div.appendChild(document.createElement('br'))  
    //
    // file button
    //
@@ -227,26 +257,45 @@ var interface = function(div){
 //
 // local functions
 //
+
+function parseMessage(event){
+   console.log(event)
+   if(typeof event.data !== 'undefined'){
+      var message = JSON.parse(event.data)
+      switch(message.type){
+         case 'data':
+            mod.status.value = 'passing data'
+            outputs.receive.event(message.data)
+            break;
+         case 'ports':
+            mod.status.value = 'populating portlist...'
+            populate_portlist(message.data)
+            break;
+         default:
+            mod.status.value = message.data
+            mod.label.nodeValue = 'waiting for file'
+            mod.labelspan.style.fontWeight = 'normal'
+      }
+   }
+}
+
 function socket_open() {
    var url = "ws://"+mod.address.value+':'+mod.port.value
    mod.socket = new WebSocket(url)
    mod.socket.onopen = function(event) {
       mod.status.value = "socket opened"
-      serial_open()
+      //serial_open()
       }
    mod.socket.onerror = function(event) {
-      mod.status.value = "can not open"
+      mod.status.value = "cannot open"
       mod.socket = null
       }
-   mod.socket.onmessage = function(event) {
-      mod.status.value = event.data
-      outputs.receive.event(event.data)
-      if ((event.data == 'done') || (event.data == 'cancel') || (event.data.slice(0,5) == 'error')) {
-         mod.label.nodeValue = 'waiting for file'
-         mod.labelspan.style.fontWeight = 'normal'
-         }
+   mod.socket.onmessage = function(event){
+      parseMessage(event)
       }
-   }
+}
+
+
 function socket_close() {
    var msh = {}
    msg.type = 'close'
@@ -271,8 +320,8 @@ function serial_open() {
    else {
       var msg = {}
       msg.type = 'open'
-      msg.device = mod.device.value
-      msg.baud = mod.baud.value
+      msg.port = mod.device
+      msg.baud = parseInt(mod.baud.value)
       msg.contents = "start"
       if (mod.flow_none.checked)
          msg.flow = 'none'
@@ -290,7 +339,7 @@ function serial_close() {
    else {
       var msg = {}
       msg.type = 'close'
-      msg.device = mod.device.value
+      msg.device = mod.device
       mod.socket.send(JSON.stringify(msg))
       }
    }
@@ -300,12 +349,32 @@ function serial_send_string(str) {
       }
    else {
       var msg = {}
-      msg.type = 'string'
+      msg.type = 'send'
       msg.string = str
       mod.socket.send(JSON.stringify(msg))
-      mod.status.value = 'transmit'
+      mod.status.value = 'transmitting'
       }
    }
+function serial_scan(){
+   if (mod.socket == null) {
+      mod.status.value = "socket not open"
+      }
+   else {
+      var msg = {}
+      msg.type = 'scan'
+      mod.socket.send(JSON.stringify(msg))
+      mod.status.value = 'transmit'
+   }
+}
+function populate_portlist(portlist){
+   mod.portlist.options.length = 0
+   for(port in portlist){
+      var opt = document.createElement('option')
+         opt.value = portlist[port]
+         opt.text = portlist[port].substring(5)
+      mod.portlist.add(opt)   
+   }
+}
 //
 // return values
 //

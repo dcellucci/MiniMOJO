@@ -92,9 +92,9 @@ void loop() {
   }
 
   //Toggle LED stuff. More debug.
-  if(curtime - ledtoggletime > 10){
+  if(curtime - ledtoggletime > 2000){
     ledtoggletime = curtime;
-    //ledstatus = !ledstatus;
+    ledstatus = !ledstatus;
     digitalWrite(0, ledstatus);
   } 
 }

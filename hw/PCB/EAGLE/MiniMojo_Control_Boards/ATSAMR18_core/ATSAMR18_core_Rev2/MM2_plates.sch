@@ -6349,6 +6349,7 @@ Some male, some female. Watch your step!</description>
 <segment>
 <pinref part="U11" gate="G$1" pin="P$2"/>
 <wire x1="119.38" y1="17.78" x2="129.54" y2="17.78" width="0.1524" layer="91"/>
+<label x="124.46" y="17.78" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="PA24/USBDM" class="0">
@@ -6360,6 +6361,7 @@ Some male, some female. Watch your step!</description>
 <segment>
 <pinref part="U11" gate="G$1" pin="P$3"/>
 <wire x1="119.38" y1="20.32" x2="129.54" y2="20.32" width="0.1524" layer="91"/>
+<label x="124.46" y="20.32" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SWDIO" class="0">
@@ -6567,6 +6569,7 @@ Some male, some female. Watch your step!</description>
 <segment>
 <pinref part="Q1" gate="G$1" pin="G"/>
 <wire x1="121.92" y1="139.7" x2="132.08" y2="139.7" width="0.1524" layer="91"/>
+<label x="127" y="139.7" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$20" class="0">
