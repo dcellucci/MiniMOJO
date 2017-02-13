@@ -46,7 +46,9 @@ var inputs = {
          //outputs.motstring.event()
          mod.value.value = mod.tarmotvals
          update_value()
-         }}}
+         }
+      }
+   }
 //
 // outputs
 //
