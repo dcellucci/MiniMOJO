@@ -1,0 +1,232 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:CSL_Opto
+LIBS:Fab
+LIBS:CSL_Power
+LIBS:CSL_Conn
+LIBS:CSL_uP
+LIBS:CSL_Sensors
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L JTAGICE3-10p J1
+U 1 1 58A75DF2
+P 3750 3400
+F 0 "J1" H 4000 3175 60  0000 C CNN
+F 1 "JTAGICE3-10p" H 3750 3600 60  0000 C CNN
+F 2 "_Fab_Footprint:JTAGICE3-10p" H 3650 3400 60  0001 C CNN
+F 3 "" H 3650 3400 60  0001 C CNN
+	1    3750 3400
+	1    0    0    -1  
+$EndComp
+$Comp
+L USB2 U1
+U 1 1 58A75E1A
+P 3750 4000
+F 0 "U1" H 3850 3700 60  0000 C CNN
+F 1 "USB2" H 3650 4300 60  0000 C CNN
+F 2 "_Fab_Footprint:USBMINIB2.0" H 3750 4000 60  0001 C CNN
+F 3 "" H 3750 4000 60  0001 C CNN
+	1    3750 4000
+	1    0    0    -1  
+$EndComp
+$Comp
+L +3V3 #PWR01
+U 1 1 58A75EA9
+P 4200 4200
+F 0 "#PWR01" H 4200 4050 60  0001 C CNN
+F 1 "+3V3" H 4200 4340 60  0000 C CNN
+F 2 "" H 4200 4200 60  0000 C CNN
+F 3 "" H 4200 4200 60  0000 C CNN
+	1    4200 4200
+	1    0    0    -1  
+$EndComp
+$Comp
+L +3V3 #PWR02
+U 1 1 58A75EC1
+P 3350 3250
+F 0 "#PWR02" H 3350 3100 60  0001 C CNN
+F 1 "+3V3" H 3350 3390 60  0000 C CNN
+F 2 "" H 3350 3250 60  0000 C CNN
+F 3 "" H 3350 3250 60  0000 C CNN
+	1    3350 3250
+	1    0    0    -1  
+$EndComp
+$Comp
+L WM1386x10 C1
+U 1 1 58A75F2D
+P 4600 4000
+F 0 "C1" V 4725 3800 39  0000 C CNN
+F 1 "WM1386x10" V 4600 3975 39  0000 C CNN
+F 2 "_Fab_Footprint:SMD-Header-5x2" H 4600 3950 60  0001 C CNN
+F 3 "" H 4600 3950 60  0001 C CNN
+	1    4600 4000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3400 3500 3350 3500
+Wire Wire Line
+	3350 3500 3350 5000
+Wire Wire Line
+	3350 4000 3500 4000
+Wire Wire Line
+	3950 4200 4050 4200
+Wire Wire Line
+	4050 4050 4050 4400
+Wire Wire Line
+	4050 4400 3350 4400
+Connection ~ 3350 4000
+Wire Wire Line
+	3350 3250 3350 3300
+Wire Wire Line
+	3350 3300 3400 3300
+Wire Wire Line
+	4200 4200 4200 4450
+Wire Wire Line
+	4450 3850 4250 3850
+Wire Wire Line
+	4250 3850 4250 4000
+Wire Wire Line
+	4250 4000 3950 4000
+Wire Wire Line
+	3950 3900 4450 3900
+Wire Wire Line
+	4200 4250 4450 4250
+Wire Wire Line
+	4450 4050 4050 4050
+Connection ~ 4050 4200
+Wire Wire Line
+	4100 3300 4300 3300
+Wire Wire Line
+	4300 3300 4300 4000
+Wire Wire Line
+	4300 4000 4450 4000
+Wire Wire Line
+	4100 3400 4350 3400
+Wire Wire Line
+	4350 3400 4350 3950
+Wire Wire Line
+	4350 3950 4450 3950
+$Comp
+L CAP C2
+U 1 1 58A76128
+P 4050 4750
+F 0 "C2" H 4100 4675 20  0000 C CNN
+F 1 "CAP" H 4050 4750 20  0000 C CNN
+F 2 "_Fab_Footprint:CAP_1206_FAB" H 4050 4750 60  0001 C CNN
+F 3 "" H 4050 4750 60  0001 C CNN
+	1    4050 4750
+	1    0    0    -1  
+$EndComp
+$Comp
+L CAP C3
+U 1 1 58A76157
+P 4650 4750
+F 0 "C3" H 4700 4675 20  0000 C CNN
+F 1 "CAP" H 4650 4750 20  0000 C CNN
+F 2 "_Fab_Footprint:CAP_1206_FAB" H 4650 4750 60  0001 C CNN
+F 3 "" H 4650 4750 60  0001 C CNN
+	1    4650 4750
+	1    0    0    -1  
+$EndComp
+$Comp
+L VREG-SOT23 U2
+U 1 1 58A7617A
+P 4350 4700
+F 0 "U2" H 4500 4600 30  0000 C CNN
+F 1 "VREG-SOT23" H 4350 4900 30  0000 C CNN
+F 2 "TO_SOT_Packages_SMD:SOT-23" H 4350 4700 60  0001 C CNN
+F 3 "" H 4350 4700 60  0001 C CNN
+	1    4350 4700
+	1    0    0    -1  
+$EndComp
+$Comp
+L FabDiode D1
+U 1 1 58A761B8
+P 4900 4600
+F 0 "D1" V 4960 4535 30  0000 C CNN
+F 1 "FabDiode" V 4820 4605 30  0000 C CNN
+F 2 "_Fab_Footprint:LED_1206_FAB" H 4900 4600 60  0001 C CNN
+F 3 "" H 4900 4600 60  0001 C CNN
+	1    4900 4600
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4600 4600 4800 4600
+Wire Wire Line
+	4650 4600 4650 4650
+Connection ~ 4650 4600
+Wire Wire Line
+	5000 4600 5000 4450
+Wire Wire Line
+	5000 4450 4200 4450
+Connection ~ 4200 4250
+Wire Wire Line
+	4100 4600 4050 4600
+Wire Wire Line
+	4050 4450 4050 4650
+Wire Wire Line
+	4050 4450 4000 4450
+Wire Wire Line
+	4000 4450 4000 3800
+Wire Wire Line
+	4000 3800 3950 3800
+Connection ~ 4050 4600
+Wire Wire Line
+	3350 5000 4650 5000
+Wire Wire Line
+	4050 5000 4050 4850
+Connection ~ 3350 4400
+Wire Wire Line
+	4350 5000 4350 4800
+Connection ~ 4050 5000
+Wire Wire Line
+	4650 5000 4650 4850
+Connection ~ 4350 5000
+Wire Wire Line
+	4450 4100 4400 4100
+Wire Wire Line
+	4400 4100 4400 3500
+Wire Wire Line
+	4400 3500 4100 3500
+$EndSCHEMATC

@@ -38,7 +38,7 @@ uint8_t* rec_message;
 byte pingCounter = 0;
 
 boolean ledstatus = true; //for debug
-boolean debugmode = false;
+boolean debugmode = true;
 long curtime = 0;
 long ledupdatetime = 0;
 long servoupdatetime = 0;

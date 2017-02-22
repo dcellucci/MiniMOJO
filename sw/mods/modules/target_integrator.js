@@ -57,7 +57,9 @@ var outputs = {
       event:function() {
          encodeMotorString()
          mods.output(mod,'motstring',mod.outvalue)
-         }}}
+         }
+      }
+   }
 //
 // interface
 //
