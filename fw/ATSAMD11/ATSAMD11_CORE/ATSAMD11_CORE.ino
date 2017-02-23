@@ -1,6 +1,8 @@
 #include <Wire.h>
 #include <Servo.h>
 #include "wiring_private.h" // pinPeripheral() function
+#include <INA3221.h>
+
 
 Servo topServo,botServo,hipServo;
 
@@ -13,6 +15,8 @@ uint8_t bufferSize;
 TwoWire subComms(&sercom0,14,15);
 TwoWire masComms(&sercom1,22,23);
 
+INA3221 curSensor(&masComms);
+
 long curTime;
 long servoUpdateTime, sensorUpdateTime;
 
@@ -22,7 +26,7 @@ bool topServoset = true; //Checks if we're the servoset closest to the main proc
 
 //Toggle Servo Power Supply
 int servoPowerPin = 16;
-bool servoPower = false;
+bool servoPower = true;
 
 
 #if defined(ARDUINO_CDC_ONLY) || defined(ARDUINO_CDC_HID_UART) || defined(ARDUINO_CDC_UART) ||  defined(ARDUINO_CDC_MIDI_HID_UART) || defined(ARDUINO_CDC_MSD_HID_UART) || defined(ARDUINO_CDC_MSD_MIDI_HID_UART)
@@ -31,7 +35,7 @@ bool servoPower = false;
 
 void setup() {
   servoUpdateInterval = 100;
-  sensorUpdateInterval = 100;
+  sensorUpdateInterval = 1000;
   // put your setup code here, to run once:
 #if defined(DEBUG_SERIAL)
     SerialUSB.begin(9600);
@@ -56,26 +60,30 @@ void setup() {
   pinPeripheral(22, PIO_SERCOM);
   pinPeripheral(23, PIO_SERCOM);
 
-  pinMode(LED_BUILTIN,OUTPUT);
   pinMode(servoPowerPin,OUTPUT);
+
+  curSensor.init();
+  //curSensor.enableDefaultSettings();
 }
 
 void loop() {
   curTime = millis();
   if(curTime - servoUpdateTime > servoUpdateInterval){
     servoUpdateTime = curTime;
-    topServo.writeMicroseconds(servoVals[0]);
-    botServo.writeMicroseconds(servoVals[1]);
-    hipServo.writeMicroseconds(servoVals[2]);
+    topServo.writeMicroseconds(map(servoVals[0],0,255,900,2100));
+    botServo.writeMicroseconds(map(servoVals[1],0,255,900,2100));
+    hipServo.writeMicroseconds(map(servoVals[2],0,255,900,2100));
     digitalWrite(servoPowerPin, servoPower);
   }
   if(curTime - sensorUpdateTime > sensorUpdateInterval){
-    updateSensors();
+    sensorUpdateTime = curTime;
+    //updateSensors();
   }
 }
 
 void receiveEvent(int howMany){
   memset(&BUFFER[0], 0, sizeof(BUFFER));
+  bufferSize=0;
 #if defined(DEBUG_SERIAL)
     SerialUSB.print("Receiving");
     SerialUSB.println(howMany);
@@ -106,7 +114,7 @@ void parseBuffer(){
       case 'x': 
         switch((char)BUFFER[1]){
           case 'p':
-            if(BUFFER[2] == 0)
+            if((char)BUFFER[2] == '0')
               servoPower = false;
             else
               servoPower = true;
@@ -121,7 +129,10 @@ void requestEvent(){
 }
 
 void updateSensors(){
-  
+#if defined(DEBUG_SERIAL)
+  SerialUSB.print("INA3221 Manufacturer ID: ");
+  SerialUSB.println(curSensor.read_manID());
+#endif
 }
 
 extern "C" {
@@ -129,6 +140,12 @@ extern "C" {
 
   void SERCOM0_Handler(void) {
     subComms.onService();
+  }
+  
+  void SERCOM1_Handler(void);
+
+  void SERCOM1_Handler(void) {
+    masComms.onService();
   }
 }
 
