@@ -5,120 +5,149 @@
 ----------------------------------------------------------*/
 
 #include <Wire.h>
+#include <INA3221.h>
 
 
-void set_default_current_alert_levels();
-void set_default_current_warning_levels();
+// DATA REGISTERS
+static const uint8_t      CONFIG = 0x00;
+static const uint8_t    SHUNT_V1 = 0x01;
+static const uint8_t      BUS_V1 = 0x02;
+static const uint8_t    SHUNT_V2 = 0x03;
+static const uint8_t      BUS_V2 = 0x04;
+static const uint8_t    SHUNT_V3 = 0x05;
+static const uint8_t      BUS_V3 = 0x06;
+static const uint8_t  CRITICAL_1 = 0x07;
+static const uint8_t   WARNING_1 = 0x08;
+static const uint8_t  CRITICAL_2 = 0x09;
+static const uint8_t   WARNING_2 = 0x0A;
+static const uint8_t  CRITICAL_3 = 0x0B;
+static const uint8_t   WARNING_3 = 0x0C;
+static const uint8_t MASK_ENABLE = 0x0F;
 
+void setDefaultCurrentAlertLevels();
+void setDefaultCurrentWarningLevels();
 
-uint16 read_config(){
-    return I2CreadByte(CONFIG_REG);
-}
+/*----------------------------------------------------------
+  INA3221
+----------------------------------------------------------*/
 
-
-uint16 read_critical_voltage_1(){
-    return I2CreadByte(CRITICAL_1_REG) >> 3;
-}
-
-
-uint16 read_critical_voltage_2(){
-    return I2CreadByte(CRITICAL_2_REG) >> 3;
-}
-
-
-uint16 read_critical_voltage_3(){
-    return I2CreadByte(CRITICAL_3_REG) >> 3;
-}
-
-
-uint16 read_warning_voltage_1(){
-    return I2CreadByte(WARNING_1_REG) >> 3;
-}
-
-
-uint16 read_warning_voltage_2(){
-    return I2CreadByte(WARNING_2_REG) >> 3;
-}
-
-
-uint16 read_warning_voltage_3(){
-    return I2CreadByte(WARNING_3_REG) >> 3;
-}
-
-
-void set_critical_voltage(uint8 channel, uint16 current){
-    current = current*CURRENT_CONV;
-    
-    if (channel==CHANNEL_1){
-        I2CwriteByte(CRITICAL_1_REG, current<<3);
-    }
-    else if (channel==CHANNEL_2){
-        I2CwriteByte(CRITICAL_2_REG, current<<3);
-    }
-    else if (channel==CHANNEL_3){
-        I2CwriteByte(CRITICAL_3_REG, current<<3);
-    }
-}
-
-// below code modified from original: SFE_LSMDS1.cpp by Jim Lindblom
-
-void initI2C()
+void INA3221::INA3221(uint16_t address)
 {
-	Wire.begin();	// Initialize I2C library
+    _address = address;
+}
+
+int INA3221::readConfig()
+{
+    return readReg(CONFIG);
+}
+
+int INA3221::readCriticalVoltage1(){
+    return readReg(CRITICAL_1) >> 3;
+}
+
+int INA3221::readCriticalVoltage2(){
+    return readReg(CRITICAL_2) >> 3;
+}
+
+int INA3221::readCriticalVoltage3(){
+    return readReg(CRITICAL_3) >> 3;
+}
+
+int INA3221::readWarningVoltage1(){
+    return readReg(WARNING_1) >> 3;
+}
+
+int INA3221::readWarningVoltage2(){
+    return readReg(WARNING_2) >> 3;
+}
+
+int INA3221::readWarningVoltage3(){
+    return readReg(WARNING_3) >> 3;
+}
+
+int INA3221::readBusVoltage1(){
+    return readReg(BUS_V1) >> 3;
+}
+
+int INA3221::readBusVoltage2(){
+    return readReg(BUS_V2) >> 3;
+}
+
+int INA3221::readBusVoltage3(){
+    return readReg(BUS_V3) >> 3;
+}
+
+int INA3221::readShuntVoltage1(){
+    return readReg(SHUNT_V1) >> 3;
+}
+
+int INA3221::readShuntVoltage2(){
+    return readReg(SHUNT_V2) >> 3;
+}
+
+int INA3221::readShuntVoltage3(){
+    return readReg(SHUNT_V3) >> 3;
+}
+
+void INA3221::setCriticalVoltage(uint8_t channel, uint16_t current){
+    current = current*currentConv;
+    
+    if (channel==1){
+        writeReg(CRITICAL_1_REG, current << 3);
+    }
+    else if (channel==2){
+        writeReg(CRITICAL_2_REG, current << 3);
+    }
+    else if (channel==3){
+        writeReg(CRITICAL_3_REG, current << 3);
+    }
+}
+
+void INA3221::setWarningVoltage(uint8_t channel, uint16_t current){
+    current = current*currentConv;
+    
+    if (channel==1){
+        writeReg(WARNING_1, current << 3);
+    }
+    else if (channel==2){
+        writeReg(WARNING_2, current << 3);
+    }
+    else if (channel==3){
+        writeReg(WARNING_3, current << 3);
+    }
+}
+
+void init()
+{
+	Wire.begin();
 }
 
 
 // Wire.h read and write protocols
-void I2CwriteByte(uint8_t reg, uint8_t data)
+uint8_t INA3221::readReg(uint8_t reg)
+{	
+	Wire.beginTransmission(_address);        // Initialize the Tx buffer
+	Wire.write(reg);	                     // Put slave register address in Tx buffer
+	Wire.endTransmission(false);             // keep connection alive for read process
+	
+    uint8_t status = Wire.requestFrom(_address, (uint8_t)1);  // Read one byte from slave register address returning status
+	if (status)
+    {
+        return(Wire.read());
+    }
+    else{
+        Serial.print("readReg failed?  status:");
+        Serial.println(status, HEX);
+    }
+    
+    return 0xff;
+}
+
+void INA3221::writeReg(uint8_t reg, uint8_t val)
 {
-	Wire.beginTransmission(INA3221_ADDR);  // Initialize the Tx buffer
+	Wire.beginTransmission(_address);      // Initialize the Tx buffer
 	Wire.write(reg);                       // Put slave register address in Tx buffer
-	Wire.write(data);                      // Put data in Tx buffer
+	Wire.write(val);                      // Put data in Tx buffer
 	Wire.endTransmission();                // Send the Tx buffer
 }
 
-
-uint8_t I2CreadByte(uint8_t reg)
-{
-	int timeout = I2C_COMM_TIMEOUT;
-	uint8_t data;                          // "data" will store the register data	
-	
-	Wire.beginTransmission(INA3221_ADDR);  // Initialize the Tx buffer
-	Wire.write(reg);	                   // Put slave register address in Tx buffer
-	Wire.endTransmission(true);            // Send the Tx buffer, but send a restart to keep connection alive
-	Wire.requestFrom(INA3221_ADDR, (uint8_t) 1);  // Read one byte from slave register address 
-	while ((Wire.available() < 1) && (timeout-- > 0))
-		delay(1);
-	
-	if (timeout <= 0)
-		return 255;	//! Bad! 255 will be misinterpreted as a good value.
-	
-	data = Wire.read();                      // Fill Rx buffer with result
-	return data;                             // Return data read from slave register
-}
-
-
-uint8_t I2CreadBytes(uint8_t reg, uint8_t * dest, uint8_t count)
-{  
-	int timeout = I2C_COMM_TIMEOUT;
-	Wire.beginTransmission(INA3221_ADDR);   // Initialize the Tx buffer
-	// Next send the register to be read. OR with 0x80 to indicate multi-read.
-	Wire.write(reg | 0x80);     // Put slave register address in Tx buffer
-
-	Wire.endTransmission(true);             // Send the Tx buffer, but send a restart to keep connection alive
-	uint8_t i = 0;
-	Wire.requestFrom(INA3221_ADDR, count);  // Read bytes from slave register address 
-	while ((Wire.available() < count) && (timeout-- > 0))
-		delay(1);
-	if (timeout <= 0)
-		return -1;
-	
-	for (int i=0; i<count;)
-	{
-		if (Wire.available())
-		{
-			dest[i++] = Wire.read();
-		}
-	}
-	return count;
-}
