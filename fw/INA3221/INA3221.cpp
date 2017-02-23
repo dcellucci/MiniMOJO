@@ -4,6 +4,9 @@
   @DATASHEET   : http://www.ti.com/lit/ds/sbos576b/sbos576b.pdf
 ----------------------------------------------------------*/
 
+#include <Wire.h>
+
+
 void set_default_current_alert_levels();
 void set_default_current_warning_levels();
 
