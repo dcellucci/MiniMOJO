@@ -30,6 +30,7 @@ var WebSocketServer = require('ws').Server
 var SerialPort = require("serialport");
 
 wss = new WebSocketServer({port:server_port})
+
 var connections = new Array;
 
 // list serial ports:
@@ -39,7 +40,18 @@ SerialPort.list(function (err, ports) {
   });
 });
 
-var port 
+
+var port;
+
+function getSerialPorts(callback) {
+   var portlist = []
+   SerialPort.list(function (err, ports) {
+      ports.forEach(function(port) {
+         portlist.push(port.comName)
+         });
+      callback(portlist)
+      })
+   }
 
 /* 
  *PORT FUNCTIONS
@@ -99,15 +111,12 @@ function handleConnection(ws) {
    ws.on("message", handleMessage);
 
    ws.on('close', function() { // when a client closes its connection
-   console.log("connection closed"); // print it out
-   var position = connections.indexOf(client); // get the client's position in the array
-   connections.splice(position, 1); // and delete it from the array
-   });
+      console.log("connection closed"); // print it out
+      var position = connections.indexOf(client); // get the client's position in the array
+      connections.splice(position, 1); // and delete it from the array
+      });
 
-
-}
-
-function handleMessage(msg){
+   function handleMessage(msg){
    //
    // cancel job
    //
@@ -122,20 +131,53 @@ function handleMessage(msg){
       var file
       var job = JSON.parse(msg)
       if(job.type == 'scan'){
-            console.log('Scanning...')
-            //console.log(fs.readdir('/dev/'))
+         console.log('Scanning...')
+         // list serial ports:
+         var mess = {}
+         mess.type = "ports"
+         getSerialPorts(function (portlist) {
+            console.log(portlist)
+            mess.data = portlist
+            ws.send(JSON.stringify(mess));  
+            });
          }
       else if(job.type == 'open'){
-         port = new SerialPort('/dev/'+job.device, { 
-            parser: SerialPort.parsers.readline('\n')
-         });
-         port.on('open', showPortOpen);
-         port.on('data', sendSerialData);
-         port.on('close', showPortClose);
-         port.on('error', showError);
-      }
-      else if(job.type == 'string'){
+         if(port != undefined){
+            if(port.isOpen()){
+               Console.log("Already Open. Closing")
+               port.close()
+               }
+            }
+         else{
+            port = new SerialPort(job.port, { 
+               parser: SerialPort.parsers.readline('\n'),
+               baudRate: job.baud
+               });
+            port.on('open', showPortOpen);
+            port.on('data', sendSerialData);
+            port.on('close', showPortClose);
+            port.on('error', showError);
+            }
+         }
+      else if(job.type == 'send'){
+         console.log(''+job.string)
          port.write(''+job.string)
+         }
+      else if(job.type == 'close'){
+         port.close()
+         }
       }
+      function sendSerialData(chunk){
+         console.log(chunk);
+         var mess = {}
+         mess.type = 'data'
+         mess.data = chunk
+         ws.send(JSON.stringify(mess))
+      }
+
    }
+
+
 }
+
+

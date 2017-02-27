@@ -22,11 +22,11 @@ long servoUpdateTime, sensorUpdateTime;
 
 int servoUpdateInterval,sensorUpdateInterval;
 
-bool topServoset = true; //Checks if we're the servoset closest to the main processor (top)
+bool topServoset = false; //Checks if we're the servoset closest to the main processor (top) (connected to the hip)
 
 //Toggle Servo Power Supply
 int servoPowerPin = 16;
-bool servoPower = true;
+bool servoPower = false;
 
 
 #if defined(ARDUINO_CDC_ONLY) || defined(ARDUINO_CDC_HID_UART) || defined(ARDUINO_CDC_UART) ||  defined(ARDUINO_CDC_MIDI_HID_UART) || defined(ARDUINO_CDC_MSD_HID_UART) || defined(ARDUINO_CDC_MSD_MIDI_HID_UART)
@@ -34,7 +34,7 @@ bool servoPower = true;
 #endif
 
 void setup() {
-  servoUpdateInterval = 100;
+  servoUpdateInterval = 10;
   sensorUpdateInterval = 1000;
   // put your setup code here, to run once:
 #if defined(DEBUG_SERIAL)
@@ -84,15 +84,18 @@ void loop() {
 void receiveEvent(int howMany){
   memset(&BUFFER[0], 0, sizeof(BUFFER));
   bufferSize=0;
+  
 #if defined(DEBUG_SERIAL)
     SerialUSB.print("Receiving");
     SerialUSB.println(howMany);
 #endif
+
   char c;
   while(0 < subComms.available()){ // loop through all but the last
     c = subComms.read(); // receive byte as a character
     BUFFER[bufferSize] = (uint8_t)c;
     bufferSize++;
+    
 #if defined(DEBUG_SERIAL)
     SerialUSB.print(c);         // print the character
 #endif
@@ -110,8 +113,12 @@ void parseBuffer(){
         servoVals[0] = BUFFER[1];
         servoVals[1] = BUFFER[2];
         servoVals[2] = BUFFER[3];
+        if(BUFFER[4] == '+')
+          servoPower = true;
+        else if(BUFFER[4] == '-')
+          servoPower = false;
         break;
-      case 'x': 
+      case '!': 
         switch((char)BUFFER[1]){
           case 'p':
             if((char)BUFFER[2] == '0')

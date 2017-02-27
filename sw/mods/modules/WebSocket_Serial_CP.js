@@ -26,9 +26,9 @@ var name = 'WebSocket serial'
 //
 var init = function() {
    mod.address.value = '127.0.0.1'
-   mod.port.value = 1234
+   mod.port.value = 8989
    mod.device = ''
-   mod.baud.value = 9600
+   mod.baud.value = 115200
    mod.flow_rtscts.checked = false
    mod.socket = null
    socket_open()
@@ -259,28 +259,17 @@ var interface = function(div){
 //
 
 function parseMessage(event){
-   //console.log(event)
-   if(typeof event.data !== 'undefined'){
+   console.log(event)
+   if(event.data !== 'undefined'){
       var message = JSON.parse(event.data)
-      switch(message.type){
-         case 'data':
-            mod.status.value = 'passing data'
-            outputs.receive.event(message.data)
-            break;
-         case 'ports':
-            mod.status.value = 'populating portlist...'
-            populate_portlist(message.data)
-            break;
-         default:
-            mod.status.value = message.data
-            mod.label.nodeValue = 'waiting for file'
-            mod.labelspan.style.fontWeight = 'normal'
+      if("SerialPorts" in message){
+          populate_portlist(message.SerialPorts)
+          }
       }
    }
-}
 
 function socket_open() {
-   var url = "ws://"+mod.address.value+':'+mod.port.value
+   var url = "ws://"+mod.address.value+':'+mod.port.value+'/ws'
    mod.socket = new WebSocket(url)
    mod.socket.onopen = function(event) {
       mod.status.value = "socket opened"
@@ -297,7 +286,7 @@ function socket_open() {
 
 
 function socket_close() {
-   var msh = {}
+   var msg = {}
    msg.type = 'close'
    mod.socket.send(JSON.stringify(msg))
    mod.socket.close()
@@ -318,18 +307,9 @@ function serial_open() {
       mod.status.value = "socket not open"
       }
    else {
-      var msg = {}
-      msg.type = 'open'
-      msg.port = mod.device
-      msg.baud = parseInt(mod.baud.value)
-      msg.contents = "start"
-      if (mod.flow_none.checked)
-         msg.flow = 'none'
-      else if (mod.flow_rtscts.checked)
-         msg.flow = 'rtscts'
-      else if (mod.flow_dsrdtr.checked)
-         msg.flow = 'dsrdtr'
-      mod.socket.send(JSON.stringify(msg))
+       var msg = 'open '
+       msg = msg + mod.device + ' ' + mod.baud.value
+      mod.socket.send(msg)
       }
    }
 function serial_close() {
@@ -337,10 +317,8 @@ function serial_close() {
       mod.status.value = "socket not open"
       }
    else {
-      var msg = {}
-      msg.type = 'close'
-      msg.device = mod.device
-      mod.socket.send(JSON.stringify(msg))
+      var msg = 'close '+ mod.device
+      mod.socket.send(msg)
       }
    }
 function serial_send_string(str) {
@@ -360,18 +338,16 @@ function serial_scan(){
       mod.status.value = "socket not open"
       }
    else {
-      var msg = {}
-      msg.type = 'scan'
-      mod.socket.send(JSON.stringify(msg))
-      mod.status.value = 'transmit'
+      mod.socket.send('list')
    }
 }
+
 function populate_portlist(portlist){
    mod.portlist.options.length = 0
    for(port in portlist){
       var opt = document.createElement('option')
-         opt.value = portlist[port]
-         opt.text = portlist[port].substring(5)
+         opt.value = portlist[port].Name
+         opt.text = portlist[port].Name.substring(5)
       mod.portlist.add(opt)   
    }
 }

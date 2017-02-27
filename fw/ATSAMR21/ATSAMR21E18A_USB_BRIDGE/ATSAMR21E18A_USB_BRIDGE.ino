@@ -158,18 +158,18 @@ void parseCommand(){
             servovals[4] = indata[1];
           writeServoVals();
           break;
+        case 'a':
+          for(int i = 0; i < 5; i++)
+            if(indata[i] > 0)
+              servovals[i] = indata[i];
+          writeServoVals();
+          break;
+        case '+':
+        case '-':
+        case '_':
+        case '=':
         case 'c':
-          payload[0] = comm[0];
-          payload[1] = comm[1];
-          Serial.println((char*)payload);
-          sendMessage(3);
-          break;
         case 'o':
-          payload[0] = comm[0];
-          payload[1] = comm[1];
-          Serial.println((char*)payload);
-          sendMessage(3);
-          break;
         case 'm':
           payload[0] = comm[0];
           payload[1] = comm[1];
@@ -181,10 +181,12 @@ void parseCommand(){
   }
   Serial.print("Command Received: ");
   Serial.println(comm);
-  for(int i = 0; i < 5; i++){
-    Serial.print(i);
-    Serial.print(": ");
-    Serial.println(indata[i]);
+  if(comm[0] == 'w'){
+    for(int i = 0; i < 5; i++){
+      Serial.print(i);
+      Serial.print(": ");
+      Serial.println(indata[i]);
+    }
   }
 }
 
