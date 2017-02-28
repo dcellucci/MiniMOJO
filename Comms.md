@@ -34,6 +34,7 @@
  (NB: The top set of motors is the one 
  	closest to the functioning coordinator)
 ```
+
 			* **config byte:** The byte is the union of 3 booleans: top power state, bot power state, and stream state (room for 5 more!) Currently the register config is  
 				`00000 | Top Power | Bot Power | Stream State`
 	4. **Coordinator -> Bridge:**
