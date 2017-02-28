@@ -22,15 +22,15 @@
 		* 	**Update Freq:** 1 Hz, or when new packet is received
 		*	`[code][5 motorval bytes][1 config byte]`
 			* *code:* currently, 'ws' is the only option. (Stands for write state)
-			* *motorval bytes:* each byte is in order of 
-				`[Top Outer | Top Inner | Bot Outer | Bot Inner | Hip]`  
+			* *motorval bytes:* each byte is in order of  
 				```
-				 (A handy figure)
-				     TOP OUTER
-				     TOP INNER
-				        HIP
-				     BOT INNER
-				     BOT OUTER 
+				[Top Outer | Top Inner | Bot Outer | Bot Inner | Hip]  
+				 (A handy figure)  
+				     TOP OUTER  
+				     TOP INNER  
+				        HIP  
+				     BOT INNER  
+				     BOT OUTER  
 				 (NB: The top set of motors is the one 
 				 	closest to the functioning coordinator)
 				```
