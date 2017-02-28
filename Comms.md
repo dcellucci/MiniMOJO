@@ -22,8 +22,8 @@
 		* 	**Update Freq:** 1 Hz, or when new packet is received
 		*	`[code][5 motorval bytes][1 config byte]`
 			* *code:* currently, 'ws' is the only option. (Stands for write state)
-			* *motorval bytes:* each byte is in order of
-				`[Top Outer | Top Inner | Bot Outer | Bot Inner | Hip]`
+			* *motorval bytes:* each byte is in order of 
+				`[Top Outer | Top Inner | Bot Outer | Bot Inner | Hip]`  
 				```
 				 (A handy figure)
 				     TOP OUTER
@@ -34,14 +34,14 @@
 				 (NB: The top set of motors is the one 
 				 	closest to the functioning coordinator)
 				```
-			* **config byte:** The byte is the union of 3 booleans: top power state, bot power state, and stream state (room for 5 more!) Currently the register config is 
+			* **config byte:** The byte is the union of 3 booleans: top power state, bot power state, and stream state (room for 5 more!) Currently the register config is  
 				`00000 | Top Power | Bot Power | Stream State`
 	4. **Coordinator -> Bridge:**
 		* **Format:** bytestrings
 		* **Update Freq:**
 		* `[code][9 current bytes][2 bytes battery]`	
 			* only code is 'us' (update state)
-			* current bytes: Are actually 6 12-bit values that are glommed together. The bus and shunt registers for a given channel share a middle byte which holds their LSB values. So for example 
+			* current bytes: Are actually 6 12-bit values that are glommed together. The bus and shunt registers for a given channel share a middle byte which holds their LSB values. So for example  
 			`[MS VShunt Byte][LS VShunt Nibble | LS VBus Nibble][MS Vbus Byte]`
 
 
