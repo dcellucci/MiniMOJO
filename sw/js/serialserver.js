@@ -160,7 +160,7 @@ function handleConnection(ws) {
             }
          }
       else if(job.type == 'send'){
-         console.log(''+job.string)
+         //console.log(''+job.string)
          port.write(''+job.string)
          }
       else if(job.type == 'close'){

@@ -35,7 +35,7 @@ var inputs = {
    state:{type:'string',
       event:function(evt){
          parseStateJSON(evt.detail)
-         outputs.outputstring.event()
+         //outputs.outputstring.event()
          }
       }
    }
@@ -89,13 +89,13 @@ function parseStateJSON(str){
       state = JSON.parse(str) 
       }
    catch(e){
-      console.log("There was an error.")
+      console.log("State JSON Parse Failed")
       }
    mod.state = state
    
-   opstr = 'wa '
+   opstr = "wa"
    for(var i = 0; i < 5; i++){
-        opstr = opstr + mod.state.motorvals[i] + " "
+        opstr = opstr + " " + mod.state.motorvals[i]
    }
    mod.outputstring = opstr + ";"
    mod.text2.value = mod.outputstring

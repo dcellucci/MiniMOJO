@@ -535,7 +535,7 @@ F 1 "FAB_LED" H 3550 1625 20  0000 C CNN
 F 2 "LEDs:LED_0603" H 3650 1625 60  0001 C CNN
 F 3 "" H 3650 1625 60  0001 C CNN
 	1    3650 1600
-	-1   0    0    1   
+	1    0    0    -1  
 $EndComp
 $Comp
 L MOSFET_N Q1
@@ -557,7 +557,7 @@ F 1 "FAB_LED" H 3900 1625 20  0000 C CNN
 F 2 "LEDs:LED_0603" H 4000 1625 60  0001 C CNN
 F 3 "" H 4000 1625 60  0001 C CNN
 	1    4000 1600
-	-1   0    0    1   
+	1    0    0    -1  
 $EndComp
 $Comp
 L RES R12
@@ -898,7 +898,7 @@ F 1 "FAB_LED" H 12500 5925 20  0000 C CNN
 F 2 "LEDs:LED_0603" H 12600 5925 60  0001 C CNN
 F 3 "" H 12600 5925 60  0001 C CNN
 	1    12600 5900
-	-1   0    0    1   
+	1    0    0    -1  
 $EndComp
 Text GLabel 12600 5500 1    39   Input ~ 0
 BB_V_MOT_UNSENSE
@@ -911,7 +911,7 @@ F 1 "FAB_LED" H 12250 5925 20  0000 C CNN
 F 2 "LEDs:LED_0603" H 12350 5925 60  0001 C CNN
 F 3 "" H 12350 5925 60  0001 C CNN
 	1    12350 5900
-	-1   0    0    1   
+	1    0    0    -1  
 $EndComp
 $Comp
 L RES R2

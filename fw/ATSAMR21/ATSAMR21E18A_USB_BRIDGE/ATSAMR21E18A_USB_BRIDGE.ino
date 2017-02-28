@@ -32,7 +32,7 @@ uint8_t *rec_message;
 static NWK_DataReq_t nwkDataReq;
 //Payload array (10 byte limit right now)
 static uint8_t payload[9];
-static uint8_t indata[5];
+static uint8_t indata[9];
 
 static uint8_t servovals[5] = {74,182,185,174,182};
 
@@ -94,7 +94,7 @@ void loop() {
   }
 
   //Toggle LED stuff. More debug.
-  if(curtime - ledtoggletime > 50){
+  if(curtime - ledtoggletime > 500){
     ledtoggletime = curtime;
     //ledstatus = !ledstatus;
     digitalWrite(0, ledstatus);
@@ -118,67 +118,75 @@ void parseCommand(){
   memset(indata,0,sizeof(indata));
   memset(payload,0,sizeof(payload));
   int curcount = 0;
-  char comm[2];
-  Serial.readBytesUntil(' ', comm, 2);
-  while(Serial.available()){ 
-    indata[curcount] = (uint8_t)Serial.parseInt();
-    curcount++;
+  char comm[3];
+  Serial.readBytesUntil(' ', comm, 3);
+  if(comm[0] == 'w' && comm[1] == 'a'){
+    while(Serial.available()){
+        indata[curcount] = (uint8_t)Serial.parseInt();
+        curcount++;
+    }
   }
-  switch(comm[0]){
-    case '!':
-      payload[0] = comm[0];
-      payload[1] = comm[1];
-      Serial.println((char*)payload);
-      sendMessage(3);
-      break;
-    case 's':
-      payload[0]='s';
-      sendMessage(1);
-      break;
-    case 'l':
-      ledstatus = !ledstatus;
-    case 'w':
-      switch(comm[1]){
-        case 't':
-          if(indata[0] > 0)
-            servovals[0] = indata[0];
-          if(indata[1] > 0)
-            servovals[1] = indata[1];
-          writeServoVals();
-          break;
-        case 'h':        
-          if(indata[0] > 0)      
-            servovals[2] = indata[0];
-          writeServoVals();
-          break;
-        case 'b': 
-          if(indata[0] > 0)     
-            servovals[3] = indata[0];
-          if(indata[1] > 0)
-            servovals[4] = indata[1];
-          writeServoVals();
-          break;
-        case 'a':
-          for(int i = 0; i < 5; i++)
-            if(indata[i] > 0)
-              servovals[i] = indata[i];
-          writeServoVals();
-          break;
-        case '+':
-        case '-':
-        case '_':
-        case '=':
-        case 'c':
-        case 'o':
-        case 'm':
-          payload[0] = comm[0];
-          payload[1] = comm[1];
-          Serial.println((char*)payload);
-          sendMessage(3);
-          break;
+  /*
+  else{
+    switch(comm[0]){
+      case '!':
+        payload[0] = comm[0];
+        payload[1] = comm[1];
+        Serial.println((char*)payload);
+        sendMessage(3);
+        break;
+      case 's':
+        payload[0]='s';
+        sendMessage(1);
+        break;
+      case 'l':
+        ledstatus = !ledstatus;
+      case 'w':
+        switch(comm[1]){
+          case 't':
+            if(indata[0] > 0)
+              servovals[0] = indata[0];
+            if(indata[1] > 0)
+              servovals[1] = indata[1];
+            writeServoVals();
+            break;
+          case 'h':        
+            if(indata[0] > 0)      
+              servovals[2] = indata[0];
+            writeServoVals();
+            break;
+          case 'b': 
+            if(indata[0] > 0)     
+              servovals[3] = indata[0];
+            if(indata[1] > 0)
+              servovals[4] = indata[1];
+            writeServoVals();
+            break;
+          case 'a':
+            for(int i = 0; i < 5; i++)
+              if(indata[i] > 0)
+                servovals[i] = indata[i];
+            writeServoVals();
+            break;
+          case '+':
+          case '-':
+          case '_':
+          case '=':
+          case 'c':
+          case 'o':
+          case 'm':
+            payload[0] = comm[0];
+            payload[1] = comm[1];
+            Serial.println((char*)payload);
+            sendMessage(3);
+            break;
+        }
+        break;
       }
-      break;
+      
   }
+  */
+  /*
   Serial.print("Command Received: ");
   Serial.println(comm);
   if(comm[0] == 'w'){
@@ -188,15 +196,14 @@ void parseCommand(){
       Serial.println(indata[i]);
     }
   }
+  */
 }
 
-void writeServoVals(){
+void writeState(){
   memset(payload,0,sizeof(payload));
-  for(int i = 0; i < 5; i++){
-    payload[i] = servovals[i];
-    Serial.println(servovals[i]);
-  }
-  Serial.println((char*)payload);
+  memcpy(&payload, &indata, sizeof(indata));
+    //Serial.println(servovals[i]);
+  //Serial.println((char*)payload);
   sendMessage(2);
 }
 

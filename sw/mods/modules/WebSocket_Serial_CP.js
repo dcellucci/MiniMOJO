@@ -259,12 +259,24 @@ var interface = function(div){
 //
 
 function parseMessage(event){
-   console.log(event)
-   if(event.data !== 'undefined'){
-      var message = JSON.parse(event.data)
-      if("SerialPorts" in message){
-          populate_portlist(message.SerialPorts)
-          }
+   //console.log("Received these data: ")
+   //console.log(event)
+   if("data" in event){
+        var message = {}
+        try {
+            message = JSON.parse(event.data)
+            }
+        catch(e){
+            console.log("JSON Parse of event data failed.")
+            }
+        if("SerialPorts" in message){
+            populate_portlist(message.SerialPorts)
+            }
+        if(!("Cmd" in message)){
+            if("D" in message){
+                outputs.receive.event(message.D)
+            }
+        }
       }
    }
 
@@ -286,13 +298,13 @@ function socket_open() {
 
 
 function socket_close() {
-   var msg = {}
-   msg.type = 'close'
+   var msg = 'close ' + mod.device
    mod.socket.send(JSON.stringify(msg))
    mod.socket.close()
    mod.status.value = "socket closed"
    mod.socket = null
    }
+   
 function socket_send(msg) {
    if (mod.socket != null) {
       mod.status.value = "send"
@@ -326,11 +338,10 @@ function serial_send_string(str) {
       mod.status.value = "socket not open"
       }
    else {
-      var msg = {}
-      msg.type = 'send'
-      msg.string = str
-      mod.socket.send(JSON.stringify(msg))
-      mod.status.value = 'transmitting'
+       var msg = 'sendnobuf '
+       msg = msg + mod.device
+       msg = msg + " " + str
+       mod.socket.send(msg)
       }
    }
 function serial_scan(){

@@ -1,11 +1,23 @@
+
+#include <ArduinoJson.h>
+
 #define Serial SERIAL_PORT_USBVIRTUAL
 
-static uint8_t servovals[5] = {74,182,185,174,182};
-static char BUFFER[255];
-static uint8_t OUT[255];
+
+//Object we're expecting
+//const char* json = "{\"updates\":true,\"power\":[true,true],\"motorvals\":[126,125,221,32,180]}";
+
+const size_t bufferSize = JSON_ARRAY_SIZE(2) + JSON_ARRAY_SIZE(5) + JSON_OBJECT_SIZE(3) + 70;
+
+bool top_pow,bot_pow,updates;
+
+static uint8_t servovals[5] = {0,0,0,0,0};
 
 void setup() {
   Serial.begin(115200);
+  top_pow = false; 
+  bot_pow = false;
+  updates = false;
 }
 
 void loop() {
@@ -17,28 +29,23 @@ void loop() {
 }
 
 void parseCommand(){
-  char comm[2];
-  Serial.readBytesUntil(' ', comm, 3);
-  if(comm[0] == 'w' && comm[1] == 'a'){
-    memset(BUFFER,0,sizeof(BUFFER));
-    memset(servovals,0,5);
-    char servoval[3];
-    for(int i = 0; i < 5; i++){
-        if(Serial.available())
-          servovals[i] = Serial.parseInt();
-        else
-          i = 5;
-      }
-    
-      strcpy(BUFFER,"ma ");
-     
-      for(int i = 0; i < 5; i++){
-        itoa(servovals[i],servoval,10);
-        strcat(BUFFER,servoval);
-        strcat(BUFFER," ");
-      }
-      strcat(BUFFER,"\n");
-      Serial.write(BUFFER);  
+  char json[255];
+  char output[255];
+  
+  Serial.readBytesUntil(';',json,255);
+  
+  StaticJsonBuffer<bufferSize> jsonBuffer;
+  JsonObject& root = jsonBuffer.parseObject(json);
+  
+  JsonArray& motorvals = root["motorvals"];
+  for(int i = 0; i < 5; i++){
+    servovals[i] = (uint8_t)motorvals[i];
   }
+  top_pow = root["power"][0];
+  bot_pow = root["power"][1];
+  updates = root["updates"];
+
+  root.printTo(output,sizeof(output));
+  Serial.write(output);
 }
 
