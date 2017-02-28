@@ -1,2 +1,4 @@
 .DS_Store
 *.3dm
+
+node_modules/
