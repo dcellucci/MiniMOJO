@@ -38,6 +38,14 @@ void loop() {
   SerialUSB.print(curSensor.read_bus_voltage(1));
   SerialUSB.print(" Channel 1 V Shunt: ");
   SerialUSB.println(curSensor.read_shunt_voltage(1),HEX);
+  SerialUSB.print("Channel 2 V Bus: ");
+  SerialUSB.print(curSensor.read_bus_voltage(2));
+  SerialUSB.print(" Channel 2 V Shunt: ");
+  SerialUSB.println(curSensor.read_shunt_voltage(2),HEX);
+  SerialUSB.print("Channel 3 V Bus: ");
+  SerialUSB.print(curSensor.read_bus_voltage(3));
+  SerialUSB.print(" Channel 3 V Shunt: ");
+  SerialUSB.println(curSensor.read_shunt_voltage(3),HEX);
   //digitalWrite(LED_BUILTIN, LOW);
   delay(1000);
 }

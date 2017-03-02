@@ -4,6 +4,7 @@
 
 #define Serial SERIAL_PORT_USBVIRTUAL
 
+
 #include "lwm.h"
 #include "lwm/sys/sys.h"
 #include "lwm/nwk/nwk.h"
@@ -11,6 +12,22 @@
 extern "C" {
   void println(char *x) { Serial.println(x); Serial.flush(); }
 }
+
+#define JSON
+//#define DEBUG
+
+#ifdef JSON
+#include <ArduinoJson.h>
+
+const size_t bufferSize = JSON_ARRAY_SIZE(2) + JSON_ARRAY_SIZE(5) + JSON_OBJECT_SIZE(3) + 70;
+bool top_pow,bot_pow,updates;
+
+static uint8_t servovals[5] = {0,0,0,0,0};
+#endif
+
+char BUFFER[255];
+
+unsigned long before, after;
 
 // LWM mesh methods 
 //Send the message
@@ -48,7 +65,13 @@ long ledtoggletime = 0;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("ATSAMR21E18A USB Bridge");
+#ifdef JSON
+  top_pow = false; 
+  bot_pow = false;
+  updates = false;
+#endif
+  before = 0;
+  after = 0;
 
   //All this was from LWM example. Thanks Atmel.
   SPI.usingInterrupt(digitalPinToInterrupt(PIN_SPI_IRQ));
@@ -82,14 +105,45 @@ void loop() {
   //This method should run as often as possible.
   SYS_TaskHandler();
   
-  //Timing variable
-  curtime = millis();
-
-  //Toggle LED stuff. More debug.
-  if(curtime - ledtoggletime > 100){
-    ledtoggletime = curtime;
-    sendMessage(1);
+  //Reads a command from Serial if available
+  if(Serial.available() > 0){
+#ifdef DEBUG
+    Serial.println("Received data");
+#endif
+    parseCommand();
   }
+}
+
+void parseCommand(){
+  memset(payload, 0, sizeof(payload));
+  before = micros();
+#ifdef JSON
+  char json[255];
+  
+  Serial.readBytesUntil(';',json,255);
+  
+  StaticJsonBuffer<bufferSize> jsonBuffer;
+  JsonObject& root = jsonBuffer.parseObject(json);
+  //JsonObject& root = jsonBuffer.parse(Serial);
+  
+  JsonArray& motorvals = root["motorvals"];
+  payload[0] = 'w';
+  payload[1] = 's';
+  for(int i = 0; i < 5; i++){
+    payload[i+2] = (uint8_t)motorvals[i];
+  }
+  payload[7] = (((int)root["power"][0])<<3 | ((int)root["power"][1]) << 2 | ((int)root["updates"]));
+  //Serial.println((char *)payload);
+#endif
+
+#ifdef bytearr
+  Serial.readBytesUntil(';',payload,sizeof(payload));
+#endif
+  sendMessage(1);
+  //Serial.write(BUFFER);
+  //after = micros();
+  //Serial.print("Time it took: ");
+  //Serial.println(after-before);
 }
 
 /*
@@ -99,10 +153,12 @@ void loop() {
  * then freeze... this method fixed it.
  */
 static void appDataConf(NWK_DataReq_t *req){
+#ifdef DEBUG
   if (NWK_SUCCESS_STATUS == req->status)
     Serial.println("Sent successfully");
   else
     Serial.println("Packet failed to send");
+#endif
 }
 
 
@@ -120,6 +176,7 @@ static void sendMessage(int dstEndpointVal){
 }
 
 static bool receiveMessage(NWK_DataInd_t *ind) {
+#ifdef DEBUG
   Serial.print("Received message - ");
   Serial.print("lqi: ");
   Serial.print(ind->lqi, DEC);
@@ -132,7 +189,39 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
   Serial.print("Data: ");
   Serial.println(ind->size);
   Serial.print("message: ");
+#endif
+  
   rec_message = (uint8_t*)(ind->data);
-  Serial.println((char*)rec_message);
+#ifdef DEBUG
+  Serial.println("messaged received from transmitter")
+  Serial.write((char*)rec_message);
+#endif
+#ifdef JSON
+  StaticJsonBuffer<bufferSize> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+  root["updates"] = (bool)(rec_message[7] & 0x01);
+  JsonArray& power = root.createNestedArray("power");
+  power.add((bool)(rec_message[7] & 0x04));
+  power.add((bool)(rec_message[7] & 0x02));
+  JsonArray& motorVals = root.createNestedArray("motorvals");
+  motorVals.add(rec_message[2]);
+  motorVals.add(rec_message[3]);
+  motorVals.add(rec_message[4]);
+  motorVals.add(rec_message[5]);
+  motorVals.add(rec_message[6]);
+  
+  root.printTo(BUFFER,sizeof(BUFFER));
+  Serial.write(BUFFER);
+#endif
+
+#ifdef bytearr
+  Serial.print((char*)rec_message);
+  Serial.print(" ");
+#endif
+  after = micros();
+  //Serial.print("Time it took: ");
+  Serial.println(after-before);
+
+
   return true;
 }

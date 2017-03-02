@@ -20,13 +20,12 @@ static void sendMessage();
 static void appDataConf(NWK_DataReq_t *req);
 
 //Update 
-static bool sendStatus(NWK_DataInd_t *ind);
+static bool echoBack(NWK_DataInd_t *ind);
 
 //1 is Receiver
 //2 is USB bridge
 int meshAddress = 1;
 
-char payload[64] = "|abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 int curloc = 0;
 //Static data packet types (prevents memory leak)
 //LWM data request struct
@@ -43,6 +42,8 @@ long curtime = 0;
 long ledupdatetime = 0;
 long servoupdatetime = 0;
 long currentreadtime = 0;
+
+uint8_t payload[9];
 
 
 void setup() {
@@ -71,7 +72,7 @@ void setup() {
   NWK_SetPanId(0x01);
   PHY_SetChannel(0x1a);
   PHY_SetRxState(true);
-  NWK_OpenEndpoint(1, sendStatus);
+  NWK_OpenEndpoint(1, echoBack);
 
 }
 
@@ -108,7 +109,7 @@ static void appDataConf(NWK_DataReq_t *req){
   }
 }
 
-static bool sendStatus(NWK_DataInd_t *ind) {
+static bool echoBack(NWK_DataInd_t *ind) {
   if(debugmode){
     Serial.print("Status Request Received...");
     Serial.print("lqi: ");
@@ -120,12 +121,11 @@ static bool sendStatus(NWK_DataInd_t *ind) {
     Serial.print(ind->rssi, DEC);
     Serial.print("  ");
   }
-
-  char tmp = payload[(curloc+1)%63];
-  payload[(curloc+1)%63]='|';
-  payload[curloc]=tmp;
+  rec_message = (uint8_t *) ind->data;
+  memcpy(payload, rec_message, sizeof(payload));
+  
+  
   sendMessage();
-  curloc = (curloc+1)%63;
 
   return true;
 }

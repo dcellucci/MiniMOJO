@@ -2,40 +2,46 @@
 #include <Servo.h>
 #include "wiring_private.h" // pinPeripheral() function
 #include <INA3221.h>
+#include <max1720x.h>
 
+//Flag for if this board is closest to the main processor (top) (also controls hip)
+bool topServoset = true;
 
+//Servo Objects
 Servo topServo,botServo,hipServo;
-
-uint8_t servoVals[3] = {128,128,128};
+//Initial Values
+uint8_t servoVals[3] = {128,128,180};
 
 //Comms Buffer for communication with main port
 uint8_t BUFFER[255];
 uint8_t bufferSize;
 
+//Initialize the I2C bus that communicates with the Coordinator
 TwoWire subComms(&sercom0,14,15);
-TwoWire masComms(&sercom1,22,23);
 
-INA3221 curSensor(&masComms);
+//Initialize a current sensor object
+INA3221 curSensor(0x43);
+//Initialize a battery sensor object
+MAX1720x batSensor;
 
-long curTime;
-long servoUpdateTime, sensorUpdateTime;
+unsigned long curTime;
+unsigned long servoUpdateTime, sensorUpdateTime;
 
-int servoUpdateInterval,sensorUpdateInterval;
+unsigned long servoUpdateInterval,sensorUpdateInterval;
 
-bool topServoset = false; //Checks if we're the servoset closest to the main processor (top) (connected to the hip)
 
 //Toggle Servo Power Supply
 int servoPowerPin = 16;
-bool servoPower = false;
+bool servoPower = true;
 
-
+//Sets whether serial will get used (for debug)
 #if defined(ARDUINO_CDC_ONLY) || defined(ARDUINO_CDC_HID_UART) || defined(ARDUINO_CDC_UART) ||  defined(ARDUINO_CDC_MIDI_HID_UART) || defined(ARDUINO_CDC_MSD_HID_UART) || defined(ARDUINO_CDC_MSD_MIDI_HID_UART)
   #define DEBUG_SERIAL
 #endif
 
 void setup() {
-  servoUpdateInterval = 10;
-  sensorUpdateInterval = 1000;
+  servoUpdateInterval = 10000; //microseconds
+  sensorUpdateInterval = 10000; //microseconds
   // put your setup code here, to run once:
 #if defined(DEBUG_SERIAL)
     SerialUSB.begin(9600);
@@ -49,7 +55,7 @@ void setup() {
   subComms.onReceive(receiveEvent);
   subComms.onRequest(requestEvent);
   
-  masComms.begin();
+  Wire.begin();
   
   topServo.attach(4);
   botServo.attach(5);
@@ -63,11 +69,12 @@ void setup() {
   pinMode(servoPowerPin,OUTPUT);
 
   curSensor.init();
+  batSensor.reset();
   //curSensor.enableDefaultSettings();
 }
 
 void loop() {
-  curTime = millis();
+  curTime = micros();
   if(curTime - servoUpdateTime > servoUpdateInterval){
     servoUpdateTime = curTime;
     topServo.writeMicroseconds(map(servoVals[0],0,255,900,2100));
@@ -77,7 +84,7 @@ void loop() {
   }
   if(curTime - sensorUpdateTime > sensorUpdateInterval){
     sensorUpdateTime = curTime;
-    //updateSensors();
+    updateSensors();
   }
 }
 
@@ -85,7 +92,7 @@ void receiveEvent(int howMany){
   memset(&BUFFER[0], 0, sizeof(BUFFER));
   bufferSize=0;
   
-#if defined(DEBUG_SERIAL)
+#ifdef DEBUG_SERIAL
     SerialUSB.print("Receiving");
     SerialUSB.println(howMany);
 #endif
@@ -96,12 +103,12 @@ void receiveEvent(int howMany){
     BUFFER[bufferSize] = (uint8_t)c;
     bufferSize++;
     
-#if defined(DEBUG_SERIAL)
+#ifdef DEBUG_SERIAL
     SerialUSB.print(c);         // print the character
 #endif
   }
-#if defined(DEBUG_SERIAL)
-  SerialUSB.print("\n");         // print the integer
+#ifdef DEBUG_SERIAL
+  SerialUSB.print("\n");       
 #endif
   parseBuffer();
 }
@@ -136,9 +143,11 @@ void requestEvent(){
 }
 
 void updateSensors(){
-#if defined(DEBUG_SERIAL)
-  SerialUSB.print("INA3221 Manufacturer ID: ");
-  SerialUSB.println(curSensor.read_manID());
+#ifdef DEBUG_SERIAL
+  SerialUSB.print("INA3221 V_Shunt Channel 2: ");
+  SerialUSB.println(curSensor.read_shunt_voltage(2));
+  SerialUSB.print("MAX17201 SoC: ");
+  SerialUSB.println(batSensor.getSOC());
 #endif
 }
 
@@ -147,12 +156,6 @@ extern "C" {
 
   void SERCOM0_Handler(void) {
     subComms.onService();
-  }
-  
-  void SERCOM1_Handler(void);
-
-  void SERCOM1_Handler(void) {
-    masComms.onService();
   }
 }
 
