@@ -1,6 +1,6 @@
-// Steven Hu [20170302]
+// Steven Hu [20170302] in collaboration with Daniel Cellucci (NASA/Cornell)
 // 
-// mods project by Neil Gershenfeld (c) Massachusetts Institute of Technology 2016
+// using mods project by Neil Gershenfeld (c) Massachusetts Institute of Technology 2016
 //
 (function(){
 //
