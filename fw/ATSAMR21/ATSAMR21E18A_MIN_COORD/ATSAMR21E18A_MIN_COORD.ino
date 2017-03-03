@@ -30,8 +30,7 @@ static bool updateMotors(NWK_DataInd_t *ind);
 static bool changeSetting(NWK_DataInd_t *ind);
 
 //Are we using serial comms?
-boolean usingSerial = false;
-boolean i2c_ready = true;
+boolean usingSerial = true;
 
 //1 is MOJO control
 //2 is USB bridge
@@ -42,7 +41,7 @@ int meshAddress = 1;
 static NWK_DataReq_t nwkDataReq;
 
 //Payload array (10 byte limit right now)
-static uint8_t payload[9];
+static uint8_t payload[30];
 static uint8_t indata[5];
                                  
 static uint8_t servovals[5];
@@ -61,19 +60,24 @@ boolean bot_servopower = false;
 /* TIMING VARIABLES
  *  
  */
-long curtime = 0;
-long ledupdatetime = 0;
-long servoupdatetime = 0;
-long currentreadtime = 0;
-long currentsendtime = 0;
-long nextframetime = 0;
+unsigned long curtime = 0;
+unsigned long ledupdatetime = 0;
+unsigned long servoupdatetime = 0;
+unsigned long sensorreadtime = 0;
+unsigned long sensorsendtime = 0;
+unsigned long nextframetime = 0;
+
+unsigned long servoUpdateInterval = 10000; //microseconds
+unsigned long sensorUpdateInterval = 10000; //microseconds
 
 
 /*I2C Settings
  * 
  */
-uint8_t top_servo_address = 0x04;
-uint8_t bot_servo_address = 0x05;
+uint8_t top_servo_ctrlr = 0x04;
+uint8_t bot_servo_ctrlr = 0x05;
+
+uint16_t vshunts[6], vbuses[6], socs[2];
 
 
 
@@ -102,11 +106,11 @@ void setup() {
   PHY_SetChannel(0x1a);
   PHY_SetRxState(true);
   NWK_OpenEndpoint(1, sendStatus);
-  NWK_OpenEndpoint(2, updateMotors);
+  NWK_OpenEndpoint(2, updateState);
   NWK_OpenEndpoint(3, changeSetting);
+  pinMode(0,OUTPUT);
 
   Wire.begin();
-  
 
   //Initialize Servo Values
   servovals[0] = 72;
@@ -120,34 +124,28 @@ void setup() {
 void loop() {
   //Wireless comms communication
   SYS_TaskHandler();
-  curtime = millis();  
+  curtime = micros();  
 
   if(Serial.available() > 0)
     parseSerialMessage();
   
   
-  if(curtime - ledupdatetime > 50){
-    //ledstatus = !ledstatus;
+  if(curtime - ledupdatetime > 1000000){
+    ledstatus = !ledstatus;
     ledupdatetime = curtime;
     digitalWrite(0, ledstatus);
   }
   
   
-  if(curtime - servoupdatetime > 10 && i2c_ready){
+  if(curtime - servoupdatetime > servoUpdateInterval){
     servoupdatetime = curtime;
-    updateServos();
+    updateControllerState();
   }
 
-  if(curtime - currentreadtime > 100 && i2c_ready){
-    currentreadtime = curtime;
-    //readCurrentValues();
+  if(curtime - sensorreadtime > sensorUpdateInterval){
+    sensorreadtime = curtime;
+    readSensorValues();
   }
-
-  if(curtime - currentsendtime > 100 && currentping){
-    currentsendtime = curtime;
-    //sendCurrentValues();
-  }
-
 }
 
 void parseSerialMessage(){
@@ -162,99 +160,76 @@ void parseSerialMessage(){
 }
 
 void parseCommand(char* comm){
+  
   switch(comm[0]){
     case '!':
       switch(comm[1]){
         case 's':
-          usingSerial = !usingSerial;
-          break;
-        case 'm':
-          moving = !moving;
-          break;
-        case 'h':
-          hipmoving = !hipmoving;
-          break;
-        case 'p':
-          currentping = !currentping;
-          break;
-        case 'i':
-          i2c_startup();
-          break;
-        case 'I':
-          usingSerial = !usingSerial;
-          i2c_startup();
-          break;
-        case 'l':
-          ledstatus = !ledstatus;
+          if(usingSerial){
+            printSensorValues();
+          }
           break;
       }
       break;
     case 's':
-       if(usingSerial){
-          Serial.println("Status:");
-          for(int i = 0; i < 5; i++){
-            Serial.print("Servo ");
-            Serial.print(i+1);
-            Serial.print(": ");
-            Serial.println(servovals[i]);
-          }
-        }else{
-          payload[0]= 's';
-          for(int i = 0; i < 5; i++){
-            payload[i+1] = servovals[i];
-          }
-          sendMessage();
-        }
       break;
     case 'c':
-      readCurrentValues();
-      if(comm[1] == 'p')
-        currentping = !currentping;
       break;
     case 'w':
-      switch(comm[1]){
-        case 't':
-          if(indata[0] > 0)
-            servovals[0] = indata[0];
-          if(indata[1] > 0)
-            servovals[1] = indata[1];
-          break;
-        case 'h':        
-          if(indata[0] > 0)      
-            servovals[2] = indata[0];
-          break;
-        case 'b': 
-          if(indata[0] > 0)     
-            servovals[3] = indata[0];
-          if(indata[1] > 0)
-            servovals[4] = indata[1];
-          break;
-        case 'p':
-          moving = true;
-          break;
-        case '+':
-          top_servopower = true;
-          break;
-        case '-':
-          top_servopower = false;
-          break;
-        case '=':
-          bot_servopower = true;
-          break;
-        case '_':
-          bot_servopower = false;
-          break;
-      }
       break;
   } 
 }
 
-void readCurrentValues(){
-  currentreadtime = curtime;
-  /*
-  top_cur_mA = top_cur_sen.getCurrent_mA()*correction_factor;
-  bot_cur_mA = bot_cur_sen.getCurrent_mA()*correction_factor;
-  */
+void printSensorValues(){
+  SerialUSB.println("INA3221 A:");
+  for(int i = 0; i < 3; i++){
+    SerialUSB.print("\tChannel ");
+    SerialUSB.print(i+1);
+    SerialUSB.println(":");
+    SerialUSB.print("\t\tV_Shunt: ");
+    SerialUSB.println(vshunts[i]);
+    SerialUSB.print("\t\tV_Bus: ");
+    SerialUSB.println(vbuses[i]);
+  }
+  
+  SerialUSB.println("INA3221 B:");
+  for(int i = 0; i < 3; i++){
+    SerialUSB.print("\tChannel ");
+    SerialUSB.print(i+1);
+    SerialUSB.println(":");
+    SerialUSB.print("\t\tV_Shunt: ");
+    SerialUSB.println(vshunts[i+3]);
+    SerialUSB.print("\t\tV_Bus: ");
+    SerialUSB.println(vbuses[i+3]);
+  }
+  SerialUSB.print("MAX17201 SoC A: ");
+  SerialUSB.println(socs[0]);
+  SerialUSB.print("MAX17201 SoC B: ");
+  SerialUSB.println(socs[1]);
+}
+
+void readSensorValues(){
+  sensorreadtime = curtime;
+  Wire.requestFrom(top_servo_ctrlr,14);
+  //if(Wire.available()){
+    for(int i = 0; i < 3; i++){
+      vshunts[i] = ((Wire.read() << 8) | Wire.read());
+    }
+    for(int i = 0; i < 3; i++){
+      vbuses[i] = ((Wire.read() << 8) | Wire.read());
+    }
+    socs[0] = ((Wire.read() << 8) | Wire.read());
+  //}
+  Wire.requestFrom(bot_servo_ctrlr,14);
+  //if(Wire.available()){
+    for(int i = 0; i < 3; i++){
+      vshunts[i+3] = ((Wire.read() << 8) | Wire.read());
+    }
+    for(int i = 0; i < 3; i++){
+      vbuses[i+3] = ((Wire.read() << 8) | Wire.read());
+    }
+    socs[1] = ((Wire.read() << 8) | Wire.read());
+  //}
 }
 
 void sendCurrentValues(){
@@ -311,30 +286,32 @@ static void appDataConf(NWK_DataReq_t *req){
 }
 
 static bool sendStatus(NWK_DataInd_t *ind) {
-  if(usingSerial){
-    Serial.print("Received message - ");
-    Serial.print("lqi: ");
-    Serial.print(ind->lqi, DEC);
   
-    Serial.print("  ");
-  
-    Serial.print("rssi: ");
-    Serial.print(ind->rssi, DEC);
-    Serial.print("  ");
-  }
-  payload[0]= 's';
-
-  for(int i = 0; i < 5; i++){
-    payload[i+1] = servovals[i];
-  }
-
-  sendMessage();
-
-  ledstatus = true;  
+  sendStatusMessage();
+  //ledstatus = true;  
   return true;
 }
 
-static bool updateMotors(NWK_DataInd_t *ind) {
+void sendStatusMessage(){
+  
+  memset(payload,0,sizeof(payload));
+  payload[5] = (top_servopower << 3) | (bot_servopower << 2); 
+  for(int i = 0; i < 5; i++){ //The third channel of the bottom should be useless
+    payload[i] = servovals[i];
+    payload[i*2+6] = (vshunts[i]>>8) & 0xFF;
+    payload[i*2+7] = (vshunts[i]) & 0xFF;
+    payload[i*2+16] = (vbuses[i]>>8) & 0xFF;
+    payload[i*2+17] = (vbuses[i]) & 0xFF;
+  }
+  payload[26] = (socs[0]>>8)&0xFF;
+  payload[27] = (socs[0] & 0xFF);
+  payload[28] = (socs[1]>>8)&0xFF;
+  payload[29] = (socs[1] & 0xFF);
+
+  sendMessage();
+}
+
+static bool updateState(NWK_DataInd_t *ind) {
   rec_message = (uint8_t*)(ind->data);
 
   if(usingSerial){
@@ -354,6 +331,10 @@ static bool updateMotors(NWK_DataInd_t *ind) {
   for(int i = 0; i < 5; i++)
     if(rec_message[i] != 0)
       servovals[i] = rec_message[i];
+  top_servopower = rec_message[5]&0x04;
+  bot_servopower = rec_message[5]&0x02;
+
+  sendStatusMessage();
   
   return true;
 }
@@ -364,12 +345,9 @@ static bool changeSetting(NWK_DataInd_t *ind){
   return true;
 }
 
-void i2c_startup(){
-  i2c_ready = true;
-}
 
-void updateServos(){
-    Wire.beginTransmission(top_servo_address);
+void updateControllerState(){
+    Wire.beginTransmission(top_servo_ctrlr);
       Wire.write('w');
       Wire.write(servovals[0]);
       Wire.write(servovals[1]);
@@ -380,7 +358,7 @@ void updateServos(){
         Wire.write('-');
     Wire.endTransmission();
     
-    Wire.beginTransmission(bot_servo_address);
+    Wire.beginTransmission(bot_servo_ctrlr);
       Wire.write('w');
       Wire.write(servovals[2]);
       Wire.write(servovals[3]);

@@ -1,16 +1,23 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <SPI.h>
+#include <ArduinoJson.h>
 
-#define Serial SERIAL_PORT_USBVIRTUAL
-
+//Atmel LWM Includes
 #include "lwm.h"
 #include "lwm/sys/sys.h"
 #include "lwm/nwk/nwk.h"
 
+//Makes definition easier
+#define Serial SERIAL_PORT_USBVIRTUAL
+
 extern "C" {
   void println(char *x) { Serial.println(x); Serial.flush(); }
 }
+
+//ArduinoJson 
+const size_t bufferSize = 2*JSON_ARRAY_SIZE(2) + 3*JSON_ARRAY_SIZE(5) + JSON_OBJECT_SIZE(5) + 150;
+char BUFFER[255]; 
 
 // LWM mesh methods 
 //Send the message
@@ -30,23 +37,30 @@ uint8_t *rec_message;
 //Static data packet types (prevents memory leak)
 //LWM data request struct
 static NWK_DataReq_t nwkDataReq;
+
 //Payload array (10 byte limit right now)
 static uint8_t payload[9];
-static uint8_t indata[9];
 
 static uint8_t servovals[5] = {74,182,185,174,182};
+static uint8_t config_byte = 0x04;
 
 //Command input (from Serial)
 String command = "";
 
 //Timing variables
-long curtime = 0;
-
+unsigned long curtime = 0;
+unsigned long syncstatetime, inctime;
+unsigned long syncstateinterval = 15000;
 
 //for debug
 boolean ledstatus = true; 
+boolean sync = false;
 boolean debug = false;
 long ledtoggletime = 0;
+
+long timestep = 0;
+
+long before, after;
 
 
 void setup() {
@@ -73,6 +87,8 @@ void setup() {
   NWK_SetPanId(0x01);
   PHY_SetChannel(0x1a);
   PHY_SetRxState(true);
+
+  pinMode(0, OUTPUT);
   
   //Associates a method with an endpoint value. 
   //Any value between 1 and 16 (0 is reserved)
@@ -86,7 +102,7 @@ void loop() {
   SYS_TaskHandler();
   
   //Timing variable
-  curtime = millis();
+  curtime = micros();
 
   //Reads a command from Serial if available
   if(Serial.available() > 0){
@@ -94,10 +110,15 @@ void loop() {
   }
 
   //Toggle LED stuff. More debug.
-  if(curtime - ledtoggletime > 500){
+  if(curtime - ledtoggletime > 500000){
     ledtoggletime = curtime;
-    //ledstatus = !ledstatus;
+    ledstatus = !ledstatus;
     digitalWrite(0, ledstatus);
+  }
+
+  if(curtime - syncstatetime > syncstateinterval && sync){
+    syncstatetime = curtime;
+    sendState();
   }
 }
 
@@ -108,23 +129,35 @@ void loop() {
  * then freeze... this method fixed it.
  */
 static void appDataConf(NWK_DataReq_t *req){
-  if (NWK_SUCCESS_STATUS == req->status)
+  if (NWK_SUCCESS_STATUS == req->status && debug){
     Serial.println("Sent successfully");
-  else
-    Serial.println("Packet failed to send");
+  }
+  else{
+    Serial.println("Packet failed to send"); 
+  }
 }
 
 void parseCommand(){
-  memset(indata,0,sizeof(indata));
   memset(payload,0,sizeof(payload));
-  int curcount = 0;
-  char comm[3];
-  Serial.readBytesUntil(' ', comm, 3);
-  if(comm[0] == 'w' && comm[1] == 'a'){
-    while(Serial.available()){
-        indata[curcount] = (uint8_t)Serial.parseInt();
-        curcount++;
+  
+  char json[255];
+  Serial.readBytesUntil(';',json,255);
+  
+  
+  if(json[0] == '{'){
+    StaticJsonBuffer<bufferSize> jsonBuffer;
+    JsonObject& root = jsonBuffer.parseObject(json);
+    JsonArray& motorvals = root["motorvals"];
+    for(int i = 0; i < 5; i++){
+      servovals[i] = (uint8_t)motorvals[i];
     }
+    config_byte = (((int)root["power"][0])<<3 | ((int)root["power"][1]) << 2 | ((int)root["updates"]));
+    sendState();
+  }
+  if(json[0] == 's'){
+    if(debug)
+      before = micros();
+    sendMessage(1);
   }
   /*
   else{
@@ -199,12 +232,13 @@ void parseCommand(){
   */
 }
 
-void writeState(){
+void sendState(){
   memset(payload,0,sizeof(payload));
-  memcpy(&payload, &indata, sizeof(indata));
-    //Serial.println(servovals[i]);
-  //Serial.println((char*)payload);
+  memcpy(&payload, &servovals, sizeof(servovals));
+  payload[5] = config_byte;
+  
   sendMessage(2);
+  sync = false;
 }
 
 static void sendMessage(int dstEndpointVal){
@@ -220,6 +254,7 @@ static void sendMessage(int dstEndpointVal){
 }
 
 static bool receiveMessage(NWK_DataInd_t *ind) {
+  //Network debug code
   if(debug){
     Serial.print("Received message - ");
     Serial.print("lqi: ");
@@ -234,34 +269,57 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
     Serial.println(ind->size);
     Serial.print("message: ");
   }
-  rec_message = (uint8_t*)(ind->data);
-  switch((char)rec_message[0]){
-    case 's':
-      for(int i = 0; i < ind->size; i++){
-        Serial.println((int)rec_message[i+1]);
-      }
-      break;
-    case 'c':
-      byte tmparr[4];
-      float tmpflt;
-      for(int i = 0; i < 4; i++){
-        tmparr[i] = rec_message[i+1];
-      }
-      tmpflt = *(float *)&tmparr;
-      Serial.print(tmpflt);
-      Serial.print(",");
-      for(int i = 0; i < 4; i++){
-        tmparr[i] = rec_message[5+i];
-      }
-      tmpflt = *(float *)&tmparr;
-      Serial.println(tmpflt);
-      //Serial.print(",");
-      break;
+  //Assign a pointer to received message data
+  rec_message = (uint8_t*) ind->data;
+  
+  StaticJsonBuffer<bufferSize> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+  JsonArray& power = root.createNestedArray("power");
+  power.add((bool)(rec_message[5] & 0x04));
+  power.add((bool)(rec_message[5] & 0x02));
+  JsonArray& motorVals = root.createNestedArray("motorvals");
+  JsonArray&      vbus = root.createNestedArray("vbus");
+  JsonArray&    vshunt = root.createNestedArray("vshunt");
+  for(int i = 0; i < 5; i++){
+    motorVals.add(rec_message[i]);
+    vbus.add(((rec_message[i*2+16] << 8) | rec_message[i*2+17]));
+    vshunt.add(((rec_message[i*2+6] << 8) | rec_message[i*2+7]));
   }
-  if((char)rec_message[0] == 's'){
+  JsonArray& soc = root.createNestedArray("soc");
+  soc.add(((rec_message[26]<<8) | rec_message[27]));
+  soc.add(((rec_message[28]<<8) | rec_message[29]));
+
+  root.printTo(BUFFER,sizeof(BUFFER));
+  Serial.write(BUFFER);
+  
+  Serial.write("\n");
+  
+  //More debug
+  if(debug){
+    after = micros();
     for(int i = 0; i < 5; i++){
-      Serial.println((int)rec_message[i+1]);
+      Serial.print(rec_message[i],DEC);
+      Serial.print(" | ");
     }
+    Serial.println();
+    SerialUSB.println("INA3221 A:");
+    for(int i = 0; i < 5; i++){
+      SerialUSB.print("\tChannel ");
+      SerialUSB.print(i+1);
+      SerialUSB.println(":");
+      SerialUSB.print("\t\tV: ");
+      SerialUSB.print(0.001*((rec_message[i*2+16] << 8) | rec_message[i*2+17]));
+      SerialUSB.println("V");
+      SerialUSB.print("\t\tC: ");
+      SerialUSB.print(4.0*0.04*((rec_message[i*2+6] << 8) | rec_message[i*2+7]));
+      SerialUSB.println("mA");
+    }
+    Serial.println("Battery A");
+    Serial.print("\tSoC: ");
+    Serial.print(1.0/256.0*((rec_message[26]<<8) | rec_message[27]));
+    SerialUSB.println("%");
+    Serial.print("Time Elapsed: ");
+    Serial.println(after-before);
   }
   return true;
 }

@@ -16,6 +16,8 @@ uint8_t servoVals[3] = {128,128,180};
 uint8_t BUFFER[255];
 uint8_t bufferSize;
 
+uint8_t msgout[255];
+
 //Initialize the I2C bus that communicates with the Coordinator
 TwoWire subComms(&sercom0,14,15);
 
@@ -32,7 +34,12 @@ unsigned long servoUpdateInterval,sensorUpdateInterval;
 
 //Toggle Servo Power Supply
 int servoPowerPin = 16;
-bool servoPower = true;
+bool servoPower = false;
+
+//sensor values
+uint16_t vshunts[3];
+uint16_t vbuses[3];
+uint16_t soc;
 
 //Sets whether serial will get used (for debug)
 #if defined(ARDUINO_CDC_ONLY) || defined(ARDUINO_CDC_HID_UART) || defined(ARDUINO_CDC_UART) ||  defined(ARDUINO_CDC_MIDI_HID_UART) || defined(ARDUINO_CDC_MSD_HID_UART) || defined(ARDUINO_CDC_MSD_MIDI_HID_UART)
@@ -43,7 +50,7 @@ void setup() {
   servoUpdateInterval = 10000; //microseconds
   sensorUpdateInterval = 10000; //microseconds
   // put your setup code here, to run once:
-#if defined(DEBUG_SERIAL)
+#ifdef DEBUG_SERIAL
     SerialUSB.begin(9600);
 #endif
 
@@ -63,14 +70,12 @@ void setup() {
 
   pinPeripheral(14, PIO_SERCOM);
   pinPeripheral(15, PIO_SERCOM);
-  pinPeripheral(22, PIO_SERCOM);
-  pinPeripheral(23, PIO_SERCOM);
-
+  
   pinMode(servoPowerPin,OUTPUT);
 
+  //initialize sensors
   curSensor.init();
   batSensor.reset();
-  //curSensor.enableDefaultSettings();
 }
 
 void loop() {
@@ -114,7 +119,7 @@ void receiveEvent(int howMany){
 }
 
 void parseBuffer(){
-  if(bufferSize > 0)
+  if(bufferSize > 0){
     switch((char)BUFFER[0]){
       case 'w':
         servoVals[0] = BUFFER[1];
@@ -125,29 +130,44 @@ void parseBuffer(){
         else if(BUFFER[4] == '-')
           servoPower = false;
         break;
-      case '!': 
-        switch((char)BUFFER[1]){
-          case 'p':
-            if((char)BUFFER[2] == '0')
-              servoPower = false;
-            else
-              servoPower = true;
-            break;
-        }
-        break;
     }
+  }
 }
 
 void requestEvent(){
-  subComms.write("status");
+  memset(msgout,0,sizeof(msgout));
+  for(int i = 0; i < 3; i++){
+    msgout[i*2] = (vshunts[i]>>8) & 0xFF;
+    msgout[i*2+1] = (vshunts[i]) & 0xFF;
+    msgout[i*2+6] = (vbuses[i]>>8) & 0xFF;
+    msgout[i*2+7] = (vbuses[i]) & 0xFF;
+  }
+  msgout[12] = (soc>>8)&0xFF;
+  msgout[13] = (soc & 0xFF);
+
+  subComms.write(msgout,14);
+  
 }
 
 void updateSensors(){
+  for(int i = 0; i < 3; i++){
+    vshunts[i] = curSensor.read_shunt_voltage(i+1);
+    vbuses[i] = curSensor.read_bus_voltage(i+1);
+  }    
+  soc = batSensor.getSOC();
 #ifdef DEBUG_SERIAL
-  SerialUSB.print("INA3221 V_Shunt Channel 2: ");
-  SerialUSB.println(curSensor.read_shunt_voltage(2));
+  SerialUSB.println("INA3221:");
+  for(int i = 0; i < 3; i++){
+    SerialUSB.print("\tChannel ");
+    SerialUSB.print(i+1);
+    SerialUSB.println(":");
+    SerialUSB.print("\t\tV_Shunt: ");
+    SerialUSB.println(vshunts[i]);
+    SerialUSB.print("\t\tV_Bus: ");
+    SerialUSB.println(vbuses[i]);
+  }
   SerialUSB.print("MAX17201 SoC: ");
-  SerialUSB.println(batSensor.getSOC());
+  SerialUSB.println(soc);
 #endif
 }
 
