@@ -31,7 +31,6 @@ var init = function() {
    mod.baud.value = 115200
    mod.flow_rtscts.checked = false
    mod.socket = null
-   socket_open()
    }
 //
 // inputs
@@ -260,7 +259,7 @@ var interface = function(div){
 
 function parseMessage(event){
    //console.log("Received these data: ")
-   //console.log(event)
+   console.log(event)
    if("data" in event){
         var message = {}
         try {
@@ -294,17 +293,18 @@ function socket_open() {
    mod.socket.onmessage = function(event){
       parseMessage(event)
       }
+   mod.socket.onclose = function(event) {
+      delete mod.socket;
+      }
 }
 
-
 function socket_close() {
-   var msg = 'close ' + mod.device
-   mod.socket.send(JSON.stringify(msg))
    mod.socket.close()
    mod.status.value = "socket closed"
-   mod.socket = null
    }
-   
+
+
+/* 
 function socket_send(msg) {
    if (mod.socket != null) {
       mod.status.value = "send"
@@ -314,6 +314,7 @@ function socket_send(msg) {
       mod.status.value = "can't send, not open"
       }
    }
+*/
 function serial_open() {
    if (mod.socket == null) {
       mod.status.value = "socket not open"

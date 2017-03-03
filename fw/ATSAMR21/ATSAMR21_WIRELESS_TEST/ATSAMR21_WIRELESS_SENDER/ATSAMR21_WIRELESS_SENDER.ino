@@ -212,6 +212,7 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
   
   root.printTo(BUFFER,sizeof(BUFFER));
   Serial.write(BUFFER);
+  Serial.write("\n");
 #endif
 
 #ifdef bytearr
