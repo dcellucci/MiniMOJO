@@ -43,8 +43,16 @@ var init = function() {
 var inputs = {
    input:{type:'character',
       event:function(evt){
-         var str = evt.detail
-         mod.character.value = str.slice(-1)
+         //var str = evt.detail
+         //mod.character.value = str.slice(-1)
+         //outputs.output.event()
+         var input = JSON.parse(evt.detail)
+         for(var i = 0; i < 5; i++){
+             if(input.motorvals[i] != 0){
+                mod.motorvals[i].value = input.motorvals[i]
+                mod.motordisp[i].value = input.motorvals[i]
+             }
+         }
          outputs.output.event()
       }
    }
@@ -58,7 +66,7 @@ var outputs = {
           mod.state.power = [mod.toppow,mod.botpow]
           mod.state.updates = mod.updates
         parseMotVals()
-         mods.output(mod,'output',JSON.stringify(mod.state))
+         mods.output(mod,'output',JSON.stringify(mod.state)+";")
       }
    }
 }

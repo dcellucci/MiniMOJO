@@ -129,12 +129,12 @@ void loop() {
  * then freeze... this method fixed it.
  */
 static void appDataConf(NWK_DataReq_t *req){
-  if (NWK_SUCCESS_STATUS == req->status && debug){
-    Serial.println("Sent successfully");
-  }
-  else{
-    Serial.println("Packet failed to send"); 
-  }
+  if (NWK_SUCCESS_STATUS == req->status)
+    if(debug)
+      Serial.println("Sent successfully");
+  else
+    if(debug)
+      Serial.println("Packet failed to send"); 
 }
 
 void parseCommand(){
@@ -151,7 +151,9 @@ void parseCommand(){
     for(int i = 0; i < 5; i++){
       servovals[i] = (uint8_t)motorvals[i];
     }
-    config_byte = (((int)root["power"][0])<<3 | ((int)root["power"][1]) << 2 | ((int)root["updates"]));
+    config_byte = (uint8_t)((((bool)(root["power"][0])) << 2) | (((bool)(root["power"][1]))) << 1 | (((bool)(root["updates"]))));
+    Serial.print("Config :");
+    Serial.println(config_byte,BIN);
     sendState();
   }
   if(json[0] == 's'){
