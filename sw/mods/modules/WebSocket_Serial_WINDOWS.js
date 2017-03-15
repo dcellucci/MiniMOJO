@@ -28,10 +28,10 @@ var init = function() {
    mod.address.value = '127.0.0.1'
    mod.port.value = 8989
    mod.device = ''
-   mod.baud.value = 9600
+   mod.baud.value = 115200
    mod.flow_rtscts.checked = false
    mod.socket = null
-   socket_open()
+   //socket_open()
    }
 //
 // inputs
@@ -170,6 +170,11 @@ var interface = function(div){
    sel.style.width = "100px"
    mod.portlist = sel
    div.appendChild(mod.portlist)
+   
+   // console.log('there <--------------------------')
+   // console.log(mod.portlist)
+   // console.log(sel.value)
+   
    div.appendChild(document.createElement('br'))   
    //
    // baud rate
@@ -260,7 +265,7 @@ var interface = function(div){
 
 function parseMessage(event){
    //console.log("Received these data: ")
-   //console.log(event)
+   console.log(event.data)
    if("data" in event){
         var message = {}
         try {
@@ -282,7 +287,12 @@ function parseMessage(event){
    }
 
 function socket_open() {
-   var url = "ws://"+mod.address.value+':'+mod.port.value+'/ws'
+   var url = "ws://"+ mod.address.value +':'+mod.port.value+'/ws'
+   
+   console.log(mod.address.value)
+   console.log(mod.port.value)
+   
+   
    mod.socket = new WebSocket(url)
    mod.socket.onopen = function(event) {
       mod.status.value = "socket opened"
@@ -294,6 +304,9 @@ function socket_open() {
       }
    mod.socket.onmessage = function(event){
       parseMessage(event)
+      }
+   mod.socket.onclose = function(event) {
+      delete mod.socket;
       }
 }
 
@@ -316,15 +329,22 @@ function socket_send(msg) {
       }
    }
 function serial_open() {
-   if (mod.socket == null) {
-      mod.status.value = "socket not open"
-      }
-   else {
-       var msg = 'open '
-       msg = msg + mod.device + ' ' + mod.baud.value
-      mod.socket.send(msg)
-      }
-   }
+    if mod.portlist.value == null{
+        console.log("ERROR - no comm port selected")
+    } else{
+        mod.device = mod.portlist.value  // uses comm port value shown in GUI    
+    }
+    
+    if (mod.socket == null) {
+        mod.status.value = "socket not open"
+    }
+    else {
+        var msg = 'open '
+        msg = msg + mod.device + ' ' + mod.baud.value
+        mod.socket.send(msg)
+    }
+}
+
 function serial_close() {
    if (mod.socket == null) {
       mod.status.value = "socket not open"
