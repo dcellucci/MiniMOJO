@@ -20,7 +20,7 @@ var mod = {}
 //
 // name
 //
-var name = 'WebSocket serial'
+var name = 'WebSocket Serial [WINDOWS]'
 //
 // initialization
 //
@@ -28,10 +28,10 @@ var init = function() {
    mod.address.value = '127.0.0.1'
    mod.port.value = 8989
    mod.device = ''
-   mod.baud.value = 115200
+   mod.baud.value = 9600
    mod.flow_rtscts.checked = false
    mod.socket = null
-   //socket_open()
+   socket_open()
    }
 //
 // inputs
@@ -130,36 +130,43 @@ var interface = function(div){
    //
    // serial
    //
+   div.appendChild(document.createElement('br'))
    div.appendChild(document.createTextNode('serial device:'))
    div.appendChild(document.createElement('br'))
    //
    // open/close
    //
-   var btn = document.createElement('button')
-      btn.style.margin = 1
-      btn.appendChild(document.createTextNode('scan'))
-      btn.addEventListener('click',function() {
-         serial_scan()
-         })
-      div.appendChild(btn)
-   var btn = document.createElement('button')
-      btn.style.margin = 1
-      btn.appendChild(document.createTextNode('open'))
-      btn.addEventListener('click',function() {
-         serial_open()
-         })
-      div.appendChild(btn)
-   var btn = document.createElement('button')
-      btn.style.margin = 1
-      btn.appendChild(document.createTextNode('close'))
-      btn.addEventListener('click',function() {
-         serial_close()
-         })
-      div.appendChild(btn)
-   div.appendChild(document.createElement('br'))
-   //
-   // device
-   //
+    var btn = document.createElement('button')
+    btn.style.margin = 1
+    btn.appendChild(document.createTextNode('scan'))
+    btn.addEventListener('click',function()
+    {
+        serial_scan()
+    })
+    div.appendChild(btn)
+    
+    var btn = document.createElement('button')
+    btn.style.margin = 1
+    btn.appendChild(document.createTextNode('open'))
+    btn.addEventListener('click',function()
+    {
+        serial_open()
+    })
+    div.appendChild(btn)
+    
+    var btn = document.createElement('button')
+    btn.style.margin = 1
+    btn.appendChild(document.createTextNode('close'))
+    btn.addEventListener('click',function()
+    {
+        serial_close()
+    })
+    div.appendChild(btn)
+    div.appendChild(document.createElement('br'))
+    
+    //
+    // device
+    //
    div.appendChild(document.createTextNode('/dev/'))
    mod.device = ""
    var sel = document.createElement('select')
@@ -170,11 +177,6 @@ var interface = function(div){
    sel.style.width = "100px"
    mod.portlist = sel
    div.appendChild(mod.portlist)
-   
-   // console.log('there <--------------------------')
-   // console.log(mod.portlist)
-   // console.log(sel.value)
-   
    div.appendChild(document.createElement('br'))   
    //
    // baud rate
@@ -217,19 +219,23 @@ var interface = function(div){
       mod.flow_dsrdtr = input
    div.appendChild(document.createTextNode('DSRDTR'))
    div.appendChild(document.createElement('br'))  
-   var btn = document.createElement('button')
-      btn.style.padding = mods.ui.padding
-      btn.style.margin = 1
-      var span = document.createElement('span')
-         var text = document.createTextNode('scan')
-            mod.label = text
-            span.appendChild(text)
-         mod.labelspan = span
-      btn.appendChild(span)
-      btn.addEventListener('click',function(){
-         serial_scan();
-      })
-   div.appendChild(btn)
+   
+   // second SCAN btn; commented out
+   // var btn = document.createElement('button')
+      // btn.style.padding = mods.ui.padding
+      // btn.style.margin = 1
+      // var span = document.createElement('span')
+         // var text = document.createTextNode('scan2')
+            // mod.label = text
+            // span.appendChild(text)
+         // mod.labelspan = span
+      // btn.appendChild(span)
+      // btn.addEventListener('click',function(){
+         // serial_scan();
+      // })
+   // div.appendChild(btn)
+   
+   
    div.appendChild(document.createElement('br'))  
    //
    // file button
@@ -264,50 +270,63 @@ var interface = function(div){
 //
 
 function parseMessage(event){
-   //console.log("Received these data: ")
-   console.log(event.data)
-   if("data" in event){
+    //console.log("Received these data: ")
+    // console.log('event.data <---------------------')
+    if("data" in event){
+        // console.log(event.data)
         var message = {}
-        try {
-            message = JSON.parse(event.data)
+        
+        if (event.data.slice(-1) == '}'){  // checking for last bracket in json format
+            try {
+                message = JSON.parse(event.data)
+            } catch(e){
+                console.log("JSON Parse of event data failed; *TRY restarting webserver")
+                console.log(e)
             }
-        catch(e){
-            console.log("JSON Parse of event data failed; *TRY restarting webserver")
-            console.log(e)
-            }
+        }
+        
         if("SerialPorts" in message){
             populate_portlist(message.SerialPorts)
             }
         if(!("Cmd" in message)){
             if("D" in message){
-                outputs.receive.event(message.D)
+                // TODO: not sure why parser is splitting json into two segments
+                //       1. is just the begining bracket
+                //       2. is the rest of the json string
+                //       below is temporary fix
+                if (message.D.slice(-1) != '{')  // ignore json with just starting bracket
+                {
+                    if (message.D.slice(-1) == '}' && message.D.slice(0) != '{'){
+                        message.D = '{'.concat(message.D)
+                    }
+                    outputs.receive.event(message.D)
+                }
             }
         }
-      }
-   }
+    }
+}
 
 function socket_open() {
-   var url = "ws://"+ mod.address.value +':'+mod.port.value+'/ws'
-   
-   console.log(mod.address.value)
-   console.log(mod.port.value)
-   
-   
-   mod.socket = new WebSocket(url)
-   mod.socket.onopen = function(event) {
-      mod.status.value = "socket opened"
-      //serial_open()
-      }
-   mod.socket.onerror = function(event) {
-      mod.status.value = "cannot open"
-      mod.socket = null
-      }
-   mod.socket.onmessage = function(event){
-      parseMessage(event)
-      }
-   mod.socket.onclose = function(event) {
-      delete mod.socket;
-      }
+    var url = "ws://"+ mod.address.value +':'+mod.port.value+'/ws'
+    mod.socket = new WebSocket(url)
+    mod.socket.onopen = function(event)
+    {
+        mod.status.value = "socket opened"
+        //serial_open()
+    }
+    mod.socket.onerror = function(event)
+    {
+        mod.status.value = "cannot open"
+        mod.socket = null
+    }
+    mod.socket.onmessage = function(event)
+    {
+        parseMessage(event)
+    }
+    mod.socket.onclose = function(event)
+    {
+        delete mod.socket;
+    }
 }
 
 
@@ -328,8 +347,9 @@ function socket_send(msg) {
       mod.status.value = "can't send, not open"
       }
    }
+   
 function serial_open() {
-    if mod.portlist.value == null{
+    if (mod.portlist.value == null){
         console.log("ERROR - no comm port selected")
     } else{
         mod.device = mod.portlist.value  // uses comm port value shown in GUI    
