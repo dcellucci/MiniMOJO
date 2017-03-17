@@ -7,10 +7,11 @@
 // module globals
 var mod = {}
 var auto_save_handle = 0  // initializing global handle
-var name = 'DATA LOGGER'  // GUI name
+var name = 'MOJO_DATA_LOGGER'  // GUI name
 
 // initialization
 var init = function() {
+    console.log("Initializing... " + name)
     var date = new Date();
     mod.text1.value = "<null>";
 }

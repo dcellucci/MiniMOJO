@@ -296,7 +296,7 @@ function parseMessage(event){
                 //       below is temporary fix
                 if (message.D.slice(-1) != '{')  // ignore json with just starting bracket
                 {
-                    if (message.D.slice(-1) == '}' && message.D.slice(0) != '{'){
+                    if (message.D.slice(-1) == '}' && message.D.slice(0,1) != '{'){
                         message.D = '{'.concat(message.D)
                     }
                     outputs.receive.event(message.D)
