@@ -70,10 +70,10 @@ When a command packet is sent to MOJO, the coordinator will respond with a packe
 Locomotion through the lattice occurs by moving MOJO through a set of 6 discrete positions. These positions can be described as the outer product of two orthogonal state vectors: `{retracted, extended}` and `{outer, middle, inner}`.
 
     ``` 
-    |        | Retracted | Extended |
-    | Outer  |    or     |    oe    |
-    | Middle |    mr     |    me    |
-    | Inner  |    ir     |    ie    |
+    |        | Retracted | Extended  |
+    | Outer  | [ 40,184] | [ 40, 80] |
+    | Middle | [ 40,200] | [ 80,178] |
+    | Inner  | [ 40,220] | [190,220] |
     HIP HIP HIP
     ```
 
@@ -86,4 +86,5 @@ The `inner` state refers to when the arms are closest to the hip. This state cor
 The `middle` state refers to when the arms are halfway between the `inner` and `outer` states. This state is mainly for debug right now.
 
 By switching between these locomotion states for the top and bottom, it is possible to perform a climb. 
+
 
