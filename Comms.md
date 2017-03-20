@@ -46,6 +46,9 @@
 			* current bytes: Are actually 6 12-bit values that are glommed together. The bus and shunt registers for a given channel share a middle byte which holds their LSB values. So for example  
 			`[MS VShunt Byte][LS VShunt Nibble | LS VBus Nibble][MS Vbus Byte]`
 
+# Network Latency Tests
+
+In order to quantify the relative speed of the system, I attempted to quantify the latency of each of the hops in the network, and the time required to do serial/deserialization of the input strings.
 
 
 

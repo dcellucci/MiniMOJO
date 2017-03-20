@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <SPI.h>
-#include <ArduinoJson.h>
 
 //Atmel LWM Includes
 #include "lwm.h"
@@ -9,15 +8,12 @@
 #include "lwm/nwk/nwk.h"
 
 //Makes definition easier
-#define Serial SerialUSB
+#define Serial SERIAL_PORT_USBVIRTUAL
+#define LED_BUILTIN 0
 
 extern "C" {
   void println(char *x) { Serial.println(x); Serial.flush(); }
 }
-
-//ArduinoJson 
-const size_t bufferSize = 2*JSON_ARRAY_SIZE(2) + 3*JSON_ARRAY_SIZE(5) + JSON_OBJECT_SIZE(5) + 150;
-char BUFFER[255]; 
 
 // LWM mesh methods 
 //Send the message
@@ -41,11 +37,9 @@ static NWK_DataReq_t nwkDataReq;
 //Payload array (10 byte limit right now)
 static uint8_t payload[9];
 
-static uint8_t servovals[5] = {74,182,185,174,182};
+//MotorLayout is: Top Outer - Top Inner - Hip - Bot Outer Bot Inner
+static uint8_t servovals[5] = {74,182,185,74,182};
 static uint8_t config_byte = 0x04;
-
-//Command input (from Serial)
-String command = "";
 
 //Timing variables
 unsigned long curtime = 0;
@@ -89,7 +83,7 @@ void setup() {
   PHY_SetChannel(0x1a);
   PHY_SetRxState(true);
 
-  pinMode(0, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
   
   //Associates a method with an endpoint value. 
   //Any value between 1 and 16 (0 is reserved)
@@ -114,7 +108,7 @@ void loop() {
   if(curtime - ledtoggletime > 500000){
     ledtoggletime = curtime;
     ledstatus = !ledstatus;
-    digitalWrite(0, ledstatus);
+    digitalWrite(LED_BUILTIN, ledstatus);
   }
 
   if(curtime - syncstatetime > syncstateinterval && sync){

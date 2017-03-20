@@ -5,7 +5,7 @@
 #include <max1720x.h>
 
 //Flag for if this board is closest to the main processor (top) (also controls hip)
-bool topServoset = false;
+bool topServoset = true;
 
 //Servo Objects
 Servo topServo,botServo,hipServo;
@@ -34,7 +34,7 @@ unsigned long servoUpdateInterval,sensorUpdateInterval;
 
 //Toggle Servo Power Supply
 int servoPowerPin = 16;
-bool servoPower = true;
+bool servoPower = false;
 
 //sensor values
 uint16_t vshunts[3];

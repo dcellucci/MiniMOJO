@@ -23,7 +23,7 @@ static void appDataConf(NWK_DataReq_t *req);
 static bool echoBack(NWK_DataInd_t *ind);
 
 //1 is Receiver
-//2 is USB bridge
+//2 is Sender
 int meshAddress = 1;
 
 int curloc = 0;

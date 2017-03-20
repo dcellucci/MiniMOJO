@@ -295,7 +295,7 @@ static bool sendStatus(NWK_DataInd_t *ind) {
 void sendStatusMessage(){
   
   memset(payload,0,sizeof(payload));
-  payload[5] = (top_servopower << 3) | (bot_servopower << 2); 
+  payload[5] = (top_servopower << 2) | (bot_servopower << 1); 
   for(int i = 0; i < 5; i++){ //The third channel of the bottom should be useless
     payload[i] = servovals[i];
     payload[i*2+6] = (vshunts[i]>>8) & 0xFF;

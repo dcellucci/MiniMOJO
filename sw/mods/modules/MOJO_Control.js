@@ -16,12 +16,20 @@
 var mod = {
    motorvals: [0,0,0,0,0],
    motordisp: [0,0,0,0,0],
-   trimvals: [0,0,0,0,0],
+   trimvals: [5,-15,10,-10,-15],
    liveupdate: false,
    toppow: false, 
    botpow: false,
-   updates: false,
-   state: {}
+   sync: false,
+   state: {},
+   pos:{
+      or:[0,0], //outer retracted
+      oe:[0,0], //outer extended
+      mr:[0,0], //mid retracted
+      me:[0,0], //mid extended
+      ir:[0,0], //inner retracted
+      ie:[0,0]  //inner extended
+   }
 }
 
 
@@ -41,22 +49,20 @@ var init = function() {
 // inputs
 //
 var inputs = {
-   input:{type:'character',
+   motorVals:{
+      type:'MOJOState',
       event:function(evt){
-         //var str = evt.detail
-         //mod.character.value = str.slice(-1)
-         //outputs.output.event()
          var input = JSON.parse(evt.detail)
          for(var i = 0; i < 5; i++){
-             if(input.motorvals[i] != 0){
-                mod.motorvals[i].value = input.motorvals[i]
-                mod.motordisp[i].value = input.motorvals[i]
-             }
-         }
+            if(parseInt(input.motorvals[i]) >= 0){
+               mod.motorvals[i].value = parseInt(input.motorvals[i])
+               mod.motordisp[i].value = parseInt(input.motorvals[i])
+               }
+            }
          outputs.output.event()
+         }
       }
    }
-}
 //
 // outputs
 //
@@ -64,9 +70,10 @@ var outputs = {
    output:{type:'string',
       event:function(){
           mod.state.power = [mod.toppow,mod.botpow]
-          mod.state.updates = mod.updates
+          mod.state.sync = mod.sync
         parseMotVals()
-         mods.output(mod,'output',JSON.stringify(mod.state)+";")
+        console.log(JSON.stringify(mod.state))
+         mods.output(mod,'output',JSON.stringify(mod.state))
       }
    }
 }
@@ -126,7 +133,7 @@ var interface = function(div){
     
     trim1 = document.createElement('input')
         trim1.type = 'text'
-        trim1.value = 0
+        trim1.value = mod.trimvals[0]
         trim1.size = 1
     div.appendChild(trim1)
         
@@ -165,7 +172,7 @@ var interface = function(div){
     
     trim2 = document.createElement('input')
         trim2.type = 'text'
-        trim2.value = 0
+        trim2.value = mod.trimvals[1]
         trim2.size = 1
     div.appendChild(trim2)
     
@@ -206,7 +213,7 @@ var interface = function(div){
     
     trim3 = document.createElement('input')
         trim3.type = 'text'
-        trim3.value = 0
+        trim3.value = mod.trimvals[2]
         trim3.size = 1
     div.appendChild(trim3)
     
@@ -246,7 +253,7 @@ var interface = function(div){
     
     trim4 = document.createElement('input')
         trim4.type = 'text'
-        trim4.value = 0
+        trim4.value = mod.trimvals[3]
         trim4.size = 1
     div.appendChild(trim4)
         
@@ -285,7 +292,7 @@ var interface = function(div){
     
     trim5 = document.createElement('input')
         trim5.type = 'text'
-        trim5.value = 0
+        trim5.value = mod.trimvals[4]
         trim5.size = 1
     div.appendChild(trim5)
     
@@ -344,7 +351,7 @@ var interface = function(div){
         updatesckbox.type = 'checkbox'
         updatesckbox.checked = mod.botpow
         updatesckbox.addEventListener('change', function(){
-            mod.updates = updatesckbox.checked
+            mod.sync = updatesckbox.checked
            outputs.output.event()
             })
     div.appendChild(updatesckbox)

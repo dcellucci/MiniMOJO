@@ -26,12 +26,11 @@ var name = 'WebSocket serial'
 //
 var init = function() {
    mod.address.value = '127.0.0.1'
-   mod.port.value = 1234
+   mod.port.value = 8080
    mod.device = ''
-   mod.baud.value = 9600
+   mod.baud.value = 115200
    mod.flow_rtscts.checked = false
    mod.socket = null
-   socket_open()
    }
 //
 // inputs
@@ -40,20 +39,6 @@ var inputs = {
    transmit:{type:'string',
       event:function(evt){
          serial_send_string(evt.detail)
-         }
-      },
-   file:{type:'object',
-      event:function(evt){
-         if (evt.detail.type == 'command') {
-            mod.command = evt.detail
-            socket_send(JSON.stringify(mod.command))
-            }
-         else if (evt.detail.type == 'file') {
-            mod.job = evt.detail
-            mod.job.type = 'file'
-            mod.label.nodeValue = 'send file'
-            mod.labelspan.style.fontWeight = 'bold'
-            }
          }
       }
    }
@@ -259,28 +244,29 @@ var interface = function(div){
 //
 
 function parseMessage(event){
-   //console.log(event)
-   if(typeof event.data !== 'undefined'){
-      var message = JSON.parse(event.data)
-      switch(message.type){
-         case 'data':
-            mod.status.value = 'passing data'
-            outputs.receive.event(message.data)
-            break;
-         case 'ports':
-            mod.status.value = 'populating portlist...'
-            populate_portlist(message.data)
-            break;
-         default:
-            mod.status.value = message.data
-            mod.label.nodeValue = 'waiting for file'
-            mod.labelspan.style.fontWeight = 'normal'
+   //console.log("Received these data: ")
+   console.log(event)
+   if("data" in event){
+        var message = {}
+        try {
+            message = JSON.parse(event.data)
+            }
+        catch(e){
+            console.log("JSON Parse of event data failed.")
+            }
+        if("SerialPorts" in message){
+            populate_portlist(message.SerialPorts)
+            }
+        if(!("Cmd" in message)){
+            if("D" in message){
+                outputs.receive.event(message.D)
+            }
+        }
       }
    }
-}
 
 function socket_open() {
-   var url = "ws://"+mod.address.value+':'+mod.port.value
+   var url = "ws://"+mod.address.value+':'+mod.port.value+'/ws'
    mod.socket = new WebSocket(url)
    mod.socket.onopen = function(event) {
       mod.status.value = "socket opened"
@@ -288,22 +274,24 @@ function socket_open() {
       }
    mod.socket.onerror = function(event) {
       mod.status.value = "cannot open"
+      console.log(event)
       mod.socket = null
       }
    mod.socket.onmessage = function(event){
       parseMessage(event)
       }
+   mod.socket.onclose = function(event) {
+      delete mod.socket;
+      }
 }
 
-
 function socket_close() {
-   var msh = {}
-   msg.type = 'close'
-   mod.socket.send(JSON.stringify(msg))
    mod.socket.close()
    mod.status.value = "socket closed"
-   mod.socket = null
    }
+
+
+/* 
 function socket_send(msg) {
    if (mod.socket != null) {
       mod.status.value = "send"
@@ -313,23 +301,15 @@ function socket_send(msg) {
       mod.status.value = "can't send, not open"
       }
    }
+*/
 function serial_open() {
    if (mod.socket == null) {
       mod.status.value = "socket not open"
       }
    else {
-      var msg = {}
-      msg.type = 'open'
-      msg.port = mod.device
-      msg.baud = parseInt(mod.baud.value)
-      msg.contents = "start"
-      if (mod.flow_none.checked)
-         msg.flow = 'none'
-      else if (mod.flow_rtscts.checked)
-         msg.flow = 'rtscts'
-      else if (mod.flow_dsrdtr.checked)
-         msg.flow = 'dsrdtr'
-      mod.socket.send(JSON.stringify(msg))
+       var msg = 'open '
+       msg = msg + mod.device + ' ' + mod.baud.value
+      mod.socket.send(msg)
       }
    }
 function serial_close() {
@@ -337,10 +317,8 @@ function serial_close() {
       mod.status.value = "socket not open"
       }
    else {
-      var msg = {}
-      msg.type = 'close'
-      msg.device = mod.device
-      mod.socket.send(JSON.stringify(msg))
+      var msg = 'close '+ mod.device
+      mod.socket.send(msg)
       }
    }
 function serial_send_string(str) {
@@ -348,30 +326,30 @@ function serial_send_string(str) {
       mod.status.value = "socket not open"
       }
    else {
-      var msg = {}
-      msg.type = 'send'
-      msg.string = str
-      mod.socket.send(JSON.stringify(msg))
-      mod.status.value = 'transmitting'
+       var msg = 'sendnobuf '
+       msg = msg + mod.device
+       msg = msg + " " + str
+       mod.socket.send(msg)
       }
    }
+   
 function serial_scan(){
    if (mod.socket == null) {
       mod.status.value = "socket not open"
       }
    else {
-      var msg = {}
-      msg.type = 'scan'
-      mod.socket.send(JSON.stringify(msg))
-      mod.status.value = 'transmit'
+      message = {}
+      message.command = "scan"
+      mod.socket.send(JSON.stringify(message))
    }
 }
+
 function populate_portlist(portlist){
    mod.portlist.options.length = 0
    for(port in portlist){
       var opt = document.createElement('option')
-         opt.value = portlist[port]
-         opt.text = portlist[port].substring(5)
+         opt.value = portlist[port].Name
+         opt.text = portlist[port].Name.substring(5)
       mod.portlist.add(opt)   
    }
 }

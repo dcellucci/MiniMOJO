@@ -20,13 +20,13 @@ var mod = {}
 //
 // name
 //
-var name = 'WebSocket serial'
+var name = 'WebSocket serial (python)'
 //
 // initialization
 //
 var init = function() {
    mod.address.value = '127.0.0.1'
-   mod.port.value = 8989
+   mod.port.value = 8080
    mod.device = ''
    mod.baud.value = 115200
    mod.flow_rtscts.checked = false
@@ -39,20 +39,6 @@ var inputs = {
    transmit:{type:'string',
       event:function(evt){
          serial_send_string(evt.detail)
-         }
-      },
-   file:{type:'object',
-      event:function(evt){
-         if (evt.detail.type == 'command') {
-            mod.command = evt.detail
-            socket_send(JSON.stringify(mod.command))
-            }
-         else if (evt.detail.type == 'file') {
-            mod.job = evt.detail
-            mod.job.type = 'file'
-            mod.label.nodeValue = 'send file'
-            mod.labelspan.style.fontWeight = 'bold'
-            }
          }
       }
    }
@@ -288,6 +274,7 @@ function socket_open() {
       }
    mod.socket.onerror = function(event) {
       mod.status.value = "cannot open"
+      console.log(event)
       mod.socket = null
       }
    mod.socket.onmessage = function(event){
@@ -320,9 +307,11 @@ function serial_open() {
       mod.status.value = "socket not open"
       }
    else {
-       var msg = 'open '
-       msg = msg + mod.device + ' ' + mod.baud.value
-      mod.socket.send(msg)
+       var msg = {}
+       msg.command = 'open'
+       msg.port = mod.device
+       mdg.baudrate = mod.baud.value
+      mod.socket.send(JSON.stringify(msg))
       }
    }
 function serial_close() {
@@ -341,17 +330,19 @@ function serial_send_string(str) {
    else {
        var msg = 'sendnobuf '
        msg = msg + mod.device
-       msg = msg + " " + str + ";"
-       console.log(msg)
+       msg = msg + " " + str
        mod.socket.send(msg)
       }
    }
+   
 function serial_scan(){
    if (mod.socket == null) {
       mod.status.value = "socket not open"
       }
    else {
-      mod.socket.send('list')
+      message = {}
+      message.command = "scan"
+      mod.socket.send(JSON.stringify(message))
    }
 }
 
@@ -359,8 +350,8 @@ function populate_portlist(portlist){
    mod.portlist.options.length = 0
    for(port in portlist){
       var opt = document.createElement('option')
-         opt.value = portlist[port].Name
-         opt.text = portlist[port].Name.substring(5)
+         opt.value = portlist[port]
+         opt.text = portlist[port].substring(5)
       mod.portlist.add(opt)   
    }
 }
