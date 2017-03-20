@@ -7,6 +7,8 @@ Each MOJO consists of two halves, a top and a bottom, each of which has 3 boards
 
 MOJO is defined by its *state*, which is the full description of the current positions and control interfaces for the robot. See the **packet format** section for more information.
 
+Servo values for MOJO can take any value between 1-255. 128 corresponds to the middle position with the arms pointing straight out, 1 corresponds to the motor pointing away from the hip, straight "up", and 255 corresponds to the motor pointing towards the hip, straight "down".
+
 ## Startup Procedure
 
 Startup of MOJO involves first turning the switch on the control/battery sandwich on. This will cause a blue LED on the battery board light up, indicating that there is power for the microprocessors. If the coordinator board is connected to the control board, then a red LED on this board will also light and a blue led on this board will begin blinking at 1 Hz. 
@@ -69,13 +71,11 @@ When a command packet is sent to MOJO, the coordinator will respond with a packe
 
 Locomotion through the lattice occurs by moving MOJO through a set of 6 discrete positions. These positions can be described as the outer product of two orthogonal state vectors: `{retracted, extended}` and `{outer, middle, inner}`.
 
-    ``` 
     |        | Retracted | Extended  |
     | Outer  | [ 40,184] | [ 40, 80] |
     | Middle | [ 40,200] | [ 80,178] |
     | Inner  | [ 40,220] | [190,220] |
     HIP HIP HIP
-    ```
 
 The `retracted` state refers to when the arms are not in contact with the lattice, the `extended` state refers to when the arms are gripping the lattice.
 
