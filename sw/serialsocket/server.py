@@ -63,9 +63,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 					out['SerialPorts'] = devicelist
 					self.write_message(json.dumps(out))
 				if(jsonmess['command'] == "open"):
-					sp.sp.port = jsonmess['port']
-					sp.sp.baudrate = jsonmess['baudrate']
+					print 'opening port'
+					sp.set(jsonmess['port'],jsonmess['baudrate'])
 					sp.open()
+					sp.start()
 				if(jsonmess['command'] == "close"):
 					sp.close()
 				if(jsonmess['command'] == "data"):
@@ -74,8 +75,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 					motvals = bytearray(jsonmess['motorvals'])
 					p = jsonmess['power']+[jsonmess['sync']]
 					status = bytearray([sum(v<<i for i, v in enumerate(p[::-1]))])
-					print command+motvals+status+bytearray([59])
-
+					outarray = command+motvals+status+bytearray([59])
+					print "sending message: %s" % outarray
+					input_queue.put(outarray)
 			else:
 				print "no command here"
 		except ValueError:
@@ -84,18 +86,26 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
 
 
-## check the queue for pending messages, and rely that to all connected clients
+## check the queue for pending messages, and relay that to all connected clients
 def checkQueue():
 	if not output_queue.empty():
 		message = output_queue.get()
+		readOutputMessage(message)
+		jsonout = {}
+		jsonout["command"] = "packet"
+		jsonout["motorvals"] = []
+		for i in range(5):
+			jsonout["motorvals"].append(message[i])
 		for c in clients:
-			c.write_message(message)
+ 			c.write_message(json.dumps(jsonout))
+
+def readOutputMessage(message):
+	print message
 
 
 if __name__ == '__main__':
-	## start the serial worker in background (as a deamon)
 	sp.daemon = True
-	sp.start()
+	## start the serial worker in background (as a deamon)
 	tornado.options.parse_command_line()
 	app = tornado.web.Application(
 	    handlers=[

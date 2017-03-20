@@ -8,7 +8,7 @@
 #include "lwm/nwk/nwk.h"
 
 //Makes definition easier
-#define Serial SERIAL_PORT_USBVIRTUAL
+#define Serial SerialUSB
 #define LED_BUILTIN 0
 
 extern "C" {
@@ -36,10 +36,12 @@ static NWK_DataReq_t nwkDataReq;
 
 //Payload array (10 byte limit right now)
 static uint8_t payload[9];
+//Array to hold the message being read in 
+static uint8_t inmess[255];
 
 //MotorLayout is: Top Outer - Top Inner - Hip - Bot Outer Bot Inner
 static uint8_t servovals[5] = {74,182,185,74,182};
-static uint8_t config_byte = 0x04;
+static uint8_t config_byte = 0x00;
 
 //Timing variables
 unsigned long curtime = 0;
@@ -133,109 +135,33 @@ static void appDataConf(NWK_DataReq_t *req){
 }
 
 void parseCommand(){
+  //clear the message 
   memset(payload,0,sizeof(payload));
-  
-  char json[255];
-  Serial.readBytesUntil(';',json,255);
-  
-  
-  if(json[0] == '{'){
-    StaticJsonBuffer<bufferSize> jsonBuffer;
-    JsonObject& root = jsonBuffer.parseObject(json);
-    JsonArray& motorvals = root["motorvals"];
-    for(int i = 0; i < 5; i++){
-      servovals[i] = (uint8_t)motorvals[i];
-    }
-    config_byte = (uint8_t)((((bool)(root["power"][0])) << 2) | (((bool)(root["power"][1]))) << 1 | (((bool)(root["updates"]))));
-    if(debug){
-      Serial.print("Config :");
-      Serial.println(config_byte,BIN);
-    }
-    if((bool)root["sync"])
-      sync = true;
-    else if(!((bool)root["sync"]))
-      sync = false;
-    if(!sync){
-      syncstatetime = curtime;
-      sendState();
-    }
+  memset(inmess,0,sizeof(inmess));
+
+  //Read the incoming message
+  Serial.readBytesUntil(';',inmess,255);
+
+  if(debug){
+    Serial.print("Bridge Received: ");
+    Serial.println((char*)inmess);
   }
-  if(json[0] == 's'){
-    if(debug)
-      before = micros();
-    sendMessage(1);
-  }
-  /*
-  else{
-    switch(comm[0]){
-      case '!':
-        payload[0] = comm[0];
-        payload[1] = comm[1];
-        Serial.println((char*)payload);
-        sendMessage(3);
-        break;
-      case 's':
-        payload[0]='s';
-        sendMessage(1);
-        break;
-      case 'l':
-        ledstatus = !ledstatus;
-      case 'w':
-        switch(comm[1]){
-          case 't':
-            if(indata[0] > 0)
-              servovals[0] = indata[0];
-            if(indata[1] > 0)
-              servovals[1] = indata[1];
-            writeServoVals();
-            break;
-          case 'h':        
-            if(indata[0] > 0)      
-              servovals[2] = indata[0];
-            writeServoVals();
-            break;
-          case 'b': 
-            if(indata[0] > 0)     
-              servovals[3] = indata[0];
-            if(indata[1] > 0)
-              servovals[4] = indata[1];
-            writeServoVals();
-            break;
-          case 'a':
-            for(int i = 0; i < 5; i++)
-              if(indata[i] > 0)
-                servovals[i] = indata[i];
-            writeServoVals();
-            break;
-          case '+':
-          case '-':
-          case '_':
-          case '=':
-          case 'c':
-          case 'o':
-          case 'm':
-            payload[0] = comm[0];
-            payload[1] = comm[1];
-            Serial.println((char*)payload);
-            sendMessage(3);
-            break;
-        }
-        break;
+  //The first two bytes are the message header
+  //The first byte is the destination
+  //The second byte is the command
+  switch(inmess[0]){
+    case 'w': //Messages meant for the coordinator
+      switch(inmess[1]){
+        case 's': //The message contains a full state
+          //Right now not checking the packet properties
+          memcpy(&payload, &inmess, sizeof(payload));
+          sendMessage(2);
+          break;
       }
-      
+      break;
+    case '!': //Messages meant for this 
+      break;
   }
-  */
-  /*
-  Serial.print("Command Received: ");
-  Serial.println(comm);
-  if(comm[0] == 'w'){
-    for(int i = 0; i < 5; i++){
-      Serial.print(i);
-      Serial.print(": ");
-      Serial.println(indata[i]);
-    }
-  }
-  */
 }
 
 
@@ -277,27 +203,8 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
   }
   //Assign a pointer to received message data
   rec_message = (uint8_t*) ind->data;
-  
-  StaticJsonBuffer<bufferSize> jsonBuffer;
-  JsonObject& root = jsonBuffer.createObject();
-  JsonArray& power = root.createNestedArray("power");
-  power.add((bool)(rec_message[5] & 0x04));
-  power.add((bool)(rec_message[5] & 0x02));
-  JsonArray& motorVals = root.createNestedArray("motorvals");
-  JsonArray&      vbus = root.createNestedArray("vbus");
-  JsonArray&    vshunt = root.createNestedArray("vshunt");
-  for(int i = 0; i < 5; i++){
-    motorVals.add(rec_message[i]);
-    vbus.add(((rec_message[i*2+16] << 8) | rec_message[i*2+17]));
-    vshunt.add(((rec_message[i*2+6] << 8) | rec_message[i*2+7]));
-  }
-  JsonArray& soc = root.createNestedArray("soc");
-  soc.add(((rec_message[26]<<8) | rec_message[27]));
-  soc.add(((rec_message[28]<<8) | rec_message[29]));
 
-  root.printTo(BUFFER,sizeof(BUFFER));
-  Serial.write(BUFFER);
-  
+  Serial.write((char*)rec_message);
   Serial.write("\n");
   
   //More debug
@@ -317,7 +224,7 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
       SerialUSB.print(0.001*((rec_message[i*2+16] << 8) | rec_message[i*2+17]));
       SerialUSB.println("V");
       SerialUSB.print("\t\tC: ");
-      SerialUSB.print(4.0*0.04*((rec_message[i*2+6] << 8) | rec_message[i*2+7]));
+      SerialUSB.print(0.16*((rec_message[i*2+6] << 8) | rec_message[i*2+7]));
       SerialUSB.println("mA");
     }
     Serial.println("Battery A");

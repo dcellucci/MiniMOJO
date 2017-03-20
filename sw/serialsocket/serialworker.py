@@ -33,8 +33,8 @@ class SerialProcess(multiprocessing.Process):
         return self.sp.readline().replace("\n", "")
     
     def set(self,port,baudrate):
-        self.port = port
-        self.baudrate = baudrate
+        self.sp.port = port
+        self.sp.baudrate = baudrate
 
     def run(self):
         if self.portOpen:

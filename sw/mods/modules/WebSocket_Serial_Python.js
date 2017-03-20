@@ -307,10 +307,11 @@ function serial_open() {
       mod.status.value = "socket not open"
       }
    else {
-       var msg = {}
-       msg.command = 'open'
-       msg.port = mod.device
-       mdg.baudrate = mod.baud.value
+      mod.status.value = "opening..."
+      msg = {}
+      msg.command = "open"
+      msg.port = mod.device
+      msg.baudrate = mod.baud.value
       mod.socket.send(JSON.stringify(msg))
       }
    }
@@ -328,10 +329,9 @@ function serial_send_string(str) {
       mod.status.value = "socket not open"
       }
    else {
-       var msg = 'sendnobuf '
-       msg = msg + mod.device
-       msg = msg + " " + str
-       mod.socket.send(msg)
+       msg = JSON.parse(str)
+       msg.command = "data"
+       mod.socket.send(JSON.stringify(msg))
       }
    }
    
