@@ -47,6 +47,7 @@ static uint8_t config_byte = 0x00;
 unsigned long curtime = 0;
 unsigned long syncstatetime, inctime;
 unsigned long syncstateinterval = 100000;
+unsigned long ledinterval = 500000;
 
 //for debug
 boolean ledstatus = true; 
@@ -75,7 +76,7 @@ void setup() {
       )
   );
 
-  //attachInterrupt(digitalPinToInterrupt(PIN_SPI_IRQ), HAL_IrqHandlerSPI, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN_SPI_IRQ), HAL_IrqHandlerSPI, RISING);
   /*  wait for SPI to be ready  */
   delay(10);
   
@@ -107,7 +108,7 @@ void loop() {
   }
 
   //Toggle LED stuff. More debug.
-  if(curtime - ledtoggletime > 500000){
+  if(curtime - ledtoggletime > ledinterval){
     ledtoggletime = curtime;
     ledstatus = !ledstatus;
     digitalWrite(LED_BUILTIN, ledstatus);
@@ -146,6 +147,7 @@ void parseCommand(){
     Serial.print("Bridge Received: ");
     Serial.println((char*)inmess);
   }
+  
   //The first two bytes are the message header
   //The first byte is the destination
   //The second byte is the command
@@ -154,12 +156,33 @@ void parseCommand(){
       switch(inmess[1]){
         case 's': //The message contains a full state
           //Right now not checking the packet properties
-          memcpy(&payload, &inmess, sizeof(payload));
+          memset(payload, 0, sizeof(payload));
+          for(int i = 0; i < 6; i++){
+            payload[i] = inmess[i+2];
+          }
           sendMessage(2);
           break;
+        case 'q':
+          if(debug){
+            SerialUSB.println("Requesting Coordinator State...");
+          }
+          sendMessage(1);
+          break;
+            
       }
       break;
     case '!': //Messages meant for this 
+      switch(inmess[1]){
+        case 'l':
+          if(ledinterval == 500000)
+            ledinterval = 100000;
+          else
+            ledinterval = 500000;
+          break;
+        case 'v':
+          debug = !debug;
+          break;      
+      }
       break;
   }
 }
@@ -169,7 +192,6 @@ void sendState(){
   memset(payload,0,sizeof(payload));
   memcpy(&payload, &servovals, sizeof(servovals));
   payload[5] = config_byte;
-  
   sendMessage(2);
 }
 
@@ -204,6 +226,7 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
   //Assign a pointer to received message data
   rec_message = (uint8_t*) ind->data;
 
+  Serial.write("Received data from coordinator: ");
   Serial.write((char*)rec_message);
   Serial.write("\n");
   

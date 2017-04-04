@@ -1,19 +1,44 @@
 #include <Arduino.h>
+
+//Comms with the sensors/control boards
 #include <Wire.h>
 
+//Comms with the onboard RF transceiver
 #include <SPI.h>
 
-#define Serial SERIAL_PORT_USBVIRTUAL
-
+//Atmel lightweight mesh
 #include "lwm.h"
 #include "lwm/sys/sys.h"
 #include "lwm/nwk/nwk.h"
+
+//IMU sensor
+#include <SparkFunLSM9DS1.h>
+
+//Serial USB because I always forget
+#define Serial SerialUSB
+
+
+//
+// LSM9DS1 Settings
+//
+
+// SDO_M and SDO_G are both pulled high, so our addresses are:
+#define LSM9DS1_M  0x1E // Would be 0x1C if SDO_M is LOW
+#define LSM9DS1_AG  0x6B // Would be 0x6A if SDO_AG is LOW
+
+// Earth's magnetic field varies by location. Add or subtract 
+// a declination to get a more accurate heading. Calculate 
+// your's here:
+// http://www.ngdc.noaa.gov/geomag-web/#declination
+#define DECLINATION 6.24 // Declination (degrees) in Sanford, FL.
 
 extern "C" {
   void println(char *x) { Serial.println(x); Serial.flush(); }
 }
 
- 
+//Instantiate an IMU object
+LSM9DS1 imu;
+
 // LWM mesh methods 
 //Send the message
 static void sendMessage();
@@ -25,7 +50,7 @@ static void appDataConf(NWK_DataReq_t *req);
 //Sends Current Status, single packet
 static bool sendStatus(NWK_DataInd_t *ind);
 //Updates the motor positions
-static bool updateMotors(NWK_DataInd_t *ind);
+static bool updateState(NWK_DataInd_t *ind);
 //Alters Specific Settings
 static bool changeSetting(NWK_DataInd_t *ind);
 
@@ -36,26 +61,31 @@ boolean usingSerial = true;
 //2 is USB bridge
 int meshAddress = 1;
 
+//0x01 default
+//0x02 alternate
+int panID = 0x02;
+
 //Static data packet types (prevents memory leak)
 //LWM data request struct
 static NWK_DataReq_t nwkDataReq;
 
-//Payload array (10 byte limit right now)
-static uint8_t payload[30];
+//Payload array (30 byte limit right now)
+static uint8_t payload[50];
 static uint8_t indata[5];
                                  
 static uint8_t servovals[5];
+static uint8_t trimvals[5] = {7,-13,7,-13,5};
 
 uint8_t* rec_message;
 
-
+boolean debug = false;
 boolean ledstatus = true; //for debug
-boolean moving = false;
-boolean hipmoving = false;
-boolean currentping = false;
 
-boolean top_servopower = false;
-boolean bot_servopower = false;
+boolean currentping = false;
+boolean imu_works = true;
+
+boolean top_servopower = true;
+boolean bot_servopower = true;
 
 /* TIMING VARIABLES
  *  
@@ -102,7 +132,7 @@ void setup() {
   
   SYS_Init();
   NWK_SetAddr(meshAddress);
-  NWK_SetPanId(0x01);
+  NWK_SetPanId(panID);
   PHY_SetChannel(0x1a);
   PHY_SetRxState(true);
   NWK_OpenEndpoint(1, sendStatus);
@@ -112,12 +142,29 @@ void setup() {
 
   Wire.begin();
 
-  //Initialize Servo Values
-  servovals[0] = 72;
-  servovals[1] = 184;
-  servovals[2] = 175;
-  servovals[3] = 72;
-  servovals[4] = 184;
+  imu.settings.device.commInterface = IMU_MODE_I2C;
+  imu.settings.device.mAddress = LSM9DS1_M;
+  imu.settings.device.agAddress = LSM9DS1_AG;
+
+  if (!imu.begin())
+  {
+    if(debug){
+      Serial.println("Failed to communicate with LSM9DS1.");
+      Serial.println("Double-check wiring.");
+      Serial.println("Default settings in this sketch will " \
+                    "work for an out of the box LSM9DS1 " \
+                    "Breakout, but may need to be modified " \
+                    "if the board jumpers are.");
+    }
+    imu_works = false;
+  }
+
+  //Initialize Servo Values to safe initial conditions
+  servovals[0] = 128;
+  servovals[1] = 128;
+  servovals[2] = 128;
+  servovals[3] = 184;
+  servovals[4] = 180;
 
 }
 
@@ -134,6 +181,13 @@ void loop() {
     ledstatus = !ledstatus;
     ledupdatetime = curtime;
     digitalWrite(0, ledstatus);
+
+    if(!imu_works){
+      imu_works = true;
+      if(!imu.begin()){
+        imu_works = false;
+      }
+    }
   }
   
   
@@ -168,6 +222,10 @@ void parseCommand(char* comm){
           if(usingSerial){
             printSensorValues();
           }
+          break;
+         case 'p':
+          top_servopower = !top_servopower;
+          bot_servopower = !bot_servopower;
           break;
       }
       break;
@@ -230,6 +288,11 @@ void readSensorValues(){
     }
     socs[1] = ((Wire.read() << 8) | Wire.read());
   //}
+  if(imu_works) {
+    imu.readAccel();
+    imu.readMag();
+    imu.readGyro();
+  }
 }
 
 void sendCurrentValues(){
@@ -258,9 +321,6 @@ void sendCurrentValues(){
   }*/
 }
 
-
-
-
 static void sendMessage(void){
   nwkDataReq.dstAddr = 2;
   nwkDataReq.dstEndpoint = 1;
@@ -286,7 +346,6 @@ static void appDataConf(NWK_DataReq_t *req){
 }
 
 static bool sendStatus(NWK_DataInd_t *ind) {
-  
   sendStatusMessage();
   //ledstatus = true;  
   return true;
@@ -295,19 +354,49 @@ static bool sendStatus(NWK_DataInd_t *ind) {
 void sendStatusMessage(){
   
   memset(payload,0,sizeof(payload));
-  payload[5] = (top_servopower << 2) | (bot_servopower << 1); 
-  for(int i = 0; i < 5; i++){ //The third channel of the bottom should be useless
+  //populating the configuration register
+  payload[5] = (imu_works << 3) | (top_servopower << 2) | (bot_servopower << 1); 
+  //populating the servoval and current sensor registers
+  for(int i = 0; i < 5; i++){ //The third channel of the bottom should be unused
     payload[i] = servovals[i];
     payload[i*2+6] = (vshunts[i]>>8) & 0xFF;
     payload[i*2+7] = (vshunts[i]) & 0xFF;
     payload[i*2+16] = (vbuses[i]>>8) & 0xFF;
     payload[i*2+17] = (vbuses[i]) & 0xFF;
   }
+  //populating the state of charge registers
   payload[26] = (socs[0]>>8)&0xFF;
   payload[27] = (socs[0] & 0xFF);
   payload[28] = (socs[1]>>8)&0xFF;
   payload[29] = (socs[1] & 0xFF);
 
+  if(imu_works){
+    //populating the IMU register
+    
+    //the gyroscope
+    payload[30] = (imu.gx>>8)&0xFF;
+    payload[31] = (imu.gx)&0xFF;
+    payload[32] = (imu.gy>>8)&0xFF;
+    payload[33] = (imu.gy)&0xFF;
+    payload[34] = (imu.gz>>8)&0xFF;
+    payload[35] = (imu.gz)&0xFF;
+    
+    //accelerometer
+    payload[36] = (imu.ax>>8)&0xFF;
+    payload[37] = (imu.ax)&0xFF;
+    payload[38] = (imu.ay>>8)&0xFF;
+    payload[39] = (imu.ay)&0xFF;
+    payload[40] = (imu.az>>8)&0xFF;
+    payload[41] = (imu.az)&0xFF;
+    
+    //magnetometer
+    payload[42] = (imu.mx>>8)&0xFF;
+    payload[43] = (imu.mx)&0xFF;
+    payload[44] = (imu.my>>8)&0xFF;
+    payload[45] = (imu.my)&0xFF;
+    payload[46] = (imu.mz>>8)&0xFF;
+    payload[47] = (imu.mz)&0xFF;
+  }
   sendMessage();
 }
 
@@ -349,9 +438,9 @@ static bool changeSetting(NWK_DataInd_t *ind){
 void updateControllerState(){
     Wire.beginTransmission(top_servo_ctrlr);
       Wire.write('w');
-      Wire.write(servovals[0]);
-      Wire.write(servovals[1]);
-      Wire.write(servovals[4]);
+      Wire.write(servovals[0]+trimvals[0]);
+      Wire.write(servovals[1]+trimvals[1]);
+      Wire.write(servovals[4]+trimvals[4]);
       if(top_servopower)
         Wire.write('+');
       else
@@ -360,9 +449,9 @@ void updateControllerState(){
     
     Wire.beginTransmission(bot_servo_ctrlr);
       Wire.write('w');
-      Wire.write(servovals[2]);
-      Wire.write(servovals[3]);
-      Wire.write(servovals[4]);
+      Wire.write(servovals[2]+trimvals[2]);
+      Wire.write(servovals[3]+trimvals[3]);
+      Wire.write(servovals[4]+trimvals[4]);
       if(bot_servopower)
         Wire.write('+');
       else

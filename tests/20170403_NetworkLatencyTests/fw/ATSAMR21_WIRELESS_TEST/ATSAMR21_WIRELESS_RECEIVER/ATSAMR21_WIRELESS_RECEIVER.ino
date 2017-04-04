@@ -12,7 +12,6 @@ extern "C" {
   void println(char *x) { Serial.println(x); Serial.flush(); }
 }
 
- 
 // LWM mesh methods 
 //Send the message
 static void sendMessage();
@@ -24,7 +23,7 @@ static bool echoBack(NWK_DataInd_t *ind);
 
 //1 is Receiver
 //2 is Sender
-int meshAddress = 2;
+int meshAddress = 1;
 
 int curloc = 0;
 //Static data packet types (prevents memory leak)
@@ -42,6 +41,8 @@ long curtime = 0;
 long ledupdatetime = 0;
 long servoupdatetime = 0;
 long currentreadtime = 0;
+
+unsigned long count;
 
 uint8_t payload[9];
 
@@ -72,25 +73,19 @@ void setup() {
   NWK_SetPanId(0x01);
   PHY_SetChannel(0x1a);
   PHY_SetRxState(true);
-  NWK_OpenEndpoint(1, printMessage);
+  NWK_OpenEndpoint(1, echoBack);
 
 }
 
 void loop() {
   SYS_TaskHandler();
-  if(Serial.available() > 0){
-    Serial.println("Received Message: ");
-    Serial.readBytesUntil(';',payload,9);
-    Serial.println((char*)payload);
-    sendMessage();
-  }
 }
 
 void parseMessage(char *data){
 }
 
 static void sendMessage(void) {
-  nwkDataReq.dstAddr = 1;
+  nwkDataReq.dstAddr = 2;
   nwkDataReq.dstEndpoint = 1;
   nwkDataReq.srcEndpoint = 1;
   nwkDataReq.options = 0;
@@ -115,7 +110,7 @@ static void appDataConf(NWK_DataReq_t *req){
   }
 }
 
-static bool printMessage(NWK_DataInd_t *ind) {
+static bool echoBack(NWK_DataInd_t *ind) {
   if(debugmode){
     Serial.print("Status Request Received...");
     Serial.print("lqi: ");
@@ -128,10 +123,18 @@ static bool printMessage(NWK_DataInd_t *ind) {
     Serial.print("  ");
   }
   rec_message = (uint8_t *) ind->data;
-  memcpy(payload, rec_message, sizeof(payload));
+
   
+  count = (rec_message[1]<<24) & (rec_message[2]<<16) & (rec_message[3]<<8) & rec_message[4];
+  count++;
+  memset(payload,0,sizeof(payload));
+  payload[0] = 'e';
+  payload[1] = (count >> 24) & 0xFF;
+  payload[2] = (count >> 16) & 0xFF;
+  payload[3] = (count >>  8) & 0xFF;
+  payload[4] =       (count) & 0xFF; 
   
-  
+  sendMessage();
 
   return true;
 }

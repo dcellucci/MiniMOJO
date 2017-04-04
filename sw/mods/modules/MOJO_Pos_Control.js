@@ -1,6 +1,5 @@
+// MOJO Motor Control
 //
-// Chart Display
-// Takes a datastream in, outputs a chart
 // 
 // This work may be reproduced, modified, distributed, performed, and 
 // displayed for any purpose, but must acknowledge the mods
@@ -10,325 +9,326 @@
 //
 // closure
 //
-
 (function(){
 //
 // module globals
 //
 var mod = {
-  counter: 0,
-  data:[
-          ['Time', 'Arm A', 'Arm B']
-       ],
-  options:{
-            title: 'Current Draw',
-            hAxis: {title: 'Time', minValue: 0, maxValue: 100},
-            vAxis: {title: 'MotorVal', viewWindowMode:'explicit',
-    viewWindow: {
-        max:255,
-        min:0
-    }},
-            legend: 'none'
-          },
-    armAVals : [ 1.47392e-6,-0.000323327,  0.0132563, -0.863413,213.412],
-    armBVals : [-1.3228e-6, 0.000239373, -0.00304926, -2.07789 ,174.47],
-    tval : 0,
-    canvas : null,
-    ctx: null,
-    increment: 5
+   curTopPos:-1,
+   curBotPos:-1,
+   curHipPos:-1,
+   posVals:{
+      or:[ 40,184], //outer retracted
+      oe:[ 40, 80], //outer extended
+      mr:[ 40,200], //mid retracted
+      me:[ 80,178], //mid extended
+      ir:[ 40,220], //inner retracted
+      ie:[190,220],  //inner extended
+      st:180,
+      bt:15
+   },
+   topPos:{},
+   botPos:{},
+   hipPos:{},
+   motorVals:[-1,-1,-1,-1,-1]
 }
 
-var input
+
+
 //
 // name
 //
-var name = 'MOJO Arm Control Test'
+var name = 'MOJO Position Control'
 //
 // initialization
 //
-var init = function() {
-}
-
+var init = function() {   
+    
+    }
+    
 //
 // inputs
 //
 var inputs = {
-  data:{
-    type:'data',
-    event:function(evt){
-      console.log(evt)
-        outarr = [mod.counter]
-        evt.detail.forEach(function(entry){
-          outarr.push(parseInt(entry))
-        })
-       mod.data.push(outarr)
-       mod.counter++
-       plotChart()
-       outputs.output.event()
-       }
-    },
-  options:{
-    type:'str',
-    event:function(evt){
-
+   frameList:{
+      type:'framelist',
+      event:function(evt){
+         var input = JSON.parse(evt.detail)
+         mod.motorVals = [-1,-1,-1,-1,-1]
+         if(topFrame in input){
+            if(mod.curTopPos != -1)
+               mod.topPos[mod.curTopPos].style.backgroundColor = 'transparent'
+            mod.topPos[val].style.backgroundColor = 'red'
+            mod.motorVals[0] = mod.posVals[val][0]
+            mod.motorVals[1] = mod.posVals[val][1]
+            }
+         if(botFrame in input){
+            if(mod.curBotPos != -1)
+               mod.topPos[mod.curTopPos].style.backgroundColor = 'transparent'
+            mod.topPos[val].style.backgroundColor = 'red'
+            mod.motorVals[2] = mod.posVals[val][0]
+            mod.motorVals[3] = mod.posVals[val][1]
+            }
+         if(hipFrame in input){
+            if(mod.curHipPos != -1)
+               mod.topPos[mod.curTopPos].style.backgroundColor = 'transparent'
+            mod.topPos[val].style.backgroundColor = 'red'
+            mod.motorVals[4] = mod.posVals[val]
+            }
+         outputs.motorVals.event()
+         }
       }
-    } 
-  }
-
+   }
 //
 // outputs
 //
 var outputs = {
-   output:{type:'string',
+   motorVals:{
+      type:'MOJOState',
       event:function(){
-          var out = {}
-          out.motorvals = [parseInt(mod.data[mod.tval][2]), parseInt(mod.data[mod.tval][1]),-1,-1,-1]
-         mods.output(mod,'output',JSON.stringify(out))}}}
+           var out = {}
+           out.motorvals = mod.motorVals
+           mods.output(mod,'motorVals',JSON.stringify(out))
+           }
+      }
+}
 //
 // interface
 //
 
+
 var interface = function(div){
-  mod.div = div
-  
-  mod.canvas = document.createElement('canvas')
-    mod.canvas.width =500
-    mod.canvas.height =300
-    mod.canvas.style.backgroundColor = 'rgb(255,255,255)'
-    div.appendChild(mod.canvas)
+   mod.div = div///*
 
-    mod.ctx = mod.canvas.getContext('2d')
-    
-    //
-    // LINE BREAK
-    //
-    div.appendChild(document.createElement('br'))
+   div.appendChild(document.createTextNode('Top: '))
+      var toptable = document.createElement('table')
+         var tr = document.createElement('tr')
+            var ttdor = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('or'))
+                  btn.addEventListener('click', function(event){
+                        goTopMOJO('or')})
+            ttdor.appendChild(btn)
+            mod.topPos.or = ttdor
+         tr.appendChild(ttdor)
+            ttdoe = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('oe'))
+                  btn.addEventListener('click', function(event){
+                        goTopMOJO('oe')})
+            ttdoe.appendChild(btn)
+            mod.topPos.oe = ttdoe
+         tr.appendChild(ttdoe)
+      toptable.appendChild(tr)
+         var tr = document.createElement('tr')
+            var ttdmr = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('mr'))
+                  btn.addEventListener('click', function(event){
+                        goTopMOJO('mr')})
+            ttdmr.appendChild(btn)
+            mod.topPos.mr = ttdmr
+         tr.appendChild(ttdmr)
+            ttdme = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('me'))
+                  btn.addEventListener('click', function(event){
+                        goTopMOJO('me')})
+            ttdme.appendChild(btn)
+            mod.topPos.me = ttdme
+         tr.appendChild(ttdme)
+      toptable.appendChild(tr)
+         var tr = document.createElement('tr')
+            var ttdir = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('ir'))
+                  btn.addEventListener('click',function(event){
+                        goTopMOJO('ir')})
+            ttdir.appendChild(btn)
+            mod.topPos.ir = ttdir
+         tr.appendChild(ttdir)
+            ttdie = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('ie'))
+                  btn.addEventListener('click', function(event){
+                        goTopMOJO('ie')})
+            ttdie.appendChild(btn)
+            mod.topPos.ie = ttdie
+         tr.appendChild(ttdie)
+      toptable.appendChild(tr)
+   div.appendChild(toptable)
 
-    input_t4a = document.createElement('input')
-        input_t4a.type = 'text'
-        input_t4a.value = mod.armAVals[0]
-        input_t4a.size = 1
-    input_t4a.addEventListener('change', function(){
-        mod.armAVals[0] = parseFloat(input_t4a.value)
-        updateChartData()
-        })
-    div.appendChild(input_t4a)
-    
-    div.appendChild(document.createTextNode('t^4 + '))
-    
-    input_t3a = document.createElement('input')
-        input_t3a.type = 'text'
-        input_t3a.value = mod.armAVals[1]
-        input_t3a.size = 1
-    input_t3a.addEventListener('change', function(){
-        mod.armAVals[1] = parseFloat(input_t3a.value)
-        updateChartData()
-        })
-    div.appendChild(input_t3a)
-    
-    div.appendChild(document.createTextNode('t^3 + '))
-    
-    input_t2a = document.createElement('input')
-        input_t2a.type = 'text'
-        input_t2a.value = mod.armAVals[2]
-        input_t2a.size = 1
-    input_t2a.addEventListener('change', function(){
-        mod.armAVals[2] = parseFloat(input_t2a.value)
-        updateChartData()
-        })
-    div.appendChild(input_t2a)
-    
-    div.appendChild(document.createTextNode('t^2 + '))
-    
-    input_t1a = document.createElement('input')
-        input_t1a.type = 'text'
-        input_t1a.value = mod.armAVals[3]
-        input_t1a.size = 1
-    input_t1a.addEventListener('change', function(){
-        mod.armAVals[3] = parseFloat(input_t1a.value)
-        updateChartData()
-        })
+   div.appendChild(document.createElement('br'))
+   
+   div.appendChild(document.createTextNode('Hip: '))
+   
+   
+      var toptable = document.createElement('table')
+         var tr = document.createElement('tr')
+            var htdst = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('straight'))
+                  btn.addEventListener('click', function(event){  
+                     goHipMOJO('st')
+                  })
+            htdst.appendChild(btn)
+            mod.hipPos.st = htdst
+         tr.appendChild(htdst)
+            var htdbt = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('bent'))
+                  btn.addEventListener('click', function(event){  
+                     goHipMOJO('bt')
+                  })
+            htdbt.appendChild(btn)
+            mod.hipPos.bt = htdbt
+         tr.appendChild(htdbt)
+      toptable.appendChild(tr)
+   div.appendChild(toptable)
+   
+   div.appendChild(document.createTextNode('Bot: '))
+      var toptable = document.createElement('table')
+         var tr = document.createElement('tr')
+            var btdir = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('ir'))
+                  btn.addEventListener('click', function(event){
+                        goBotMOJO('ir')})
+            btdir.appendChild(btn)
+            mod.botPos.ir = btdir
+         tr.appendChild(btdir)
+            btdie = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('ie'))
+                  btn.addEventListener('click', function(event){
+                        goBotMOJO('ie')})
+            btdie.appendChild(btn)
+            mod.botPos.ie = btdie
+         tr.appendChild(btdie)
+      toptable.appendChild(tr)
+         var tr = document.createElement('tr')
+            var btdmr = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('mr'))
+                  btn.addEventListener('click', function(event){
+                        goBotMOJO('mr')})
+            btdmr.appendChild(btn)
+            mod.botPos.mr = btdmr
+         tr.appendChild(btdmr)
+            btdme = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('me'))
+                  btn.addEventListener('click', function(event){
+                        goBotMOJO('me')})
+            btdme.appendChild(btn)
+            mod.botPos.me = btdme
+         tr.appendChild(btdme)
+      toptable.appendChild(tr)
+         var tr = document.createElement('tr')
+            var btdor = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('or'))
+                  btn.addEventListener('click',function(event){
+                        goBotMOJO('or')})
+            btdor.appendChild(btn)
+            mod.botPos.or = btdor
+         tr.appendChild(btdor)
+            btdoe = document.createElement('td')
+               var btn = document.createElement('button')
+                  btn.style.margin = 1
+                  btn.appendChild(document.createTextNode('oe'))
+                  btn.addEventListener('click', function(event){
+                        goBotMOJO('oe')})
+            btdoe.appendChild(btn)
+            mod.botPos.oe = btdoe
+         tr.appendChild(btdoe)
+      toptable.appendChild(tr)
+   div.appendChild(toptable)
 
-    div.appendChild(input_t1a)
-    
-    div.appendChild(document.createTextNode('t^1 + '))
-    
-    input_t0a = document.createElement('input')
-        input_t0a.type = 'text'
-        input_t0a.value = mod.armAVals[4]
-        input_t0a.size = 1
-    input_t0a.addEventListener('change', function(){
-        mod.armAVals[4] = parseFloat(input_t0a.value)
-        updateChartData()
-        })
- 
-    div.appendChild(input_t0a)
-    
-    //
-    // LINE BREAK
-    //
-    div.appendChild(document.createElement('br'))
-    
-    //
-    // New Set of inputs (B arm)
-    //
-        input_t4b = document.createElement('input')
-        input_t4b.type = 'text'
-        input_t4b.value = mod.armBVals[0]
-        input_t4b.size = 1
-    input_t4b.addEventListener('change', function(){
-        mod.armBVals[0] = parseFloat(input_t4b.value)
-        updateChartData()
-        })
-    div.appendChild(input_t4b)
-    
-    div.appendChild(document.createTextNode('t^4 + '))
-    
-    input_t3b = document.createElement('input')
-        input_t3b.type = 'text'
-        input_t3b.value = mod.armBVals[1]
-        input_t3b.size = 1
-    input_t3b.addEventListener('change', function(){
-        mod.armBVals[1] = parseFloat(input_t3b.value)
-        updateChartData()
-        })
-    div.appendChild(input_t3b)
-    
-    div.appendChild(document.createTextNode('t^3 + '))
-    
-    input_t2b = document.createElement('input')
-        input_t2b.type = 'text'
-        input_t2b.value = mod.armBVals[2]
-        input_t2b.size = 1
-    input_t2b.addEventListener('change', function(){
-        mod.armBVals[2] = parseFloat(input_t2b.value)
-        updateChartData()
-        })
-    div.appendChild(input_t2b)
-    
-    div.appendChild(document.createTextNode('t^2 + '))
-    
-    input_t1b = document.createElement('input')
-        input_t1b.type = 'text'
-        input_t1b.value = mod.armBVals[3]
-        input_t1b.size = 1
-    input_t1b.addEventListener('change', function(){
-        mod.armBVals[3] = parseFloat(input_t1b.value)
-        updateChartData()
-        })
-    div.appendChild(input_t1b)
-    
-    div.appendChild(document.createTextNode('t^1 + '))
-    
-    input_t0b = document.createElement('input')
-        input_t0b.type = 'text'
-        input_t0b.value = mod.armBVals[4]
-        input_t0b.size = 1
-    input_t0b.addEventListener('change', function(){
-        mod.armBVals[4] = parseFloat(input_t0b.value)
-        updateChartData()
-        })
+   div.appendChild(document.createElement('br'))
 
-    div.appendChild(input_t0b)
-    
-    //
-    // LINE BREAK
-    //
-    div.appendChild(document.createElement('br'))
-    
-  var btn = document.createElement('button')
-      btn.style.padding = mods.ui.padding
+   var btn = document.createElement('button')
       btn.style.margin = 1
-      btn.appendChild(document.createTextNode('update'))
-      btn.addEventListener('click',updateChartData)
-      div.appendChild(btn)  
-    
-    var btn = document.createElement('button')
-      btn.style.padding = mods.ui.padding
-      btn.style.margin = 1
-      btn.appendChild(document.createTextNode('go'))
-      btn.addEventListener('click',function(){
-          mod.incrementing = true
-          increment()
+      btn.appendChild(document.createTextNode('send state'))
+      btn.addEventListener('click', function(event){  
+         goCurMOJO()
+         outputs.motorVals.event()
       })
-      div.appendChild(btn)
-  }
+   div.appendChild(btn)  
+   }
 
-function plotChart(){
-    
-    mod.ctx.clearRect(0,0,mod.canvas.width,mod.canvas.height)
-    mod.ctx.beginPath()
-    mod.ctx.moveTo(10,mod.canvas.height-armA(0))
-    for(var t = 0; t < 100; t++){
-        mod.ctx.lineTo(t*(mod.canvas.width-20)/100.0+10,mod.canvas.height-mod.data[t][1])
-    }
-    mod.ctx.strokeStyle="red";
-    mod.ctx.stroke()
-    
-    mod.ctx.moveTo(10,mod.canvas.height-armB(0))
-    mod.ctx.beginPath()
-    for(var t = 0; t < 100; t++){
-        mod.ctx.lineTo(t*(mod.canvas.width-20)/100.0+10,mod.canvas.height-mod.data[t][2])
-    }
-    mod.ctx.strokeStyle="blue";
-    mod.ctx.stroke()
-    
-    
-    mod.ctx.moveTo(mod.tval*(mod.canvas.width-20)/100.0+10,mod.canvas.height)
-    mod.ctx.beginPath()
-        mod.ctx.lineTo(mod.tval*(mod.canvas.width-20)/100.0+10,mod.canvas.height)
-        mod.ctx.lineTo(mod.tval*(mod.canvas.width-20)/100.0+10,0)
-    mod.ctx.strokeStyle="black";
-    mod.ctx.stroke()
-    
-    
-  }
-function increment(){
-    mod.tval = mod.tval + mod.increment
-    if(mod.tval > 99){
-        mod.incrementing = false
-        mod.tval = 99
-        mod.increment = -5
-    }
-    if(mod.tval < 0){
-        mod.incrementing = false
-        mod.tval = 0
-        mod.increment = 5
-    }
-    plotChart()
-    outputs.output.event()
-    
-    if(mod.incrementing)
-        setTimeout(increment,100)
-        
-        
-}
-function updateChartData(){
-    mod.data = []
-    
-    for(var t = 0; t < 100; t++){
-        mod.data.push([t,armA(t),armB(t)])
-    }
-    
-    
-    plotChart()
-}
+//
+// local functions
+//
 
-function armA(tval){
-    var total = 0;
-    for(var i = 4; i >= 0; i--){
-        total = total + Math.pow(tval,i)*mod.armAVals[4-i]
-    }
-    return total
-}
+   function goCurMOJO(){
+      if(mod.curTopPos != -1){
+         mod.motorVals[0] = mod.posVals[mod.curTopPos][0]
+         mod.motorVals[1] = mod.posVals[mod.curTopPos][1]
+         }
+      if(mod.curBotPos != -1){
+         mod.motorVals[2] = mod.posVals[mod.curBotPos][0]
+         mod.motorVals[3] = mod.posVals[mod.curBotPos][1]
+         }
+      if(mod.curHipPos != -1){
+         mod.motorVals[4] = mod.posVals[mod.curHipPos]
+         }
+      }
+   
+   function goTopMOJO(val){
+      mod.motorVals[0] = mod.posVals[val][0]
+      mod.motorVals[1] = mod.posVals[val][1]
+      mod.motorVals[2] = -1
+      mod.motorVals[3] = -1
+      mod.motorVals[4] = -1
+      if(mod.curTopPos != -1)
+        mod.topPos[mod.curTopPos].style.backgroundColor = 'transparent'
+      mod.topPos[val].style.backgroundColor = 'red'
+      mod.curTopPos = val
+      outputs.motorVals.event()
+   }
 
-function armB(tval){
-    var total = 0;
-    for(var i = 4; i >= 0; i--){
-        total = total + Math.pow(tval,i)*mod.armBVals[4-i]
-    }
-    return total
-}
+   function goBotMOJO(val){
+      mod.motorVals[2] = mod.posVals[val][0]
+      mod.motorVals[3] = mod.posVals[val][1]
+      mod.motorVals[0] = -1
+      mod.motorVals[1] = -1
+      mod.motorVals[4] = -1
+      if(mod.curBotPos != -1)
+        mod.botPos[mod.curBotPos].style.backgroundColor = 'transparent'
+      mod.botPos[val].style.backgroundColor = 'red'
+      mod.curBotPos = val
+      outputs.motorVals.event()
+   }
+   
+   function goHipMOJO(val){
+      mod.motorVals[4] = mod.posVals[val]
+      mod.motorVals[0] = -1
+      mod.motorVals[1] = -1
+      mod.motorVals[2] = -1
+      mod.motorVals[3] = -1
+      if(mod.curHipPos != -1)
+         mod.hipPos[mod.curHipPos].style.backgroundColor = 'transparent'
+      mod.hipPos[val].style.backgroundColor = 'red'
+      mod.curHipPos = val
+      outputs.motorVals.event()
+   }
+
+
+   
 
 //
 // return values
@@ -341,3 +341,5 @@ return ({
    interface:interface
    })
 }())
+
+

@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <SPI.h>
-#include <ArduinoJson.h>
 
 //Atmel LWM Includes
 #include "lwm.h"
@@ -11,13 +10,15 @@
 //Makes definition easier
 #define Serial SerialUSB
 
+#include <ArduinoJson.h>
+//ArduinoJson 
+const size_t bufferSize = 2*JSON_ARRAY_SIZE(2) + 3*JSON_ARRAY_SIZE(3) + 3*JSON_ARRAY_SIZE(5) + JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(6) + 220;
+char BUFFER[512]; 
+
+
 extern "C" {
   void println(char *x) { Serial.println(x); Serial.flush(); }
 }
-
-//ArduinoJson 
-const size_t bufferSize = 2*JSON_ARRAY_SIZE(2) + 3*JSON_ARRAY_SIZE(5) + JSON_OBJECT_SIZE(5) + 150;
-char BUFFER[255]; 
 
 // LWM mesh methods 
 //Send the message
@@ -31,6 +32,10 @@ static bool receiveMessage(NWK_DataInd_t *ind);
 //2 is USB bridge
 int meshAddress = 2; 
 
+//0x01 is the main PAN
+//0x02 is the alternate PAN
+int panID = 0x01;
+
 //The received message
 uint8_t *rec_message;
 
@@ -40,6 +45,7 @@ static NWK_DataReq_t nwkDataReq;
 
 //Payload array (10 byte limit right now)
 static uint8_t payload[9];
+char inmess[255];
 
 static uint8_t servovals[5] = {74,182,185,174,182};
 static uint8_t config_byte = 0x04;
@@ -51,12 +57,15 @@ String command = "";
 unsigned long curtime = 0;
 unsigned long syncstatetime, inctime;
 unsigned long syncstateinterval = 100000;
+unsigned long ledinterval = 500000;
 
 //for debug
 boolean ledstatus = true; 
 boolean sync = false;
 boolean debug = false;
 boolean waiting = false;
+
+boolean jsonoutput = false;
 long ledtoggletime = 0;
 
 long timestep = 0;
@@ -79,13 +88,13 @@ void setup() {
       )
   );
 
-  //attachInterrupt(digitalPinToInterrupt(PIN_SPI_IRQ), HAL_IrqHandlerSPI, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN_SPI_IRQ), HAL_IrqHandlerSPI, RISING);
   /*  wait for SPI to be ready  */
   delay(10);
   
   SYS_Init();
   NWK_SetAddr(meshAddress);
-  NWK_SetPanId(0x01);
+  NWK_SetPanId(panID);
   PHY_SetChannel(0x1a);
   PHY_SetRxState(true);
 
@@ -111,7 +120,7 @@ void loop() {
   }
 
   //Toggle LED stuff. More debug.
-  if(curtime - ledtoggletime > 500000){
+  if(curtime - ledtoggletime > ledinterval){
     ledtoggletime = curtime;
     ledstatus = !ledstatus;
     digitalWrite(0, ledstatus);
@@ -139,15 +148,16 @@ static void appDataConf(NWK_DataReq_t *req){
 }
 
 void parseCommand(){
+  //clear the message 
   memset(payload,0,sizeof(payload));
+  memset(inmess,0,sizeof(inmess));
   
-  char json[255];
-  Serial.readBytesUntil(';',json,255);
+  Serial.readBytesUntil(';',inmess,255);
   
-  
-  if(json[0] == '{'){
+  if(inmess[0] == '{'){
+    jsonoutput = true;
     StaticJsonBuffer<bufferSize> jsonBuffer;
-    JsonObject& root = jsonBuffer.parseObject(json);
+    JsonObject& root = jsonBuffer.parseObject(inmess);
     JsonArray& motorvals = root["motorvals"];
     for(int i = 0; i < 5; i++){
       servovals[i] = (uint8_t)motorvals[i];
@@ -166,82 +176,42 @@ void parseCommand(){
       sendState();
     }
   }
-  if(json[0] == 's'){
-    if(debug)
-      before = micros();
-    sendMessage(1);
-  }
-  /*
   else{
-    switch(comm[0]){
-      case '!':
-        payload[0] = comm[0];
-        payload[1] = comm[1];
-        Serial.println((char*)payload);
-        sendMessage(3);
-        break;
-      case 's':
-        payload[0]='s';
-        sendMessage(1);
-        break;
-      case 'l':
-        ledstatus = !ledstatus;
-      case 'w':
-        switch(comm[1]){
-          case 't':
-            if(indata[0] > 0)
-              servovals[0] = indata[0];
-            if(indata[1] > 0)
-              servovals[1] = indata[1];
-            writeServoVals();
-            break;
-          case 'h':        
-            if(indata[0] > 0)      
-              servovals[2] = indata[0];
-            writeServoVals();
-            break;
-          case 'b': 
-            if(indata[0] > 0)     
-              servovals[3] = indata[0];
-            if(indata[1] > 0)
-              servovals[4] = indata[1];
-            writeServoVals();
-            break;
-          case 'a':
-            for(int i = 0; i < 5; i++)
-              if(indata[i] > 0)
-                servovals[i] = indata[i];
-            writeServoVals();
-            break;
-          case '+':
-          case '-':
-          case '_':
-          case '=':
-          case 'c':
-          case 'o':
-          case 'm':
-            payload[0] = comm[0];
-            payload[1] = comm[1];
-            Serial.println((char*)payload);
-            sendMessage(3);
-            break;
-        }
-        break;
+    jsonoutput = false;
+    switch(inmess[0]){
+    case 'w': //Messages meant for the coordinator
+      switch(inmess[1]){
+        case 's': //The message contains a full state
+          //Right now not checking the packet properties
+          memset(payload, 0, sizeof(payload));
+          for(int i = 0; i < 6; i++){
+            payload[i] = inmess[i+2];
+          }
+          sendMessage(2);
+          break;
+        case 'q':
+          if(debug){
+            SerialUSB.println("Requesting Coordinator State...");
+          }
+          sendMessage(1);
+          break;
       }
-      
+      break;
+    case '!': //Messages meant for this 
+      switch(inmess[1]){
+        case 'l':
+          if(ledinterval == 500000)
+            ledinterval = 100000;
+          else
+            ledinterval = 500000;
+          break;
+        case 'v':
+          debug = !debug;
+          break;  
+      }
+      break;
   }
-  */
-  /*
-  Serial.print("Command Received: ");
-  Serial.println(comm);
-  if(comm[0] == 'w'){
-    for(int i = 0; i < 5; i++){
-      Serial.print(i);
-      Serial.print(": ");
-      Serial.println(indata[i]);
-    }
   }
-  */
 }
 
 
@@ -249,7 +219,10 @@ void sendState(){
   memset(payload,0,sizeof(payload));
   memcpy(&payload, &servovals, sizeof(servovals));
   payload[5] = config_byte;
-  
+  if(debug){
+    SerialUSB.println("Packet Being Sent to Coordinator: ");
+    SerialUSB.println((char*)payload);
+  }
   sendMessage(2);
 }
 
@@ -283,27 +256,47 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
   }
   //Assign a pointer to received message data
   rec_message = (uint8_t*) ind->data;
-  
-  StaticJsonBuffer<bufferSize> jsonBuffer;
-  JsonObject& root = jsonBuffer.createObject();
-  JsonArray& power = root.createNestedArray("power");
-  power.add((bool)(rec_message[5] & 0x04));
-  power.add((bool)(rec_message[5] & 0x02));
-  JsonArray& motorVals = root.createNestedArray("motorvals");
-  JsonArray&      vbus = root.createNestedArray("vbus");
-  JsonArray&    vshunt = root.createNestedArray("vshunt");
-  for(int i = 0; i < 5; i++){
-    motorVals.add(rec_message[i]);
-    vbus.add(((rec_message[i*2+16] << 8) | rec_message[i*2+17]));
-    vshunt.add(((rec_message[i*2+6] << 8) | rec_message[i*2+7]));
-  }
-  JsonArray& soc = root.createNestedArray("soc");
-  soc.add(((rec_message[26]<<8) | rec_message[27]));
-  soc.add(((rec_message[28]<<8) | rec_message[29]));
 
-  root.printTo(BUFFER,sizeof(BUFFER));
-  Serial.write(BUFFER);
-  
+  if(jsonoutput){
+    StaticJsonBuffer<bufferSize> jsonBuffer;
+    JsonObject& root = jsonBuffer.createObject();
+    JsonArray& power = root.createNestedArray("power");
+    power.add((bool)(rec_message[5] & 0x04));
+    power.add((bool)(rec_message[5] & 0x02));
+    JsonArray& motorVals = root.createNestedArray("motorvals");
+    JsonArray&      vbus = root.createNestedArray("vbus");
+    JsonArray&    vshunt = root.createNestedArray("vshunt");
+    for(int i = 0; i < 5; i++){
+      motorVals.add(rec_message[i]);
+      vbus.add(((rec_message[i*2+16] << 8) | rec_message[i*2+17]));
+      vshunt.add(((rec_message[i*2+6] << 8) | rec_message[i*2+7]));
+    }
+    JsonArray& soc = root.createNestedArray("soc");
+    soc.add(((rec_message[26]<<8) | rec_message[27]));
+    soc.add(((rec_message[28]<<8) | rec_message[29]));
+
+    if((bool)(rec_message[5] & 0x08)){
+      JsonObject& imu = root.createNestedObject("imu");
+      JsonArray& accelerometer = imu.createNestedArray("acc");
+      JsonArray& magnetometer = imu.createNestedArray("mag");
+      JsonArray& gyroscope = imu.createNestedArray("gyro");
+    
+      for(int i = 0; i < 3; i++){
+        gyroscope.add((rec_message[30+i*2]<<8)|rec_message[31+i*2]);
+        accelerometer.add((rec_message[36+i*2]<<8)|rec_message[37+i*2]);
+        magnetometer.add((rec_message[42+i*2]<<8)|rec_message[43+i*2]);
+      }
+    }
+    else{
+      root["imu"] = false;
+    }
+    root.printTo(BUFFER,sizeof(BUFFER));
+    Serial.write(BUFFER);
+  }
+  else{
+    Serial.write((char*)rec_message);
+  }
+    
   Serial.write("\n");
   
   //More debug

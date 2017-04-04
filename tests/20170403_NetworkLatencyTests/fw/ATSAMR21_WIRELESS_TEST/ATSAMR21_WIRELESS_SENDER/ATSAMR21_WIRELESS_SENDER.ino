@@ -24,7 +24,7 @@ static bool echoBack(NWK_DataInd_t *ind);
 
 //1 is Receiver
 //2 is Sender
-int meshAddress = 1;
+int meshAddress = 2;
 
 int curloc = 0;
 //Static data packet types (prevents memory leak)
@@ -37,13 +37,18 @@ uint8_t* rec_message;
 byte pingCounter = 0;
 
 boolean ledstatus = true; //for debug
-boolean debugmode = true;
-long curtime = 0;
-long ledupdatetime = 0;
-long servoupdatetime = 0;
-long currentreadtime = 0;
+boolean debugmode = false;
+unsigned long curtime = 0;
+unsigned long pingtime = 0;
+
+unsigned long pinginterval = 10;
+
+unsigned long timepingsent, timepingrec;
+unsigned long count;
 
 uint8_t payload[9];
+
+bool waitingForPing = false;
 
 
 void setup() {
@@ -72,19 +77,40 @@ void setup() {
   NWK_SetPanId(0x01);
   PHY_SetChannel(0x1a);
   PHY_SetRxState(true);
-  NWK_OpenEndpoint(1, echoBack);
+  NWK_OpenEndpoint(1, printMessage);
 
+  count = 0;
+  waitingForPing = false;
 }
 
 void loop() {
   SYS_TaskHandler();
+  
+  curtime = millis();
+  if(curtime - pingtime > pinginterval && !waitingForPing){
+    pingtime = curtime;
+    waitingForPing = true;
+    payload[0] = 'p';
+    payload[1] = (count >> 24) & 0xFF;
+    payload[2] = (count >> 16) & 0xFF;
+    payload[3] = (count >>  8) & 0xFF;
+    payload[4] =       (count) & 0xFF; 
+    //timestamp current time
+    timepingsent = micros();
+    sendMessage();
+    count++;
+  }
+  if(curtime - pingtime > pinginterval * 10){
+    waitingForPing = false;
+  }
+  
 }
 
 void parseMessage(char *data){
 }
 
 static void sendMessage(void) {
-  nwkDataReq.dstAddr = 2;
+  nwkDataReq.dstAddr = 1;
   nwkDataReq.dstEndpoint = 1;
   nwkDataReq.srcEndpoint = 1;
   nwkDataReq.options = 0;
@@ -109,9 +135,11 @@ static void appDataConf(NWK_DataReq_t *req){
   }
 }
 
-static bool echoBack(NWK_DataInd_t *ind) {
+static bool printMessage(NWK_DataInd_t *ind) {
+  timepingrec = micros();
+  waitingForPing = false;
   if(debugmode){
-    Serial.print("Status Request Received...");
+    Serial.print("Response Packet Received...");
     Serial.print("lqi: ");
     Serial.print(ind->lqi, DEC);
   
@@ -121,11 +149,15 @@ static bool echoBack(NWK_DataInd_t *ind) {
     Serial.print(ind->rssi, DEC);
     Serial.print("  ");
   }
+  
   rec_message = (uint8_t *) ind->data;
-  memcpy(payload, rec_message, sizeof(payload));
   
+  if(rec_message[0] == 'e'){
+    count = (rec_message[1]<<24) & (rec_message[2]<<16) & (rec_message[3]<<8) & rec_message[4];
+  }
   
-  sendMessage();
+  //Serial.print("Network latency: ");
+  Serial.println(timepingrec-timepingsent);
 
   return true;
 }

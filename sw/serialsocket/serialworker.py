@@ -7,7 +7,7 @@ SERIAL_PORT = '/dev/ttyACM0'
 SERIAL_BAUDRATE = 115200
 
 class SerialProcess(multiprocessing.Process):
- 
+
     def __init__(self, input_queue, output_queue):
         multiprocessing.Process.__init__(self)
         self.input_queue = input_queue
@@ -16,7 +16,7 @@ class SerialProcess(multiprocessing.Process):
         self.sp.port = SERIAL_PORT
         self.sp.baudrate = SERIAL_BAUDRATE
         self.portOpen = False
- 
+
     def open(self):
         self.portOpen = True
         self.sp.open()
@@ -24,14 +24,14 @@ class SerialProcess(multiprocessing.Process):
     def close(self):
         self.portOpen = False
         self.sp.close()
- 
+
     def writeSerial(self, data):
         self.sp.write(data)
         # time.sleep(1)
-        
+
     def readSerial(self):
         return self.sp.readline().replace("\n", "")
-    
+
     def set(self,port,baudrate):
         self.sp.port = port
         self.sp.baudrate = baudrate
@@ -39,7 +39,7 @@ class SerialProcess(multiprocessing.Process):
     def run(self):
         if self.portOpen:
             self.sp.flushInput()
-            
+
             while True:
                 # look for incoming tornado request
                 if not self.input_queue.empty():
@@ -47,10 +47,15 @@ class SerialProcess(multiprocessing.Process):
                     # send it to the serial device
                     self.writeSerial(data)
                     print "writing to serial: " + data
-     
+
                 # look for incoming serial data
                 if (self.sp.inWaiting() > 0):
                     data = self.readSerial()
                     print "reading from serial: " + data
                     # send it back to tornado
-                    self.output_queue.put(data)
+                    if(data[0] == '!'): #it's a local message, between bridge and WSS host.
+                        if(data[1] == 'p'):
+                            outmsg = bytearray([ord('e'),59])
+                            self.input_queue.put(outmsg)
+                    else:
+                        self.output_queue.put(data)

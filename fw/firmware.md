@@ -38,7 +38,7 @@ The command byte can be only `s` right now, which means the entire robot state i
 
 The format for the coordinator write state packet is as follows:
 
-`[header][5 motorval bytes][1 config byte]`
+`[header][5 motorval bytes][1 config byte][EOL]`
  * *code:* currently, 'ws' is the only option. (Stands for write state)
  * *motorval bytes:* each byte is in order of  
 
@@ -56,6 +56,7 @@ The format for the coordinator write state packet is as follows:
 
  * *config byte:* The byte is the union of 3 booleans: top power state, bot power state, and stream state (room for 5 more!) Currently the register config is:
     `00000 | Top Power | Bot Power | Stream State`
+ * *EOL:* Stands for End of Line, in this case it's a semicolon `;`
 
 ### Response Packet
 
@@ -75,7 +76,7 @@ Locomotion through the lattice occurs by moving MOJO through a set of 6 discrete
     | Outer  | [ 40,184] | [ 40, 80] |
     | Middle | [ 40,200] | [ 80,178] |
     | Inner  | [ 40,220] | [190,220] |
-    HIP HIP HIP
+    HIP HIP HIP - 180
 
 The `retracted` state refers to when the arms are not in contact with the lattice, the `extended` state refers to when the arms are gripping the lattice.
 
