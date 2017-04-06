@@ -15,4 +15,4 @@ This set of tests is designed to ascertain the maximum data bandwidth/latency of
 The variables we have to play with are:
  * WSS Host update period (given in milliseconds)
  * USB Bridge send period (ms as well)
- * 
+ *

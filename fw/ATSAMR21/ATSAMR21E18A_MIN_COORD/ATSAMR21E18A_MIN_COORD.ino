@@ -63,14 +63,14 @@ int meshAddress = 1;
 
 //0x01 default
 //0x02 alternate
-int panID = 0x02;
+int panID = 0x01;
 
 //Static data packet types (prevents memory leak)
 //LWM data request struct
 static NWK_DataReq_t nwkDataReq;
 
 //Payload array (30 byte limit right now)
-static uint8_t payload[50];
+static uint8_t payload[60];
 static uint8_t indata[5];
                                  
 static uint8_t servovals[5];
@@ -84,8 +84,8 @@ boolean ledstatus = true; //for debug
 boolean currentping = false;
 boolean imu_works = true;
 
-boolean top_servopower = true;
-boolean bot_servopower = true;
+boolean top_servopower = false;
+boolean bot_servopower = false;
 
 /* TIMING VARIABLES
  *  
@@ -108,6 +108,7 @@ uint8_t top_servo_ctrlr = 0x04;
 uint8_t bot_servo_ctrlr = 0x05;
 
 uint16_t vshunts[6], vbuses[6], socs[2];
+uint32_t topstamp, botstamp;
 
 
 
@@ -166,6 +167,8 @@ void setup() {
   servovals[3] = 184;
   servovals[4] = 180;
 
+  topstamp = 0;
+  botstamp = 0;
 }
 
 void loop() {
@@ -268,8 +271,9 @@ void printSensorValues(){
 
 void readSensorValues(){
   sensorreadtime = curtime;
-  Wire.requestFrom(top_servo_ctrlr,14);
+  Wire.requestFrom(top_servo_ctrlr,18);
   //if(Wire.available()){
+    topstamp = ((Wire.read() << 24) | (Wire.read() << 16) | (Wire.read() << 8) | (Wire.read()));
     for(int i = 0; i < 3; i++){
       vshunts[i] = ((Wire.read() << 8) | Wire.read());
     }
@@ -278,8 +282,9 @@ void readSensorValues(){
     }
     socs[0] = ((Wire.read() << 8) | Wire.read());
   //}
-  Wire.requestFrom(bot_servo_ctrlr,14);
+  Wire.requestFrom(bot_servo_ctrlr,18);
   //if(Wire.available()){
+    botstamp = ((Wire.read() << 24) | (Wire.read() << 16) | (Wire.read() << 8) | (Wire.read()));
     for(int i = 0; i < 3; i++){
       vshunts[i+3] = ((Wire.read() << 8) | Wire.read());
     }
@@ -354,48 +359,58 @@ static bool sendStatus(NWK_DataInd_t *ind) {
 void sendStatusMessage(){
   
   memset(payload,0,sizeof(payload));
+  
+  payload[0] = (topstamp >> 24) & 0xFF;
+  payload[1] = (topstamp >> 16) & 0xFF;
+  payload[2] = (topstamp >> 8) & 0xFF;
+  payload[3] = topstamp & 0xFF;
+  
+  payload[4] = (botstamp >> 24) & 0xFF;
+  payload[5] = (botstamp >> 16) & 0xFF;
+  payload[6] = (botstamp >> 8) & 0xFF;
+  payload[7] = botstamp & 0xFF;
   //populating the configuration register
-  payload[5] = (imu_works << 3) | (top_servopower << 2) | (bot_servopower << 1); 
+  payload[13] = (imu_works << 3) | (top_servopower << 2) | (bot_servopower << 1); 
   //populating the servoval and current sensor registers
   for(int i = 0; i < 5; i++){ //The third channel of the bottom should be unused
-    payload[i] = servovals[i];
-    payload[i*2+6] = (vshunts[i]>>8) & 0xFF;
-    payload[i*2+7] = (vshunts[i]) & 0xFF;
-    payload[i*2+16] = (vbuses[i]>>8) & 0xFF;
-    payload[i*2+17] = (vbuses[i]) & 0xFF;
+    payload[i+8] = servovals[i];
+    payload[i*2+14] = (vshunts[i]>>8) & 0xFF;
+    payload[i*2+15] = (vshunts[i]) & 0xFF;
+    payload[i*2+24] = (vbuses[i]>>8) & 0xFF;
+    payload[i*2+25] = (vbuses[i]) & 0xFF;
   }
   //populating the state of charge registers
-  payload[26] = (socs[0]>>8)&0xFF;
-  payload[27] = (socs[0] & 0xFF);
-  payload[28] = (socs[1]>>8)&0xFF;
-  payload[29] = (socs[1] & 0xFF);
+  payload[34] = (socs[0]>>8)&0xFF;
+  payload[35] = (socs[0] & 0xFF);
+  payload[36] = (socs[1]>>8)&0xFF;
+  payload[37] = (socs[1] & 0xFF);
 
   if(imu_works){
     //populating the IMU register
     
     //the gyroscope
-    payload[30] = (imu.gx>>8)&0xFF;
-    payload[31] = (imu.gx)&0xFF;
-    payload[32] = (imu.gy>>8)&0xFF;
-    payload[33] = (imu.gy)&0xFF;
-    payload[34] = (imu.gz>>8)&0xFF;
-    payload[35] = (imu.gz)&0xFF;
+    payload[38] = (imu.gx>>8)&0xFF;
+    payload[39] = (imu.gx)&0xFF;
+    payload[40] = (imu.gy>>8)&0xFF;
+    payload[41] = (imu.gy)&0xFF;
+    payload[42] = (imu.gz>>8)&0xFF;
+    payload[43] = (imu.gz)&0xFF;
     
     //accelerometer
-    payload[36] = (imu.ax>>8)&0xFF;
-    payload[37] = (imu.ax)&0xFF;
-    payload[38] = (imu.ay>>8)&0xFF;
-    payload[39] = (imu.ay)&0xFF;
-    payload[40] = (imu.az>>8)&0xFF;
-    payload[41] = (imu.az)&0xFF;
+    payload[44] = (imu.ax>>8)&0xFF;
+    payload[45] = (imu.ax)&0xFF;
+    payload[46] = (imu.ay>>8)&0xFF;
+    payload[47] = (imu.ay)&0xFF;
+    payload[48] = (imu.az>>8)&0xFF;
+    payload[49] = (imu.az)&0xFF;
     
     //magnetometer
-    payload[42] = (imu.mx>>8)&0xFF;
-    payload[43] = (imu.mx)&0xFF;
-    payload[44] = (imu.my>>8)&0xFF;
-    payload[45] = (imu.my)&0xFF;
-    payload[46] = (imu.mz>>8)&0xFF;
-    payload[47] = (imu.mz)&0xFF;
+    payload[50] = (imu.mx>>8)&0xFF;
+    payload[51] = (imu.mx)&0xFF;
+    payload[52] = (imu.my>>8)&0xFF;
+    payload[53] = (imu.my)&0xFF;
+    payload[54] = (imu.mz>>8)&0xFF;
+    payload[55] = (imu.mz)&0xFF;
   }
   sendMessage();
 }

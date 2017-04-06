@@ -25,33 +25,34 @@ var name = 'WebSocket serial (Python)'
 // initialization
 //
 var init = function() {
-   mod.address.value = '127.0.0.1'
-   mod.port.value = 8080
-   mod.device = ''
-   mod.baud.value = 115200
-   mod.flow_rtscts.checked = false
-   mod.socket = null
-   }
+    mod.address.value = '127.0.0.1'
+    mod.port.value = 8080
+    mod.device = ''
+    mod.baud.value = 115200
+    mod.flow_rtscts.checked = false
+    mod.socket = null
+    mod.verbose = false
+    }
 //
 // inputs
 //
 var inputs = {
-   transmit:{type:'string',
-      event:function(evt){
-         serial_send_string(evt.detail)
-         }
-      }
-   }
+    transmit:{type:'MOJOState',
+        event:function(evt){
+            serial_send_state(evt.detail)
+        }
+    }
+}
 //
 // outputs
 //
 var outputs = {
-   receive:{type:'string',
-      event:function(str){
-         mods.output(mod,'receive',str)
-         }
-      }
-   }
+    receive:{type:'string',
+        event:function(str){
+            mods.output(mod,'receive',str)
+            }
+    }
+}
 //
 
 //
@@ -234,6 +235,8 @@ var interface = function(div){
             })
     div.appendChild(btn)
     div.appendChild(document.createElement('br'))
+
+
     //
     // file button
     //
@@ -262,6 +265,16 @@ var interface = function(div){
                 }
             })
     div.appendChild(btn)
+    div.appendChild(document.createElement('br'))
+    var chkbox = document.createElement("input")
+      chkbox.setAttribute("type","checkbox")
+      chkbox.label = "Debug Output"
+      chkbox.addEventListener('change',
+          function(){
+              mod.verbose = chkbox.checked
+          })
+    div.appendChild(chkbox)
+    div.appendChild(document.createTextNode("Debug Output"))
     }
 //
 // local functions
@@ -290,11 +303,15 @@ function parseMessage(event){
                 mod.socket.send(JSON.stringify(outmsg))
             }
             else{
-                console.log("does not have commands")
+              if(mod.verbose){
+                  console.log("does not have commands")
+              }
             }
         }
         catch(e){
-            console.log("JSON Parse of event data failed.")
+            if(mod.verbose){
+                console.log("JSON Parse of event data failed.")
+            }
         }
     }
 }
@@ -304,11 +321,12 @@ function socket_open() {
     mod.socket = new WebSocket(url)
     mod.socket.onopen = function(event) {
         mod.status.value = "socket opened"
-        //serial_open()
     }
     mod.socket.onerror = function(event) {
         mod.status.value = "cannot open"
-        console.log(event)
+        if(mod.verbose){
+            console.log(event)
+        }
         mod.socket = null
     }
     mod.socket.onmessage = function(event){
@@ -363,14 +381,33 @@ function serial_close() {
     }
 }
 
-function serial_send_string(str) {
+function serial_send_state(str) {
     if (mod.socket == null) {
         mod.status.value = "socket not open"
     }
     else {
-        msg = JSON.parse(str)
-        msg.command = "data"
-        mod.socket.send(JSON.stringify(msg))
+        try{
+            msg = JSON.parse(str)
+            if(!("motorvals" in msg || "status" in msg) ){
+                throw NotMOJOState
+            }
+            msg.command = "state"
+            mod.socket.send(JSON.stringify(msg))
+        }
+        catch (exception){
+            if(exception == SyntaxError){
+                if(mod.verbose){
+                    console.log("That wasn't a properly formed JSON string")
+                }
+                mod.status.value = "Not JSON"
+            }
+            else if (exception == NotMOJOState) {
+                if(mod.verbose){
+                    console.log("That was JSON but not a MOJO State")
+                }
+                mod.status.value = "Not MOJO State"
+            }
+        }
     }
 }
 

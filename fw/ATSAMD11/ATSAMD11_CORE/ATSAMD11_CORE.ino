@@ -4,6 +4,18 @@
 #include <INA3221.h>
 #include <max1720x.h>
 
+//System wide defines
+//Sets whether serial will get used (for debug)
+#if defined(ARDUINO_CDC_ONLY) || defined(ARDUINO_CDC_HID_UART) || defined(ARDUINO_CDC_UART) ||  defined(ARDUINO_CDC_MIDI_HID_UART) || defined(ARDUINO_CDC_MSD_HID_UART) || defined(ARDUINO_CDC_MSD_MIDI_HID_UART)
+  #define DEBUG_SERIAL
+#endif
+
+#define MOJORTC
+
+#ifdef MOJORTC
+  #include <RTC_CSL.h>
+#endif
+
 //Flag for if this board is closest to the main processor (top) (also controls hip)
 bool topServoset = true;
 
@@ -16,7 +28,7 @@ uint8_t servoVals[3] = {128,128,180};
 uint8_t BUFFER[255];
 uint8_t bufferSize;
 
-uint8_t msgout[255];
+uint8_t msgout[20];
 
 //Initialize the I2C bus that communicates with the Coordinator
 TwoWire subComms(&sercom0,14,15);
@@ -25,7 +37,11 @@ TwoWire subComms(&sercom0,14,15);
 INA3221 curSensor(0x43);
 //Initialize a battery sensor object
 MAX1720x batSensor;
-
+//Initialize an RTC Counter
+#ifdef MOJORTC
+  RTC_CSL rtc;
+#endif
+  unsigned long curcount;
 unsigned long curTime;
 unsigned long servoUpdateTime, sensorUpdateTime;
 
@@ -41,17 +57,15 @@ uint16_t vshunts[3];
 uint16_t vbuses[3];
 uint16_t soc;
 
-//Sets whether serial will get used (for debug)
-#if defined(ARDUINO_CDC_ONLY) || defined(ARDUINO_CDC_HID_UART) || defined(ARDUINO_CDC_UART) ||  defined(ARDUINO_CDC_MIDI_HID_UART) || defined(ARDUINO_CDC_MSD_HID_UART) || defined(ARDUINO_CDC_MSD_MIDI_HID_UART)
-  #define DEBUG_SERIAL
-#endif
+
 
 void setup() {
   servoUpdateInterval = 10000; //microseconds
   sensorUpdateInterval = 10000; //microseconds
   // put your setup code here, to run once:
 #ifdef DEBUG_SERIAL
-    SerialUSB.begin(9600);
+    SerialUSB.begin(9600);    
+    servoPower = true;
 #endif
 
   if(topServoset)
@@ -76,6 +90,10 @@ void setup() {
   //initialize sensors
   curSensor.init();
   batSensor.reset();
+#ifdef MOJORTC
+  rtc.begin();
+#endif
+  curcount = 0;
 }
 
 void loop() {
@@ -88,7 +106,11 @@ void loop() {
     digitalWrite(servoPowerPin, servoPower);
   }
   if(curTime - sensorUpdateTime > sensorUpdateInterval){
-    sensorUpdateTime = curTime;
+    sensorUpdateTime = curTime;  
+    //get timestamp
+#ifdef MOJORTC
+    curcount = rtc.getCount();
+#endif
     updateSensors();
   }
 }
@@ -136,17 +158,23 @@ void parseBuffer(){
 
 void requestEvent(){
   memset(msgout,0,sizeof(msgout));
-  for(int i = 0; i < 3; i++){
-    msgout[i*2] = (vshunts[i]>>8) & 0xFF;
-    msgout[i*2+1] = (vshunts[i]) & 0xFF;
-    msgout[i*2+6] = (vbuses[i]>>8) & 0xFF;
-    msgout[i*2+7] = (vbuses[i]) & 0xFF;
-  }
-  msgout[12] = (soc>>8)&0xFF;
-  msgout[13] = (soc & 0xFF);
-
-  subComms.write(msgout,14);
   
+  msgout[0] = (curcount>>24) & 0xFF;
+  msgout[1] = (curcount>>16) & 0xFF;
+  msgout[2] = (curcount>>8) & 0xFF;
+  msgout[3] = curcount & 0xFF;
+  
+  for(int i = 0; i < 3; i++){
+    msgout[i*2+4] = (vshunts[i]>>8) & 0xFF;
+    msgout[i*2+5] = (vshunts[i]) & 0xFF;
+    msgout[i*2+10] = (vbuses[i]>>8) & 0xFF;
+    msgout[i*2+11] = (vbuses[i]) & 0xFF;
+  }
+  
+  msgout[16] = (soc>>8)&0xFF;
+  msgout[17] = (soc & 0xFF);
+
+  subComms.write(msgout,18);
 }
 
 void updateSensors(){
@@ -156,6 +184,8 @@ void updateSensors(){
   }    
   soc = batSensor.getSOC();
 #ifdef DEBUG_SERIAL
+  SerialUSB.print("Current Count: ");
+  SerialUSB.print(curcount);
   SerialUSB.println("INA3221:");
   for(int i = 0; i < 3; i++){
     SerialUSB.print("\tChannel ");

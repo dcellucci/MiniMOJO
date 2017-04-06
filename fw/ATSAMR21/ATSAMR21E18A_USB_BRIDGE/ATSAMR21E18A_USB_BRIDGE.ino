@@ -294,7 +294,12 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
     Serial.write(BUFFER);
   }
   else{
-    Serial.write((char*)rec_message);
+    memset(BUFFER, 0, sizeof(BUFFER));
+    BUFFER[0] = 'd';
+    for(int i = 0; i < ind->size; i++){
+      BUFFER[i+1] = rec_message[i];
+    }
+    Serial.write(BUFFER);
   }
     
   Serial.write("\n");

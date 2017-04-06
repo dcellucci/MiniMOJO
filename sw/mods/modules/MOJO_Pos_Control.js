@@ -1,10 +1,10 @@
 // MOJO Motor Control
 //
-// 
-// This work may be reproduced, modified, distributed, performed, and 
+//
+// This work may be reproduced, modified, distributed, performed, and
 // displayed for any purpose, but must acknowledge the mods
-// project. Copyright is retained and must be preserved. The work is 
-// provided as is; no warranty is provided, and users accept all 
+// project. Copyright is retained and must be preserved. The work is
+// provided as is; no warranty is provided, and users accept all
 // liability.
 //
 // closure
@@ -42,43 +42,49 @@ var name = 'MOJO Position Control'
 //
 // initialization
 //
-var init = function() {   
-    
+var init = function() {
+
     }
-    
+
 //
 // inputs
 //
 var inputs = {
-   frameList:{
-      type:'framelist',
-      event:function(evt){
-         var input = JSON.parse(evt.detail)
-         mod.motorVals = [-1,-1,-1,-1,-1]
-         if(topFrame in input){
-            if(mod.curTopPos != -1)
-               mod.topPos[mod.curTopPos].style.backgroundColor = 'transparent'
-            mod.topPos[val].style.backgroundColor = 'red'
-            mod.motorVals[0] = mod.posVals[val][0]
-            mod.motorVals[1] = mod.posVals[val][1]
+    frameList:{
+        type:'framelist',
+        event:function(evt){
+            var input = JSON.parse(evt.detail)
+            mod.motorVals = [-1,-1,-1,-1,-1]
+            if("topFrame" in input){
+                val = input.topFrame
+                if(mod.curTopPos != -1)
+                    mod.topPos[mod.curTopPos].style.backgroundColor = 'transparent'
+                mod.topPos[val].style.backgroundColor = 'red'
+                mod.curTopPos = val
+                mod.motorVals[0] = mod.posVals[val][0]
+                mod.motorVals[1] = mod.posVals[val][1]
             }
-         if(botFrame in input){
-            if(mod.curBotPos != -1)
-               mod.topPos[mod.curTopPos].style.backgroundColor = 'transparent'
-            mod.topPos[val].style.backgroundColor = 'red'
-            mod.motorVals[2] = mod.posVals[val][0]
-            mod.motorVals[3] = mod.posVals[val][1]
+            if("botFrame" in input){
+                val = input.botFrame
+                if(mod.curBotPos != -1)
+                    mod.botPos[mod.curBotPos].style.backgroundColor = 'transparent'
+                mod.botPos[val].style.backgroundColor = 'red'
+                mod.curBotPos = val
+                mod.motorVals[2] = mod.posVals[val][0]
+                mod.motorVals[3] = mod.posVals[val][1]
             }
-         if(hipFrame in input){
-            if(mod.curHipPos != -1)
-               mod.topPos[mod.curTopPos].style.backgroundColor = 'transparent'
-            mod.topPos[val].style.backgroundColor = 'red'
-            mod.motorVals[4] = mod.posVals[val]
+            if("hipFrame" in input){
+                val = input.hipFrame
+                if(mod.curHipPos != -1)
+                    mod.hipPos[mod.curHipPos].style.backgroundColor = 'transparent'
+                mod.hipPos[val].style.backgroundColor = 'red'
+                mod.curHipPos = val
+                mod.motorVals[4] = mod.posVals[val]
             }
-         outputs.motorVals.event()
-         }
-      }
-   }
+            outputs.motorVals.event()
+        }
+    }
+}
 //
 // outputs
 //
@@ -98,7 +104,21 @@ var outputs = {
 
 
 var interface = function(div){
-   mod.div = div///*
+    mod.div = div///*
+
+    var btn = document.createElement('button')
+        btn.style.margin = 1
+        btn.appendChild(document.createTextNode('init'))
+        btn.addEventListener('click', function(event){
+            goTopMOJO('mr')
+            goBotMOJO('mr')
+            goHipMOJO('st')
+            goCurMOJO()
+            outputs.motorVals.event()
+        })
+   div.appendChild(btn)
+
+   div.appendChild(document.createElement('br'))
 
    div.appendChild(document.createTextNode('Top: '))
       var toptable = document.createElement('table')
@@ -107,8 +127,11 @@ var interface = function(div){
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('or'))
-                  btn.addEventListener('click', function(event){
-                        goTopMOJO('or')})
+                  btn.addEventListener('click',
+                      function(event){
+                          goTopMOJO('or')
+                          outputs.motorVals.event()
+                      })
             ttdor.appendChild(btn)
             mod.topPos.or = ttdor
          tr.appendChild(ttdor)
@@ -116,8 +139,11 @@ var interface = function(div){
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('oe'))
-                  btn.addEventListener('click', function(event){
-                        goTopMOJO('oe')})
+                  btn.addEventListener('click',
+                      function(event){
+                          goTopMOJO('oe')
+                          outputs.motorVals.event()
+                      })
             ttdoe.appendChild(btn)
             mod.topPos.oe = ttdoe
          tr.appendChild(ttdoe)
@@ -127,8 +153,11 @@ var interface = function(div){
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('mr'))
-                  btn.addEventListener('click', function(event){
-                        goTopMOJO('mr')})
+                  btn.addEventListener('click',
+                      function(event){
+                          goTopMOJO('mr')
+                          outputs.motorVals.event()
+                      })
             ttdmr.appendChild(btn)
             mod.topPos.mr = ttdmr
          tr.appendChild(ttdmr)
@@ -136,8 +165,11 @@ var interface = function(div){
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('me'))
-                  btn.addEventListener('click', function(event){
-                        goTopMOJO('me')})
+                  btn.addEventListener('click',
+                      function(event){
+                          goTopMOJO('me')
+                          outputs.motorVals.event()
+                      })
             ttdme.appendChild(btn)
             mod.topPos.me = ttdme
          tr.appendChild(ttdme)
@@ -147,8 +179,11 @@ var interface = function(div){
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('ir'))
-                  btn.addEventListener('click',function(event){
-                        goTopMOJO('ir')})
+                  btn.addEventListener('click',
+                      function(event){
+                          goTopMOJO('ir')
+                          outputs.motorVals.event()
+                      })
             ttdir.appendChild(btn)
             mod.topPos.ir = ttdir
          tr.appendChild(ttdir)
@@ -156,8 +191,11 @@ var interface = function(div){
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('ie'))
-                  btn.addEventListener('click', function(event){
-                        goTopMOJO('ie')})
+                  btn.addEventListener('click',
+                      function(event){
+                          goTopMOJO('ie')
+                          outputs.motorVals.event()
+                      })
             ttdie.appendChild(btn)
             mod.topPos.ie = ttdie
          tr.appendChild(ttdie)
@@ -165,19 +203,21 @@ var interface = function(div){
    div.appendChild(toptable)
 
    div.appendChild(document.createElement('br'))
-   
+
    div.appendChild(document.createTextNode('Hip: '))
-   
-   
+
+
       var toptable = document.createElement('table')
          var tr = document.createElement('tr')
             var htdst = document.createElement('td')
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('straight'))
-                  btn.addEventListener('click', function(event){  
-                     goHipMOJO('st')
-                  })
+                  btn.addEventListener('click',
+                      function(event){
+                          goHipMOJO('st')
+                          outputs.motorVals.event()
+                      })
             htdst.appendChild(btn)
             mod.hipPos.st = htdst
          tr.appendChild(htdst)
@@ -185,15 +225,17 @@ var interface = function(div){
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('bent'))
-                  btn.addEventListener('click', function(event){  
-                     goHipMOJO('bt')
-                  })
+                  btn.addEventListener('click',
+                      function(event){
+                          goHipMOJO('bt')
+                          outputs.motorVals.event()
+                      })
             htdbt.appendChild(btn)
             mod.hipPos.bt = htdbt
          tr.appendChild(htdbt)
       toptable.appendChild(tr)
    div.appendChild(toptable)
-   
+
    div.appendChild(document.createTextNode('Bot: '))
       var toptable = document.createElement('table')
          var tr = document.createElement('tr')
@@ -201,8 +243,11 @@ var interface = function(div){
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('ir'))
-                  btn.addEventListener('click', function(event){
-                        goBotMOJO('ir')})
+                  btn.addEventListener('click',
+                      function(event){
+                          goBotMOJO('ir')
+                          outputs.motorVals.event()
+                      })
             btdir.appendChild(btn)
             mod.botPos.ir = btdir
          tr.appendChild(btdir)
@@ -210,8 +255,11 @@ var interface = function(div){
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('ie'))
-                  btn.addEventListener('click', function(event){
-                        goBotMOJO('ie')})
+                  btn.addEventListener('click',
+                      function(event){
+                          goBotMOJO('ie')
+                          outputs.motorVals.event()
+                      })
             btdie.appendChild(btn)
             mod.botPos.ie = btdie
          tr.appendChild(btdie)
@@ -221,8 +269,11 @@ var interface = function(div){
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('mr'))
-                  btn.addEventListener('click', function(event){
-                        goBotMOJO('mr')})
+                  btn.addEventListener('click',
+                      function(event){
+                          goBotMOJO('mr')
+                          outputs.motorVals.event()
+                      })
             btdmr.appendChild(btn)
             mod.botPos.mr = btdmr
          tr.appendChild(btdmr)
@@ -230,8 +281,11 @@ var interface = function(div){
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('me'))
-                  btn.addEventListener('click', function(event){
-                        goBotMOJO('me')})
+                  btn.addEventListener('click',
+                      function(event){
+                          goBotMOJO('me')
+                          outputs.motorVals.event()
+                      })
             btdme.appendChild(btn)
             mod.botPos.me = btdme
          tr.appendChild(btdme)
@@ -241,8 +295,11 @@ var interface = function(div){
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('or'))
-                  btn.addEventListener('click',function(event){
-                        goBotMOJO('or')})
+                  btn.addEventListener('click',
+                      function(event){
+                          goBotMOJO('or')
+                          outputs.motorVals.event()
+                      })
             btdor.appendChild(btn)
             mod.botPos.or = btdor
          tr.appendChild(btdor)
@@ -250,8 +307,11 @@ var interface = function(div){
                var btn = document.createElement('button')
                   btn.style.margin = 1
                   btn.appendChild(document.createTextNode('oe'))
-                  btn.addEventListener('click', function(event){
-                        goBotMOJO('oe')})
+                  btn.addEventListener('click',
+                      function(event){
+                          goBotMOJO('oe')
+                          outputs.motorVals.event()
+                      })
             btdoe.appendChild(btn)
             mod.botPos.oe = btdoe
          tr.appendChild(btdoe)
@@ -263,31 +323,31 @@ var interface = function(div){
    var btn = document.createElement('button')
       btn.style.margin = 1
       btn.appendChild(document.createTextNode('send state'))
-      btn.addEventListener('click', function(event){  
+      btn.addEventListener('click', function(event){
          goCurMOJO()
          outputs.motorVals.event()
       })
-   div.appendChild(btn)  
+   div.appendChild(btn)
    }
 
 //
 // local functions
 //
 
-   function goCurMOJO(){
-      if(mod.curTopPos != -1){
-         mod.motorVals[0] = mod.posVals[mod.curTopPos][0]
-         mod.motorVals[1] = mod.posVals[mod.curTopPos][1]
-         }
-      if(mod.curBotPos != -1){
-         mod.motorVals[2] = mod.posVals[mod.curBotPos][0]
-         mod.motorVals[3] = mod.posVals[mod.curBotPos][1]
-         }
-      if(mod.curHipPos != -1){
-         mod.motorVals[4] = mod.posVals[mod.curHipPos]
-         }
-      }
-   
+function goCurMOJO(){
+    if(mod.curTopPos != -1){
+        mod.motorVals[0] = mod.posVals[mod.curTopPos][0]
+        mod.motorVals[1] = mod.posVals[mod.curTopPos][1]
+    }
+    if(mod.curBotPos != -1){
+        mod.motorVals[2] = mod.posVals[mod.curBotPos][0]
+        mod.motorVals[3] = mod.posVals[mod.curBotPos][1]
+    }
+    if(mod.curHipPos != -1){
+        mod.motorVals[4] = mod.posVals[mod.curHipPos]
+    }
+}
+
    function goTopMOJO(val){
       mod.motorVals[0] = mod.posVals[val][0]
       mod.motorVals[1] = mod.posVals[val][1]
@@ -298,7 +358,6 @@ var interface = function(div){
         mod.topPos[mod.curTopPos].style.backgroundColor = 'transparent'
       mod.topPos[val].style.backgroundColor = 'red'
       mod.curTopPos = val
-      outputs.motorVals.event()
    }
 
    function goBotMOJO(val){
@@ -311,9 +370,8 @@ var interface = function(div){
         mod.botPos[mod.curBotPos].style.backgroundColor = 'transparent'
       mod.botPos[val].style.backgroundColor = 'red'
       mod.curBotPos = val
-      outputs.motorVals.event()
    }
-   
+
    function goHipMOJO(val){
       mod.motorVals[4] = mod.posVals[val]
       mod.motorVals[0] = -1
@@ -324,11 +382,10 @@ var interface = function(div){
          mod.hipPos[mod.curHipPos].style.backgroundColor = 'transparent'
       mod.hipPos[val].style.backgroundColor = 'red'
       mod.curHipPos = val
-      outputs.motorVals.event()
    }
 
 
-   
+
 
 //
 // return values
@@ -341,5 +398,3 @@ return ({
    interface:interface
    })
 }())
-
-
