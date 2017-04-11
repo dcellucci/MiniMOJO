@@ -253,6 +253,7 @@ static bool receiveMessage(NWK_DataInd_t *ind) {
     Serial.print("Data: ");
     Serial.println(ind->size);
     Serial.print("message: ");
+    Serial.println((char*)ind->data);
   }
   //Assign a pointer to received message data
   rec_message = (uint8_t*) ind->data;

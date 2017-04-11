@@ -100,7 +100,7 @@ unsigned long nextframetime = 0;
 unsigned long servoUpdateInterval = 10000; //microseconds
 unsigned long sensorUpdateInterval = 10000; //microseconds
 
-
+bool stream = false;
 /*I2C Settings
  * 
  */
@@ -149,7 +149,7 @@ void setup() {
 
   if (!imu.begin())
   {
-    if(debug){
+    if(usingSerial){
       Serial.println("Failed to communicate with LSM9DS1.");
       Serial.println("Double-check wiring.");
       Serial.println("Default settings in this sketch will " \
@@ -229,6 +229,7 @@ void parseCommand(char* comm){
          case 'p':
           top_servopower = !top_servopower;
           bot_servopower = !bot_servopower;
+          stream = true;
           break;
       }
       break;
@@ -267,6 +268,10 @@ void printSensorValues(){
   SerialUSB.println(socs[0]);
   SerialUSB.print("MAX17201 SoC B: ");
   SerialUSB.println(socs[1]);
+  SerialUSB.print("Top Timestamp:");
+  SerialUSB.println(topstamp);
+  SerialUSB.print("Bottom Timestamp:");
+  SerialUSB.println(botstamp);
 }
 
 void readSensorValues(){
@@ -297,6 +302,9 @@ void readSensorValues(){
     imu.readAccel();
     imu.readMag();
     imu.readGyro();
+  }
+  if(stream){
+    printSensorValues();
   }
 }
 

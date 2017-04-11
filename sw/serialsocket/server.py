@@ -182,33 +182,35 @@ def parseOutputMessage(message):
     elif message[0] == 'd':
         if verbose:
             print "it's a data packet."
-        output["command"] = "data"
-        unpkvals = struct.unpack(dataformat,message[1:])
-        output["timestamps"] = unpkvals[0:2]
-        output["motorvals"] = unpkvals[2:7]
-        statusbools = [bool(int(i)) for i in bin(unpkvals[7])[2:].zfill(8)]
-        output["power"] = statusbools[-3:-1]
-        output["sync"] = statusbools[-1]
-        output["vshunts"] = unpkvals[8:13]
-        output["vbuses"] = unpkvals[13:18]
-        output["socs"] = unpkvals[18:20]
-        output["imu"] = {
-            "gyro" : {
-                "x" : unpkvals[20],
-                "y" : unpkvals[21],
-                "z" : unpkvals[22]
+            print "length: %d" % len(message)
+        if (len(message) == 57):
+            output["command"] = "data"
+            unpkvals = struct.unpack(dataformat,message[1:])
+            output["timestamps"] = unpkvals[0:2]
+            output["motorvals"] = unpkvals[2:7]
+            statusbools = [bool(int(i)) for i in bin(unpkvals[7])[2:].zfill(8)]
+            output["power"] = statusbools[-3:-1]
+            output["sync"] = statusbools[-1]
+            output["vshunts"] = unpkvals[8:13]
+            output["vbuses"] = unpkvals[13:18]
+            output["socs"] = unpkvals[18:20]
+            output["imu"] = {
+                "gyro" : {
+                    "x" : unpkvals[20],
+                    "y" : unpkvals[21],
+                    "z" : unpkvals[22]
+                },
+                "acc" : {
+                    "x" : unpkvals[23],
+                    "y" : unpkvals[24],
+                    "z" : unpkvals[25]
+                },
+                "mag" : {
+                    "x" : unpkvals[26],
+                    "y" : unpkvals[27],
+                    "z" : unpkvals[28]
+                }
             }
-            "acc" : {
-                "x" : unpkvals[23],
-                "y" : unpkvals[24],
-                "z" : unpkvals[25]
-            }
-            "mag" : {
-                "x" : unpkvals[26],
-                "y" : unpkvals[27],
-                "z" : unpkvals[28]
-            }
-        }
     else:
         print "Could not parse the command"
 

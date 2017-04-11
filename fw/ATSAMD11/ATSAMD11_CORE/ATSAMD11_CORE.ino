@@ -17,7 +17,7 @@
 #endif
 
 //Flag for if this board is closest to the main processor (top) (also controls hip)
-bool topServoset = true;
+bool topServoset = false;
 
 //Servo Objects
 Servo topServo,botServo,hipServo;
